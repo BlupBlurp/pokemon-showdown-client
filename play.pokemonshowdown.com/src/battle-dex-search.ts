@@ -774,6 +774,7 @@ abstract class BattleTypedSearch<T extends SearchType> {
 		speciesOrSet: ID | Dex.PokemonSet = "" as ID,
 	) {
 		this.searchType = searchType;
+		const fullFormatId = toID(format);
 
 		this.baseResults = null;
 		this.baseIllegalResults = null;
@@ -784,6 +785,13 @@ abstract class BattleTypedSearch<T extends SearchType> {
 			this.dex = Dex.forGen(gen);
 		} else if (!format) {
 			this.dex = Dex;
+		}
+
+		if (
+			fullFormatId.includes("relumi") &&
+			window.BattleTeambuilderTable?.gen8relumi
+		) {
+			this.dex = Dex.mod("gen8relumi" as ID);
 		}
 
 		if (format.startsWith("dlc1") && this.dex.gen === 8) {
