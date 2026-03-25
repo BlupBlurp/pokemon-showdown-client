@@ -1894,23 +1894,23 @@ export class BattleTooltips {
 		// Weather and pseudo-weather type changes.
 		if (move.id === "weatherball" && value.weatherModify(0)) {
 			switch (this.battle.weather) {
-				case "sunnyday":
-				case "desolateland":
-					if (item.id === "utilityumbrella") break;
-					moveType = "Fire";
-					break;
-				case "raindance":
-				case "primordialsea":
-					if (item.id === "utilityumbrella") break;
-					moveType = "Water";
-					break;
-				case "sandstorm":
-					moveType = "Rock";
-					break;
-				case "hail":
-				case "snowscape":
-					moveType = "Ice";
-					break;
+			case "sunnyday":
+			case "desolateland":
+				if (item.id === "utilityumbrella") break;
+				moveType = "Fire";
+				break;
+			case "raindance":
+			case "primordialsea":
+				if (item.id === "utilityumbrella") break;
+				moveType = "Water";
+				break;
+			case "sandstorm":
+				moveType = "Rock";
+				break;
+			case "hail":
+			case "snowscape":
+				moveType = "Ice";
+				break;
 			}
 		}
 		if (move.id === "terrainpulse" && pokemon.isGrounded(serverPokemon)) {
