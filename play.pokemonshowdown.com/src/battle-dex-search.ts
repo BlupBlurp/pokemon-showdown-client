@@ -645,9 +645,11 @@ abstract class BattleTypedSearch<T extends SearchType> {
 			this.dex = Dex;
 		}
 
-		if (format.startsWith('champoins')) {
-			this.formatType = 'champoin';
-			format = format.slice(9) as ID;
+		if (
+			fullFormatId.includes("relumi") &&
+			window.BattleTeambuilderTable?.gen8relumi
+		) {
+			this.dex = Dex.mod("gen8relumi" as ID);
 		}
 
 		if (format.startsWith('champoins')) {
