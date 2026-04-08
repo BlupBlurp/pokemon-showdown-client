@@ -1206,7 +1206,13 @@ export const Dex = new (class implements ModdedDex {
 			});
 		}
 		if (relumiBasename) {
-			return `background:transparent url(${Dex.resourcePrefix}sprites/pokemonicons-relumi/${relumiBasename}.png) no-repeat center center / contain${fainted}`;
+			const relumiIconPath = `${Dex.resourcePrefix}sprites/pokemonicons-relumi/${relumiBasename}.png`;
+			if (relumiBasename.includes("-female")) {
+				const fallbackBasename = relumiBasename.replace("-female", "");
+				const fallbackIconPath = `${Dex.resourcePrefix}sprites/pokemonicons-relumi/${fallbackBasename}.png`;
+				return `background:transparent url(${relumiIconPath}) no-repeat center center / contain, transparent url(${fallbackIconPath}) no-repeat center center / contain${fainted}`;
+			}
+			return `background:transparent url(${relumiIconPath}) no-repeat center center / contain${fainted}`;
 		}
 
 		let num = this.getPokemonIconNum(id, pokemon?.gender === "F", facingLeft);
