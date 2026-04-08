@@ -92,6 +92,9 @@ export class TeamEditorState extends PSModel {
 		this.format = formatid;
 		team.format = formatid;
 		this.dex = Dex.forFormat(formatid);
+		if (formatid.includes('relumi')) {
+			this.dex = Dex.mod('gen8relumi' as ID);
+		}
 		this.gen = this.dex.gen;
 
 		format = toID(format).slice(4);

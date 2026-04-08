@@ -854,7 +854,9 @@ abstract class BattleTypedSearch<T extends SearchType> {
 		if (this.sortRow) {
 			results = [this.sortRow, ...results];
 		}
-		if (illegalResults?.length) {
+		const hideIllegalResultsForRelumi =
+			this.format.includes('relumi') && !this.format.includes('testing');
+		if (illegalResults?.length && !hideIllegalResultsForRelumi) {
 			results = [...results, ['header', "Illegal results"], ...illegalResults];
 		}
 		return results;
@@ -1072,7 +1074,40 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 		if (!format) return this.getDefaultResults();
 		if (format.includes("relumi")) {
 			const isRelumiMainLadder =
-				format === "relumisingles" || format === "relumidoubles";
+				format === "relumisingles" || format === "relumidoubles" ||
+				format.startsWith("relumisingles") || format.startsWith("relumidoubles") ||
+				format.startsWith("gen8relumisingles") || format.startsWith("gen8relumidoubles");
+			const isRelumiUbers = format.includes('ubers');
+			const isRelumiOU = format.includes('ou');
+			const relumiGen9Allowed = new Set([
+				'sprigatito', 'floragato', 'meowscarada',
+				'fuecoco', 'crocalor', 'skeledirge',
+				'quaxly', 'quaxwell', 'quaquaval',
+				'wooperpaldea', 'clodsire',
+				'taurospaldeacombat', 'taurospaldeablaze', 'taurospaldeaaqua',
+				'ursalunabloodmoon', 'farigiraf',
+				'dudunsparce', 'dudunsparcethreesegment',
+				'kingambit', 'annihilape',
+				'dipplin', 'hydrapple', 'archaludon',
+			]);
+			const relumiOUBans = new Set([
+				'mewtwo', 'mewtwoshadow', 'lugia', 'lugiashadow', 'hooh',
+				'kyogre', 'groudon', 'groudonmeta', 'rayquaza', 'rayquazaillusory',
+				'deoxys', 'deoxysattack', 'deoxysdefense', 'deoxysspeed',
+				'dialga', 'palkia', 'giratina', 'giratinaorigin',
+				'regigigas', 'darkrai', 'shayminsky',
+				'arceus', 'arceusbug', 'arceusdark', 'arceusdragon', 'arceuselectric',
+				'arceusfairy', 'arceusfighting', 'arceusfire', 'arceusflying',
+				'arceusghost', 'arceusgrass', 'arceusground', 'arceusice', 'arceuspoison',
+				'arceuspsychic', 'arceusrock', 'arceussteel', 'arceuswater',
+				'reshiram', 'zekrom', 'landorus', 'kyuremblack', 'kyuremwhite',
+				'genesect', 'genesectburn', 'genesectchill', 'genesectdouse', 'genesectshock',
+				'xerneas', 'yveltal', 'zygardecomplete',
+				'solgaleo', 'lunala', 'necrozmadawnwings', 'necrozmaduskmane',
+				'pheromosa', 'magearna', 'magearnaoriginal', 'marshadow', 'naganadel',
+				'zacian', 'zaciancrowned', 'zamazenta', 'zamazentacrowned',
+				'urshifu', 'calyrexice', 'calyrexshadow',
+			]);
 			const pikachuCapFormes = new Set([
 				"Original",
 				"Hoenn",
@@ -1097,6 +1132,12 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 				if (id === "missingno") continue;
 				const species = this.dex.species.get(id);
 				if (!species.exists) continue;
+				const baseSpecies = this.dex.species.get(species.baseSpecies || species.name);
+				const introducedGen = baseSpecies.exists ? baseSpecies.gen : species.gen;
+				if ((isRelumiUbers || isRelumiOU) && introducedGen === 9) {
+					if (!relumiGen9Allowed.has(species.id)) continue;
+				}
+				if (isRelumiOU && relumiOUBans.has(species.id)) continue;
 				const isRevavroomCustomForm =
 					species.baseSpecies === "Revavroom" &&
 					species.id !== "revavroom";
@@ -1128,7 +1169,6 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 				) {
 					continue;
 				}
-				const baseSpecies = this.dex.species.get(species.baseSpecies || species.name);
 				if (
 					species.isNonstandard &&
 					species.isNonstandard !== "Past" &&
@@ -1349,7 +1389,7 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 			'tiershift', 'linked', '4v4doublesuu', 'pokebilitiesaaa',
 		];
 		if (dex.gen >= 6) {
-			if (customBanlists.includes(format) && table.metagameBans?.[format]) {
+			if ((customBanlists.includes(format) || format.includes('relumi')) && table.metagameBans?.[format]) {
 				tierSet = tierSet.filter(([type, id]) => {
 					if (id in table.metagameBans[format]) return false;
 					if (!this.formatType && dex.gen === 9 &&
