@@ -1079,36 +1079,13 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 				format.startsWith("gen8relumisingles") || format.startsWith("gen8relumidoubles");
 			const isRelumiUbers = format.includes('ubers');
 			const isRelumiOU = format.includes('ou');
-			const relumiGen9Allowed = new Set([
-				'sprigatito', 'floragato', 'meowscarada',
-				'fuecoco', 'crocalor', 'skeledirge',
-				'quaxly', 'quaxwell', 'quaquaval',
-				'wooperpaldea', 'clodsire',
-				'taurospaldeacombat', 'taurospaldeablaze', 'taurospaldeaaqua',
-				'ursalunabloodmoon', 'farigiraf',
-				'dudunsparce', 'dudunsparcethreesegment',
-				'kingambit', 'annihilape',
-				'dipplin', 'hydrapple', 'archaludon',
-			]);
-			const relumiOUBans = new Set([
-				'mewtwo', 'mewtwoshadow', 'lugia', 'lugiashadow', 'hooh',
-				'kyogre', 'groudon', 'groudonmeta', 'rayquaza', 'rayquazaillusory',
-				'deoxys', 'deoxysattack', 'deoxysdefense', 'deoxysspeed',
-				'dialga', 'palkia', 'giratina', 'giratinaorigin',
-				'regigigas', 'darkrai', 'shayminsky',
-				'arceus', 'arceusbug', 'arceusdark', 'arceusdragon', 'arceuselectric',
-				'arceusfairy', 'arceusfighting', 'arceusfire', 'arceusflying',
-				'arceusghost', 'arceusgrass', 'arceusground', 'arceusice', 'arceuspoison',
-				'arceuspsychic', 'arceusrock', 'arceussteel', 'arceuswater',
-				'reshiram', 'zekrom', 'landorus', 'kyuremblack', 'kyuremwhite',
-				'genesect', 'genesectburn', 'genesectchill', 'genesectdouse', 'genesectshock',
-				'xerneas', 'yveltal', 'zygardecomplete',
-				'solgaleo', 'lunala', 'necrozmadawnwings', 'necrozmaduskmane',
-				'pheromosa', 'magearna', 'magearnaoriginal', 'marshadow', 'naganadel',
-				'zacian', 'zaciancrowned', 'zamazenta', 'zamazentacrowned',
-				'urshifu', 'calyrexice', 'calyrexshadow',
-			]);
-			const pikachuCapFormes = new Set([
+			const relumiBanConfig =
+				window.BattleTeambuilderTable?.gen8relumi?.relumiBanConfig || {};
+			const relumiBaseTagBans: string[] = relumiBanConfig.baseTagBans || [];
+			const relumiBasePokemonBans: string[] = relumiBanConfig.basePokemonBans || [];
+			const relumiGen9Allowed: string[] = relumiBanConfig.gen9Allowlist || [];
+			const relumiOUBans: string[] = relumiBanConfig.ouPokemonBans || [];
+			const pikachuCapFormes = [
 				"Original",
 				"Hoenn",
 				"Sinnoh",
@@ -1117,7 +1094,7 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 				"Alola",
 				"Partner",
 				"World",
-			]);
+			];
 			const results: SearchRow[] = [];
 			const relumiSpeciesRows: {
 				id: ID,
@@ -1135,9 +1112,9 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 				const baseSpecies = this.dex.species.get(species.baseSpecies || species.name);
 				const introducedGen = baseSpecies.exists ? baseSpecies.gen : species.gen;
 				if ((isRelumiUbers || isRelumiOU) && introducedGen === 9) {
-					if (!relumiGen9Allowed.has(species.id)) continue;
+					if (!relumiGen9Allowed.includes(species.id)) continue;
 				}
-				if (isRelumiOU && relumiOUBans.has(species.id)) continue;
+				if (isRelumiOU && relumiOUBans.includes(species.id)) continue;
 				const isRevavroomCustomForm =
 					species.baseSpecies === "Revavroom" &&
 					species.id !== "revavroom";
@@ -1156,15 +1133,21 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 				const isStellarForm = species.forme.endsWith('Stellar');
 				const isPikachuCapForm =
 					species.baseSpecies === "Pikachu" &&
-					pikachuCapFormes.has(species.forme);
+					pikachuCapFormes.includes(species.forme);
+				const hasRelumiBaseTagBan =
+					(relumiBaseTagBans.includes("pokemontag:mega") && isMegaForm) ||
+					(relumiBaseTagBans.includes("pokemontag:gigantamax") && isGigantamaxForm) ||
+					(relumiBaseTagBans.includes("pokemontag:teraforme") && isTeraForm) ||
+					(relumiBaseTagBans.includes("pokemontag:stellarforme") && isStellarForm) ||
+					(relumiBaseTagBans.includes("pokemontag:pikachucap") && isPikachuCapForm);
+				const hasRelumiBasePokemonBan =
+					relumiBasePokemonBans.includes(species.id) ||
+					relumiBasePokemonBans.includes(toID(species.name));
 				if (
 					isRelumiMainLadder &&
-					(isMegaForm ||
-						species.isPrimal ||
-						isGigantamaxForm ||
-						isTeraForm ||
-						isStellarForm ||
-						isPikachuCapForm ||
+					(species.isPrimal ||
+						hasRelumiBaseTagBan ||
+						hasRelumiBasePokemonBan ||
 						isRevavroomCustomForm)
 				) {
 					continue;
