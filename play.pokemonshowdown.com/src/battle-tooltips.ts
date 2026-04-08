@@ -1096,7 +1096,10 @@ export class BattleTooltips {
 			return false;
 		}
 		const tierId = toID(this.battle.tier || '');
-		return tierId === 'gen8relumirandombattle' || tierId === 'gen8relumirandomdoublesbattle';
+		return [
+			'gen8relumisinglesrandom',
+			'gen8relumidoublesrandom',
+		].includes(tierId);
 	}
 
 	private getTypeWeakness(type: Dex.TypeName, attackType: Dex.TypeName): 0 | 0.5 | 1 | 2 {
