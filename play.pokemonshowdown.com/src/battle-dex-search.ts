@@ -862,13 +862,7 @@ abstract class BattleTypedSearch<T extends SearchType> {
 		return results;
 	}
 	protected firstLearnsetid(speciesid: ID) {
-		let table = BattleTeambuilderTable;
-		if (this.formatType?.startsWith('bdsp')) table = table['gen8bdsp'];
-		if (this.formatType === 'letsgo') table = table['gen7letsgo'];
-		if (this.formatType === 'bw1') table = table['gen5bw1'];
-		if (this.formatType === 'rs') table = table['gen3rs'];
-		if (this.formatType === 'frlg') table = table['gen3frlg'];
-		if (this.formatType === 'legendsza') table = table['gen9legendsou'];
+		const table = this.getLearnsetTable();
 		if (speciesid in table.learnsets) return speciesid;
 		const species = this.dex.species.get(speciesid);
 		if (!species.exists) return '' as ID;
@@ -934,14 +928,8 @@ abstract class BattleTypedSearch<T extends SearchType> {
 			}
 		}
 		let learnsetid = this.firstLearnsetid(speciesid);
+		const table = this.getLearnsetTable();
 		while (learnsetid) {
-			let table = BattleTeambuilderTable;
-			if (this.formatType?.startsWith('bdsp')) table = table['gen8bdsp'];
-			if (this.formatType === 'letsgo') table = table['gen7letsgo'];
-			if (this.formatType === 'bw1') table = table['gen5bw1'];
-			if (this.formatType === 'rs') table = table['gen3rs'];
-			if (this.formatType === 'frlg') table = table['gen3frlg'];
-			if (this.formatType === 'legendsza') table = table['gen9legendsou'];
 			let learnset = table.learnsets[learnsetid];
 			const eggMovesOnly = this.eggMovesOnly(learnsetid, speciesid);
 			if (learnset && (moveid in learnset) && (!this.format.startsWith('tradebacks') ? learnset[moveid].includes(genChar) :
@@ -953,6 +941,19 @@ abstract class BattleTypedSearch<T extends SearchType> {
 			learnsetid = this.nextLearnsetid(learnsetid, speciesid, true);
 		}
 		return false;
+	}
+	private getLearnsetTable() {
+		let table = BattleTeambuilderTable;
+		if (this.format.includes('relumi') && table?.gen8relumi) {
+			table = table.gen8relumi;
+		}
+		if (this.formatType?.startsWith('bdsp')) table = table['gen8bdsp'];
+		if (this.formatType === 'letsgo') table = table['gen7letsgo'];
+		if (this.formatType === 'bw1') table = table['gen5bw1'];
+		if (this.formatType === 'rs') table = table['gen3rs'];
+		if (this.formatType === 'frlg') table = table['gen3frlg'];
+		if (this.formatType === 'legendsza') table = table['gen9legendsou'];
+		return table;
 	}
 	getTier(pokemon: Dex.Species) {
 		if (this.formatType === 'metronome') {
