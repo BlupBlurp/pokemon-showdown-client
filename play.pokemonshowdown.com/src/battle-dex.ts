@@ -808,7 +808,6 @@ export const Dex = new (class implements ModdedDex {
 
 		const relumiBasename = this.getRelumiIconsBasename(species, {
 			speciesId: requestedId,
-			gender: options.gender,
 			shiny: !!options.shiny,
 		});
 
@@ -1242,7 +1241,6 @@ export const Dex = new (class implements ModdedDex {
 
 		const relumiBasename = this.getRelumiIconsBasename(species, {
 			speciesId: id,
-			gender: pokemon?.gender as Dex.GenderName | undefined,
 			shiny: !!pokemon?.shiny,
 			force: true,
 		});
