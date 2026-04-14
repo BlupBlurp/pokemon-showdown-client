@@ -26,6 +26,59 @@ export class PSSearchResults extends preact.Component<{
 	moveIds: ID[] = [];
 	resultIndex = -1;
 
+	private getRelumiOverrides() {
+		return (window as any).BattleTeambuilderTable?.gen8relumi || null;
+	}
+	private shouldHighlightRelumiChanges() {
+		const format = this.props.search.typedSearch?.format || '';
+		if (!format.includes('relumi')) return false;
+		if (Dex.prefs('relumiHighlightBalanceChanges') === false) return false;
+		return !!this.getRelumiOverrides();
+	}
+	private getStatClass(speciesId: ID, statName: Dex.StatName, value: number) {
+		if (!this.shouldHighlightRelumiChanges()) return '';
+		const relumiTable = this.getRelumiOverrides();
+		const relumiSpeciesDiff = relumiTable?.overrideSpeciesData?.[speciesId];
+		if (!relumiSpeciesDiff?.baseStats || relumiSpeciesDiff.baseStats[statName] === undefined) return '';
+		const vanillaSpecies = Dex.forGen(9).species.get(speciesId);
+		if (!vanillaSpecies.exists) return '';
+		const vanillaStat = vanillaSpecies.baseStats[statName];
+		if (value > vanillaStat) return 'relumi-change-up';
+		if (value < vanillaStat) return 'relumi-change-down';
+		return '';
+	}
+	private isNewRelumiAbility(speciesId: ID, abilityName: string) {
+		if (!this.shouldHighlightRelumiChanges()) return false;
+		const relumiTable = this.getRelumiOverrides();
+		const relumiSpeciesDiff = relumiTable?.overrideSpeciesData?.[speciesId];
+		if (!relumiSpeciesDiff?.abilities) return false;
+		const vanillaSpecies = Dex.forGen(9).species.get(speciesId);
+		const vanillaAbilities = Object.create(null) as Record<string, 1>;
+		if (vanillaSpecies.exists) {
+			for (const ability of Object.values(vanillaSpecies.abilities || {})) {
+				if (ability) vanillaAbilities[ability] = 1;
+			}
+		}
+		return !vanillaAbilities[abilityName];
+	}
+	private getMoveChangeClass(moveId: ID, valueType: 'basePower' | 'accuracy', value: number | true) {
+		if (!this.shouldHighlightRelumiChanges()) return '';
+		const relumiTable = this.getRelumiOverrides();
+		const relumiMoveDiff = relumiTable?.overrideMoveData?.[moveId];
+		if (!relumiMoveDiff || relumiMoveDiff[valueType] === undefined) return '';
+		const vanillaMove = Dex.forGen(9).moves.get(moveId);
+		if (!vanillaMove.exists) return '';
+		const vanillaValue = vanillaMove[valueType];
+		if (value === vanillaValue) return '';
+		if (value === true && vanillaValue !== true) return 'relumi-change-up';
+		if (value !== true && vanillaValue === true) return 'relumi-change-down';
+		if (typeof value === 'number' && typeof vanillaValue === 'number') {
+			if (value > vanillaValue) return 'relumi-change-up';
+			if (value < vanillaValue) return 'relumi-change-down';
+		}
+		return '';
+	}
+
 	renderPokemonSortRow() {
 		const search = this.props.search;
 		const sortCol = search.sortCol;
@@ -64,6 +117,20 @@ export class PSSearchResults extends preact.Component<{
 		let tagStart = (pokemon.forme ? pokemon.name.length - pokemon.forme.length - 1 : 0);
 
 		const stats = pokemon.baseStats;
+		const hpClass = this.getStatClass(id, 'hp', stats.hp);
+		const atkClass = this.getStatClass(id, 'atk', stats.atk);
+		const defClass = this.getStatClass(id, 'def', stats.def);
+		const spaClass = this.getStatClass(id, 'spa', stats.spa);
+		const spdClass = this.getStatClass(id, 'spd', stats.spd);
+		const speClass = this.getStatClass(id, 'spe', stats.spe);
+		const ability0NewClass = this.isNewRelumiAbility(id, pokemon.abilities['0']) ?
+			'relumi-change-up' : '';
+		const ability1NewClass = pokemon.abilities['1'] &&
+			this.isNewRelumiAbility(id, pokemon.abilities['1']) ? 'relumi-change-up' : '';
+		const hiddenAbilityNewClass = pokemon.abilities['H'] &&
+			this.isNewRelumiAbility(id, pokemon.abilities['H']) ? 'relumi-change-up' : '';
+		const specialAbilityNewClass = pokemon.abilities['S'] &&
+			this.isNewRelumiAbility(id, pokemon.abilities['S']) ? 'relumi-change-up' : '';
 		let bst = 0;
 		for (const stat of Object.values(stats)) bst += stat;
 		if (search.dex.gen < 2) bst -= stats['spd'];
@@ -106,32 +173,36 @@ export class PSSearchResults extends preact.Component<{
 
 				{search.dex.gen >= 3 && (
 					pokemon.abilities['1'] ? (
-						<span class="col twoabilitycol">{pokemon.abilities['0']}<br />{pokemon.abilities['1']}</span>
+						<span class="col twoabilitycol">
+							<span class={ability0NewClass}>{pokemon.abilities['0']}</span><br />
+							<span class={ability1NewClass}>{pokemon.abilities['1']}</span>
+						</span>
 					) : (
-						<span class="col abilitycol">{pokemon.abilities['0']}</span>
+						<span class="col abilitycol"><span class={ability0NewClass}>{pokemon.abilities['0']}</span></span>
 					)
 				)}
 				{search.dex.gen >= 5 && (
 					pokemon.abilities['S'] ? (
 						<span class={`col twoabilitycol${pokemon.unreleasedHidden ? ' unreleasedhacol' : ''}`}>
-							{pokemon.abilities['H'] || ''}<br />{pokemon.abilities['S']}
+							<span class={hiddenAbilityNewClass}>{pokemon.abilities['H'] || ''}</span><br />
+							<span class={specialAbilityNewClass}>{pokemon.abilities['S']}</span>
 						</span>
 					) : pokemon.abilities['H'] ? (
 						<span class={`col abilitycol${pokemon.unreleasedHidden ? ' unreleasedhacol' : ''}`}>
-							{pokemon.abilities['H']}
+							<span class={hiddenAbilityNewClass}>{pokemon.abilities['H']}</span>
 						</span>
 					) : (
 						<span class="col abilitycol"></span>
 					)
 				)}
 
-				<span class="col statcol"><em>HP</em><br />{stats.hp}</span>
-				<span class="col statcol"><em>Atk</em><br />{stats.atk}</span>
-				<span class="col statcol"><em>Def</em><br />{stats.def}</span>
-				{search.dex.gen >= 2 && <span class="col statcol"><em>SpA</em><br />{stats.spa}</span>}
-				{search.dex.gen >= 2 && <span class="col statcol"><em>SpD</em><br />{stats.spd}</span>}
-				{search.dex.gen < 2 && <span class="col statcol"><em>Spc</em><br />{stats.spa}</span>}
-				<span class="col statcol"><em>Spe</em><br />{stats.spe}</span>
+				<span class="col statcol"><em>HP</em><br /><span class={hpClass}>{stats.hp}</span></span>
+				<span class="col statcol"><em>Atk</em><br /><span class={atkClass}>{stats.atk}</span></span>
+				<span class="col statcol"><em>Def</em><br /><span class={defClass}>{stats.def}</span></span>
+				{search.dex.gen >= 2 && <span class="col statcol"><em>SpA</em><br /><span class={spaClass}>{stats.spa}</span></span>}
+				{search.dex.gen >= 2 && <span class="col statcol"><em>SpD</em><br /><span class={spdClass}>{stats.spd}</span></span>}
+				{search.dex.gen < 2 && <span class="col statcol"><em>Spc</em><br /><span class={spaClass}>{stats.spa}</span></span>}
+				<span class="col statcol"><em>Spe</em><br /><span class={speClass}>{stats.spe}</span></span>
 				<span class="col bstcol"><em>BST<br />{bst}</em></span>
 			</a>
 		</li>;
@@ -242,6 +313,8 @@ export class PSSearchResults extends preact.Component<{
 
 		let pp = (move.pp === 1 || move.noPPBoosts ? move.pp : move.pp * 8 / 5);
 		if (search.dex.gen < 3) pp = Math.min(61, pp);
+		const movePowerClass = this.getMoveChangeClass(id, 'basePower', move.basePower);
+		const moveAccuracyClass = this.getMoveChangeClass(id, 'accuracy', move.accuracy);
 		return <li class="result"><a
 			href={`${this.URL_ROOT}moves/${id}`} class={this.moveIds.includes(id) ? 'cur' : ''}
 			data-target="push" data-entry={entry}
@@ -260,10 +333,15 @@ export class PSSearchResults extends preact.Component<{
 			</span>
 
 			<span class="col labelcol">
-				{move.category !== 'Status' ? [<em>Power</em>, <br />, move.basePower || '\u2014'] : ''}
+				{move.category !== 'Status' ? [
+					<em>Power</em>, <br />, <span class={movePowerClass}>{move.basePower || '\u2014'}</span>,
+				] : ''}
 			</span>
 			<span class="col widelabelcol">
-				<em>Accuracy</em><br />{move.accuracy && move.accuracy !== true ? `${move.accuracy}%` : '\u2014'}
+				<em>Accuracy</em><br />
+				<span class={moveAccuracyClass}>
+					{move.accuracy && move.accuracy !== true ? `${move.accuracy}%` : '\u2014'}
+				</span>
 			</span>
 			<span class="col pplabelcol">
 				<em>PP</em><br />{pp}

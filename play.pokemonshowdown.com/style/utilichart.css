@@ -278,6 +278,21 @@
 	outline-offset: 0;
 	background: #4488CC;
 }
+.utilichart .relumi-change-up {
+	color: #1f7a34;
+	font-weight: 600;
+}
+.utilichart .relumi-change-down {
+	color: #a3312f;
+	font-weight: 600;
+}
+
+.dark .utilichart .relumi-change-up {
+	color: #5dd981;
+}
+.dark .utilichart .relumi-change-down {
+	color: #ff8d8d;
+}
 .utilichart .itemdesccol,
 .utilichart .abilitydesccol,
 .utilichart .movedesccol {

@@ -293,6 +293,102 @@
 		buf += '</div></li>';
 		return buf;
 	};
+	Search.prototype.getRelumiOverrides = function () {
+		var table = window.BattleTeambuilderTable;
+		return (table && table.gen8relumi) || null;
+	};
+	Search.prototype.getVanillaSpeciesData = function (speciesId) {
+		var relumiTable = this.getRelumiOverrides();
+		if (relumiTable && relumiTable.vanillaSpeciesData && relumiTable.vanillaSpeciesData[speciesId]) {
+			return relumiTable.vanillaSpeciesData[speciesId];
+		}
+		var vanillaSpecies = Dex.forGen(9).species.get(speciesId);
+		if (!vanillaSpecies || !vanillaSpecies.exists) return null;
+		return vanillaSpecies;
+	};
+	Search.prototype.getVanillaMoveData = function (moveId) {
+		var relumiTable = this.getRelumiOverrides();
+		if (relumiTable && relumiTable.vanillaMoveData && relumiTable.vanillaMoveData[moveId]) {
+			return relumiTable.vanillaMoveData[moveId];
+		}
+		var vanillaMove = Dex.forGen(9).moves.get(moveId);
+		if (!vanillaMove || !vanillaMove.exists) return null;
+		return vanillaMove;
+	};
+	Search.prototype.shouldHighlightRelumiChanges = function () {
+		if (Dex.prefs('relumiHighlightBalanceChanges') === false) return false;
+
+		if (this.engine && this.engine.dex && this.engine.dex.modid === 'gen8relumi') {
+			return true;
+		}
+
+		var typedSearch = this.engine && this.engine.typedSearch;
+		var format = typedSearch && typedSearch.format;
+		return (typeof format === 'string' && format.indexOf('gen8relumi') >= 0);
+	};
+	Search.prototype.getStatClass = function (speciesId, statName, value) {
+		if (!this.shouldHighlightRelumiChanges()) return '';
+
+		var relumiTable = this.getRelumiOverrides();
+		if (!relumiTable || !relumiTable.overrideSpeciesData) return '';
+
+		var relumiSpeciesDiff = relumiTable.overrideSpeciesData[speciesId];
+		if (!relumiSpeciesDiff || !relumiSpeciesDiff.baseStats || relumiSpeciesDiff.baseStats[statName] === undefined) {
+			return '';
+		}
+
+		var vanillaSpecies = this.getVanillaSpeciesData(speciesId);
+		if (!vanillaSpecies) return '';
+
+		var vanillaStat = vanillaSpecies.baseStats[statName];
+		if (typeof vanillaStat !== 'number' || vanillaStat === value) return '';
+
+		return value > vanillaStat ? ' relumi-change-up' : ' relumi-change-down';
+	};
+	Search.prototype.isNewRelumiAbility = function (speciesId, abilityName) {
+		if (!abilityName || !this.shouldHighlightRelumiChanges()) return false;
+
+		var relumiTable = this.getRelumiOverrides();
+		if (!relumiTable || !relumiTable.overrideSpeciesData) return false;
+
+		var relumiSpeciesDiff = relumiTable.overrideSpeciesData[speciesId];
+		if (!relumiSpeciesDiff || !relumiSpeciesDiff.abilities) return false;
+
+		var vanillaSpecies = this.getVanillaSpeciesData(speciesId);
+		if (!vanillaSpecies) return false;
+
+		var vanillaAbilities = {};
+		for (var slot in vanillaSpecies.abilities) {
+			var vanillaAbilityName = vanillaSpecies.abilities[slot];
+			if (vanillaAbilityName) vanillaAbilities[vanillaAbilityName] = true;
+		}
+
+		return !vanillaAbilities[abilityName];
+	};
+	Search.prototype.wrapRelumiAbility = function (speciesId, abilityName) {
+		if (!abilityName) return '';
+		if (!this.isNewRelumiAbility(speciesId, abilityName)) return abilityName;
+		return '<span class="relumi-change-up">' + BattleLog.escapeHTML(abilityName) + '</span>';
+	};
+	Search.prototype.getMoveChangeClass = function (moveId, valueType, value) {
+		if (!this.shouldHighlightRelumiChanges()) return '';
+
+		var relumiTable = this.getRelumiOverrides();
+		if (!relumiTable || !relumiTable.overrideMoveData) return '';
+
+		var relumiMoveDiff = relumiTable.overrideMoveData[moveId];
+		if (!relumiMoveDiff || relumiMoveDiff[valueType] === undefined) return '';
+
+		var vanillaMove = this.getVanillaMoveData(moveId);
+		if (!vanillaMove) return '';
+
+		var vanillaValue = vanillaMove[valueType];
+		if (typeof vanillaValue !== 'number' || typeof value !== 'number' || vanillaValue === value) {
+			return '';
+		}
+
+		return value > vanillaValue ? ' relumi-change-up' : ' relumi-change-down';
+	};
 	Search.prototype.renderPokemonRow = function (pokemon, matchStart, matchLength, errorMessage, attrs) {
 		if (!attrs) attrs = '';
 		if (!pokemon) return '<li class="result">Unrecognized pokemon</li>';
@@ -349,29 +445,33 @@
 		// abilities
 		if (gen >= 3 && !(this.engine && this.engine.dex.modid === 'gen7letsgo')) {
 			var abilities = pokemon.abilities;
+			var ability0 = this.wrapRelumiAbility(id, abilities['0']);
+			var ability1 = this.wrapRelumiAbility(id, abilities['1']);
+			var hiddenAbility = this.wrapRelumiAbility(id, abilities['H']);
+			var specialAbility = this.wrapRelumiAbility(id, abilities['S']);
 			if (gen >= 5) {
 				if (abilities['1']) {
-					buf += '<span class="col twoabilitycol">' + abilities['0'] + '<br />' +
-						abilities['1'] + '</span>';
+					buf += '<span class="col twoabilitycol">' + ability0 + '<br />' +
+						ability1 + '</span>';
 				} else {
-					buf += '<span class="col abilitycol">' + abilities['0'] + '</span>';
+					buf += '<span class="col abilitycol">' + ability0 + '</span>';
 				}
 				var unreleasedHidden = pokemon.unreleasedHidden;
 				if (unreleasedHidden === 'Past' && (this.mod === 'natdex' || gen < 8)) unreleasedHidden = false;
 				if (abilities['S']) {
 					if (abilities['H']) {
-						buf += '<span class="col twoabilitycol' + (unreleasedHidden ? ' unreleasedhacol' : '') + '">' + (abilities['H'] || '') + '<br />(' + abilities['S'] + ')</span>';
+						buf += '<span class="col twoabilitycol' + (unreleasedHidden ? ' unreleasedhacol' : '') + '">' + (hiddenAbility || '') + '<br />(' + specialAbility + ')</span>';
 					} else {
-						buf += '<span class="col abilitycol">(' + abilities['S'] + ')</span>';
+						buf += '<span class="col abilitycol">(' + specialAbility + ')</span>';
 					}
 				} else if (abilities['H']) {
-					buf += '<span class="col abilitycol' + (unreleasedHidden ? ' unreleasedhacol' : '') + '">' + abilities['H'] + '</span>';
+					buf += '<span class="col abilitycol' + (unreleasedHidden ? ' unreleasedhacol' : '') + '">' + hiddenAbility + '</span>';
 				} else {
 					buf += '<span class="col abilitycol"></span>';
 				}
 			} else {
-				buf += '<span class="col abilitycol">' + abilities['0'] + '</span>';
-				buf += '<span class="col abilitycol">' + (abilities['1'] ? abilities['1'] : '') + '</span>';
+				buf += '<span class="col abilitycol">' + ability0 + '</span>';
+				buf += '<span class="col abilitycol">' + (ability1 || '') + '</span>';
 			}
 		} else {
 			buf += '<span class="col abilitycol"></span>';
@@ -380,16 +480,22 @@
 
 		// base stats
 		var stats = pokemon.baseStats;
-		buf += '<span class="col statcol"><em>HP</em><br />' + stats.hp + '</span> ';
-		buf += '<span class="col statcol"><em>Atk</em><br />' + stats.atk + '</span> ';
-		buf += '<span class="col statcol"><em>Def</em><br />' + stats.def + '</span> ';
+		var hpClass = this.getStatClass(id, 'hp', stats.hp);
+		var atkClass = this.getStatClass(id, 'atk', stats.atk);
+		var defClass = this.getStatClass(id, 'def', stats.def);
+		var spaClass = this.getStatClass(id, 'spa', stats.spa);
+		var spdClass = this.getStatClass(id, 'spd', stats.spd);
+		var speClass = this.getStatClass(id, 'spe', stats.spe);
+		buf += '<span class="col statcol' + hpClass + '"><em>HP</em><br />' + stats.hp + '</span> ';
+		buf += '<span class="col statcol' + atkClass + '"><em>Atk</em><br />' + stats.atk + '</span> ';
+		buf += '<span class="col statcol' + defClass + '"><em>Def</em><br />' + stats.def + '</span> ';
 		if (gen >= 2) {
-			buf += '<span class="col statcol"><em>SpA</em><br />' + stats.spa + '</span> ';
-			buf += '<span class="col statcol"><em>SpD</em><br />' + stats.spd + '</span> ';
+			buf += '<span class="col statcol' + spaClass + '"><em>SpA</em><br />' + stats.spa + '</span> ';
+			buf += '<span class="col statcol' + spdClass + '"><em>SpD</em><br />' + stats.spd + '</span> ';
 		} else {
-			buf += '<span class="col statcol"><em>Spc</em><br />' + stats.spa + '</span> ';
+			buf += '<span class="col statcol' + spaClass + '"><em>Spc</em><br />' + stats.spa + '</span> ';
 		}
-		buf += '<span class="col statcol"><em>Spe</em><br />' + stats.spe + '</span> ';
+		buf += '<span class="col statcol' + speClass + '"><em>Spe</em><br />' + stats.spe + '</span> ';
 		var bst = 0;
 		for (i in stats) {
 			if (i === 'spd' && gen === 1) continue;
@@ -570,8 +676,10 @@
 		// power, accuracy, pp
 		var pp = (move.pp === 1 || move.noPPBoosts ? move.pp : move.pp * 8 / 5);
 		if (this.engine && this.engine.dex.gen < 3) pp = Math.min(61, pp);
-		buf += '<span class="col labelcol">' + (move.category !== 'Status' ? ('<em>Power</em><br />' + (move.basePower || '&mdash;')) : '') + '</span> ';
-		buf += '<span class="col widelabelcol"><em>Accuracy</em><br />' + (move.accuracy && move.accuracy !== true ? move.accuracy + '%' : '&mdash;') + '</span> ';
+		var movePowerClass = this.getMoveChangeClass(id, 'basePower', move.basePower);
+		var moveAccuracyClass = this.getMoveChangeClass(id, 'accuracy', move.accuracy);
+		buf += '<span class="col labelcol' + movePowerClass + '">' + (move.category !== 'Status' ? ('<em>Power</em><br />' + (move.basePower || '&mdash;')) : '') + '</span> ';
+		buf += '<span class="col widelabelcol' + moveAccuracyClass + '"><em>Accuracy</em><br />' + (move.accuracy && move.accuracy !== true ? move.accuracy + '%' : '&mdash;') + '</span> ';
 		buf += '<span class="col pplabelcol"><em>PP</em><br />' + pp + '</span> ';
 
 		// desc
@@ -607,8 +715,10 @@
 		// power, accuracy, pp
 		var pp = (move.pp === 1 || move.noPPBoosts ? move.pp : move.pp * 8 / 5);
 		if (this.engine && this.engine.dex.gen < 3) pp = Math.min(61, pp);
-		buf += '<span class="col labelcol">' + (move.category !== 'Status' ? ('<em>Power</em><br />' + (move.basePower || '&mdash;')) : '') + '</span> ';
-		buf += '<span class="col widelabelcol"><em>Accuracy</em><br />' + (move.accuracy && move.accuracy !== true ? move.accuracy + '%' : '&mdash;') + '</span> ';
+		var movePowerClass = this.getMoveChangeClass(toID(move.name), 'basePower', move.basePower);
+		var moveAccuracyClass = this.getMoveChangeClass(toID(move.name), 'accuracy', move.accuracy);
+		buf += '<span class="col labelcol' + movePowerClass + '">' + (move.category !== 'Status' ? ('<em>Power</em><br />' + (move.basePower || '&mdash;')) : '') + '</span> ';
+		buf += '<span class="col widelabelcol' + moveAccuracyClass + '"><em>Accuracy</em><br />' + (move.accuracy && move.accuracy !== true ? move.accuracy + '%' : '&mdash;') + '</span> ';
 		buf += '<span class="col pplabelcol"><em>PP</em><br />' + pp + '</span> ';
 
 		// desc

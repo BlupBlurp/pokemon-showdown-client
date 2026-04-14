@@ -631,6 +631,7 @@ class OptionsPanel extends PSRoomPanel {
 		case 'refreshprompt':
 		case 'noanim':
 		case 'nopastgens':
+		case 'relumiHighlightBalanceChanges':
 		case 'noselfhighlight':
 		case 'leavePopupRoom':
 		case 'inchatpm':
@@ -714,6 +715,14 @@ class OptionsPanel extends PSRoomPanel {
 				<label class="checkbox"><input
 					name="nopastgens" checked={PS.prefs.nopastgens || false} type="checkbox" onChange={this.handleOnChange}
 				/> Use modern sprites for past generations</label>
+			</p>
+			<p>
+				<label class="checkbox"><input
+					name="relumiHighlightBalanceChanges"
+					checked={PS.prefs.relumiHighlightBalanceChanges !== false}
+					type="checkbox"
+					onChange={this.handleOnChange}
+				/> Highlight Relumi balance changes in Teambuilder</label>
 			</p>
 			<hr />
 			<h3>Chat</h3>

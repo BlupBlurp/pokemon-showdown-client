@@ -654,6 +654,7 @@
 			"change input[name=nogif]": "setNogif",
 			"change input[name=bwgfx]": "setBwgfx",
 			"change input[name=nopastgens]": "setNopastgens",
+			"change input[name=relumiHighlightBalanceChanges]": "setRelumiHighlightBalanceChanges",
 			"change select[name=tournaments]": "setTournaments",
 			"change select[name=language]": "setLanguage",
 			"change input[name=blockchallenges]": "setBlockchallenges",
@@ -759,6 +760,10 @@
 				'<p><label class="checkbox"><input type="checkbox" name="nopastgens"' +
 				(Dex.prefs("nopastgens") ? " checked" : "") +
 				" /> Use modern sprites for past generations</label></p>";
+			buf +=
+				'<p><label class="checkbox"><input type="checkbox" name="relumiHighlightBalanceChanges"' +
+				(Dex.prefs("relumiHighlightBalanceChanges") !== false ? " checked" : "") +
+				" /> Highlight Relumi balance changes in Teambuilder</label></p>";
 
 			buf += "<hr />";
 			buf += "<p><strong>Chat</strong></p>";
@@ -920,6 +925,10 @@
 		setNopastgens: function (e) {
 			var nopastgens = !!e.currentTarget.checked;
 			Storage.prefs("nopastgens", nopastgens);
+		},
+		setRelumiHighlightBalanceChanges: function (e) {
+			var relumiHighlightBalanceChanges = !!e.currentTarget.checked;
+			Storage.prefs("relumiHighlightBalanceChanges", relumiHighlightBalanceChanges);
 		},
 		setTournaments: function (e) {
 			var tournaments = e.currentTarget.value;
