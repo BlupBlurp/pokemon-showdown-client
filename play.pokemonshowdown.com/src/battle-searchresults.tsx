@@ -35,12 +35,37 @@ export class PSSearchResults extends preact.Component<{
 		if (Dex.prefs('relumiHighlightBalanceChanges') === false) return false;
 		return !!this.getRelumiOverrides();
 	}
+	private getRelumiDiffSourceSpeciesId(speciesId: ID) {
+		const relumiTable = this.getRelumiOverrides();
+		if (!relumiTable?.overrideSpeciesData) return speciesId;
+		if (relumiTable.overrideSpeciesData[speciesId]) return speciesId;
+		// Compare cosmetics against their base diff source when only base has overrides.
+		const species = this.props.search.dex.species.get(speciesId);
+		if (!species?.exists) return speciesId;
+		const baseId = toID(species.baseSpecies || speciesId) as ID;
+		if (baseId !== speciesId && relumiTable.overrideSpeciesData[baseId]) {
+			return baseId;
+		}
+		return speciesId;
+	}
+	private getVanillaComparisonSpeciesId(speciesId: ID) {
+		const vanillaSpecies = Dex.forGen(9).species.get(speciesId);
+		if (vanillaSpecies.exists) return speciesId;
+		// Fall back to base species for forms that do not exist in vanilla data.
+		const species = this.props.search.dex.species.get(speciesId);
+		if (!species?.exists) return speciesId;
+		const baseId = toID(species.baseSpecies || speciesId) as ID;
+		if (baseId !== speciesId) return baseId;
+		return speciesId;
+	}
 	private getStatClass(speciesId: ID, statName: Dex.StatName, value: number) {
 		if (!this.shouldHighlightRelumiChanges()) return '';
 		const relumiTable = this.getRelumiOverrides();
-		const relumiSpeciesDiff = relumiTable?.overrideSpeciesData?.[speciesId];
+		const diffSourceId = this.getRelumiDiffSourceSpeciesId(speciesId);
+		const relumiSpeciesDiff = relumiTable?.overrideSpeciesData?.[diffSourceId];
 		if (!relumiSpeciesDiff?.baseStats || relumiSpeciesDiff.baseStats[statName] === undefined) return '';
-		const vanillaSpecies = Dex.forGen(9).species.get(speciesId);
+		const vanillaComparisonId = this.getVanillaComparisonSpeciesId(diffSourceId);
+		const vanillaSpecies = Dex.forGen(9).species.get(vanillaComparisonId);
 		if (!vanillaSpecies.exists) return '';
 		const vanillaStat = vanillaSpecies.baseStats[statName];
 		if (value > vanillaStat) return 'relumi-change-up';
@@ -50,9 +75,11 @@ export class PSSearchResults extends preact.Component<{
 	private isNewRelumiAbility(speciesId: ID, abilityName: string) {
 		if (!this.shouldHighlightRelumiChanges()) return false;
 		const relumiTable = this.getRelumiOverrides();
-		const relumiSpeciesDiff = relumiTable?.overrideSpeciesData?.[speciesId];
+		const diffSourceId = this.getRelumiDiffSourceSpeciesId(speciesId);
+		const relumiSpeciesDiff = relumiTable?.overrideSpeciesData?.[diffSourceId];
 		if (!relumiSpeciesDiff?.abilities) return false;
-		const vanillaSpecies = Dex.forGen(9).species.get(speciesId);
+		const vanillaComparisonId = this.getVanillaComparisonSpeciesId(diffSourceId);
+		const vanillaSpecies = Dex.forGen(9).species.get(vanillaComparisonId);
 		const vanillaAbilities = Object.create(null) as Record<string, 1>;
 		if (vanillaSpecies.exists) {
 			for (const ability of Object.values(vanillaSpecies.abilities || {})) {

@@ -326,18 +326,49 @@
 		var format = typedSearch && typedSearch.format;
 		return (typeof format === 'string' && format.indexOf('gen8relumi') >= 0);
 	};
+	Search.prototype.getRelumiDiffSourceSpeciesId = function (speciesId) {
+		var relumiTable = this.getRelumiOverrides();
+		if (!relumiTable || !relumiTable.overrideSpeciesData) return speciesId;
+		if (relumiTable.overrideSpeciesData[speciesId]) return speciesId;
+
+		// Compare cosmetics against their base diff source when only base has overrides.
+		var currentDex = (this.engine && this.engine.dex) || Dex;
+		if (!currentDex || !currentDex.species) return speciesId;
+		var species = currentDex.species.get(speciesId);
+		if (!species || !species.exists) return speciesId;
+		var baseId = toID(species.baseSpecies || speciesId);
+		if (baseId !== speciesId && relumiTable.overrideSpeciesData[baseId]) {
+			return baseId;
+		}
+		return speciesId;
+	};
+	Search.prototype.getVanillaComparisonSpeciesId = function (speciesId) {
+		var vanillaSpecies = Dex.forGen(9).species.get(speciesId);
+		if (vanillaSpecies && vanillaSpecies.exists) return speciesId;
+
+		// Fall back to base species for forms that do not exist in vanilla data.
+		var currentDex = (this.engine && this.engine.dex) || Dex;
+		if (!currentDex || !currentDex.species) return speciesId;
+		var species = currentDex.species.get(speciesId);
+		if (!species || !species.exists) return speciesId;
+		var baseId = toID(species.baseSpecies || speciesId);
+		if (baseId !== speciesId) return baseId;
+		return speciesId;
+	};
 	Search.prototype.getStatClass = function (speciesId, statName, value) {
 		if (!this.shouldHighlightRelumiChanges()) return '';
 
 		var relumiTable = this.getRelumiOverrides();
 		if (!relumiTable || !relumiTable.overrideSpeciesData) return '';
 
-		var relumiSpeciesDiff = relumiTable.overrideSpeciesData[speciesId];
+		var diffSourceId = this.getRelumiDiffSourceSpeciesId(speciesId);
+		var relumiSpeciesDiff = relumiTable.overrideSpeciesData[diffSourceId];
 		if (!relumiSpeciesDiff || !relumiSpeciesDiff.baseStats || relumiSpeciesDiff.baseStats[statName] === undefined) {
 			return '';
 		}
 
-		var vanillaSpecies = this.getVanillaSpeciesData(speciesId);
+		var vanillaComparisonId = this.getVanillaComparisonSpeciesId(diffSourceId);
+		var vanillaSpecies = this.getVanillaSpeciesData(vanillaComparisonId);
 		if (!vanillaSpecies) return '';
 
 		var vanillaStat = vanillaSpecies.baseStats[statName];
@@ -351,10 +382,12 @@
 		var relumiTable = this.getRelumiOverrides();
 		if (!relumiTable || !relumiTable.overrideSpeciesData) return false;
 
-		var relumiSpeciesDiff = relumiTable.overrideSpeciesData[speciesId];
+		var diffSourceId = this.getRelumiDiffSourceSpeciesId(speciesId);
+		var relumiSpeciesDiff = relumiTable.overrideSpeciesData[diffSourceId];
 		if (!relumiSpeciesDiff || !relumiSpeciesDiff.abilities) return false;
 
-		var vanillaSpecies = this.getVanillaSpeciesData(speciesId);
+		var vanillaComparisonId = this.getVanillaComparisonSpeciesId(diffSourceId);
+		var vanillaSpecies = this.getVanillaSpeciesData(vanillaComparisonId);
 		if (!vanillaSpecies) return false;
 
 		var vanillaAbilities = {};

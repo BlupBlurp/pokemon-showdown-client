@@ -576,7 +576,13 @@ export const Dex = new (class implements ModdedDex {
 			if (formid in window.BattlePokedexAltForms)
 				return window.BattlePokedexAltForms[formid];
 			hydrateRelumiSpecies(formid);
-			if (window.BattleAliases && id in BattleAliases) {
+			// Preserve exact species IDs (including cosmetic formes) and only apply aliases
+			// when there is no direct Pokedex entry for the requested ID.
+			if (
+				window.BattleAliases &&
+				id in BattleAliases &&
+				!(window.BattlePokedex && id in window.BattlePokedex)
+			) {
 				name = BattleAliases[id];
 				id = toID(name);
 				hydrateRelumiSpecies(id);
@@ -595,6 +601,23 @@ export const Dex = new (class implements ModdedDex {
 			if (!window.BattlePokedex) window.BattlePokedex = {};
 			hydrateRelumiSpecies(id);
 			let data = window.BattlePokedex[id];
+			if (data?.isCosmeticForme && data.baseSpecies) {
+				// Build cosmetic forms from base species data so aliases keep abilities/stats.
+				const baseSpecies = this.species.get(data.baseSpecies);
+				if (baseSpecies.exists) {
+					const cosmeticName = data.name || baseSpecies.name;
+					const cosmeticSpecies = new Species(formid, cosmeticName, {
+						...baseSpecies,
+						...data,
+						name: cosmeticName,
+						baseForme: "",
+						baseSpecies: baseSpecies.name,
+						otherFormes: null,
+					});
+					window.BattlePokedexAltForms[formid] = cosmeticSpecies;
+					return cosmeticSpecies;
+				}
+			}
 
 			let species: Species;
 			if (data && typeof data.exists === "boolean") {
@@ -1529,7 +1552,11 @@ export class ModdedDex {
 	species = {
 		get: (name: string): Species => {
 			let id = toID(name);
-			if (window.BattleAliases && id in BattleAliases) {
+			if (
+				window.BattleAliases &&
+				id in BattleAliases &&
+				!(window.BattlePokedex && id in window.BattlePokedex)
+			) {
 				name = BattleAliases[id];
 				id = toID(name);
 			}
