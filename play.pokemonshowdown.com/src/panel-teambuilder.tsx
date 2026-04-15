@@ -50,7 +50,7 @@ class PSTextarea extends preact.Component<{ initialValue?: string, name?: string
 }
 
 class TeambuilderRoom extends PSRoom {
-	readonly DEFAULT_FORMAT = Dex.modid;
+	readonly DEFAULT_FORMAT = 'gen8relumisinglesou' as ID;
 
 	/**
 	 * - `""` - all
