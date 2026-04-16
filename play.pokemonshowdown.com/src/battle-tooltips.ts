@@ -1749,7 +1749,9 @@ export class BattleTooltips {
 		}
 		// Weather and pseudo-weather type changes.
 		if (move.id === 'weatherball') {
-			if (value.weatherModify(0)) {
+			if (value.abilityModify(0, 'Mega Sol')) {
+				moveType = 'Fire';
+			} else if (value.weatherModify(0)) {
 				switch (this.battle.weather) {
 				case 'sunnyday':
 				case 'desolateland':
@@ -1769,8 +1771,6 @@ export class BattleTooltips {
 					moveType = 'Ice';
 					break;
 				}
-			} else if (value.abilityModify(0, 'Mega Sol')) {
-				moveType = 'Fire';
 			}
 		}
 		if (move.id === 'terrainpulse' && pokemon.isGrounded(serverPokemon)) {
@@ -2242,7 +2242,7 @@ export class BattleTooltips {
 		value.set(move.accuracy as number);
 
 		if (move.id === 'hurricane' || move.id === 'thunder') {
-			if (value.tryAbility('Mega Sol')) value.set(50, 'Mega Sol');
+			if (value.tryAbility('Mega Sol')) value.set(50, 'Mega Sol'); // TODO check implementation
 			if (value.tryWeather('Sunny Day')) value.set(50, 'Sunny Day');
 			if (value.tryWeather('Desolate Land')) value.set(50, 'Desolate Land');
 		}
@@ -2374,8 +2374,7 @@ export class BattleTooltips {
 			}
 		}
 		if (move.id === 'weatherball') {
-			value.abilityModify(2, "Mega Sol");
-			if (this.battle.weather !== 'deltastream') {
+			if (!value.abilityModify(2, "Mega Sol") && this.battle.weather !== 'deltastream') {
 				value.weatherModify(2);
 			}
 		}
