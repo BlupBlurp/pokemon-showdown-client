@@ -1590,6 +1590,8 @@ class BattleItemSearch extends BattleTypedSearch<'item'> {
 	}
 	getDefaultResults(): SearchRow[] {
 		let table = BattleTeambuilderTable;
+		// Relumi inherits Gen 9 content despite using a Gen 8 label.
+		const itemTableGen = this.format.includes('relumi') ? Math.max(this.dex.gen, 9) : this.dex.gen;
 		if (this.formatType?.startsWith('bdsp')) {
 			table = table['gen8bdsp'];
 		} else if (this.formatType === 'bw1') {
@@ -1601,15 +1603,15 @@ class BattleItemSearch extends BattleTypedSearch<'item'> {
 		} else if (this.formatType === 'natdex') {
 			table = table[`gen${this.dex.gen}natdex`];
 		} else if (this.formatType?.endsWith('doubles')) { // no natdex/bdsp doubles support
-			table = table[`gen${this.dex.gen}doubles`];
+			table = table[`gen${itemTableGen}doubles`];
 		} else if (this.formatType === 'metronome') {
-			table = table[`gen${this.dex.gen}metronome`];
+			table = table[`gen${itemTableGen}metronome`];
 		} else if (this.formatType === 'legendsza') {
 			table = table[`gen9legendsou`];
 		} else if (this.formatType === 'champions') {
 			table = table[`champions`];
-		} else if (this.dex.gen < 9) {
-			table = table[`gen${this.dex.gen}`];
+		} else if (itemTableGen < 9) {
+			table = table[`gen${itemTableGen}`];
 		}
 		if (!table.itemSet) {
 			table.itemSet = table.items.map((r: any) => {
