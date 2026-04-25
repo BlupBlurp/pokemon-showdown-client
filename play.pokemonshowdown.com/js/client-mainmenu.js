@@ -55,15 +55,15 @@
 			buf += '<div class="menugroup">';
 			buf += '<p><button class="button mainmenu2" name="joinRoom" value="teambuilder">Teambuilder</button></p>';
 			buf += '<p><button class="button mainmenu3" name="joinRoom" value="ladder">Ladder</button></p>';
-			buf += '<p><button class="button mainmenu4" name="send" value="/smogtours">Tournaments</button></p>';
-			buf += '<p><a class="button mainmenu5" href="stats.html">Stats</a></p>';
-			buf += '<p><a class="button mainmenu6" href="https://calc.relumishowdown.dpdns.org/" target="_blank" rel="noopener noreferrer">Damage Calc</a></p>';
+			// buf += '<p><button class="button mainmenu4" name="send" value="/smogtours">Tournaments</button></p>';
+			buf += '<p><a class="button mainmenu4" href="stats.html">Stats</a></p>';
+			buf += '<p><a class="button mainmenu5" href="https://calc.relumishowdown.dpdns.org/" target="_blank" rel="noopener noreferrer">Damage Calc</a></p>';
 			buf += '</div>';
 
-			buf += '<div class="menugroup"><p><button class="button mainmenu4 onlineonly disabled" name="joinRoom" value="battles">Watch a battle</button></p>';
-			buf += '<p><button class="button mainmenu5 onlineonly disabled" name="finduser">Find a user</button></p>';
-			buf += '<p><button class="button mainmenu6 onlineonly disabled" name="send" value="/friends">Friends</button></p>';
-			buf += '<p><button class="button mainmenu7" name="joinRoom" value="resources">Info & Resources</button></p></div>';
+			buf += '<div class="menugroup"><p><button class="button mainmenu6 onlineonly disabled" name="joinRoom" value="battles">Watch a battle</button></p>';
+			buf += '<p><button class="button mainmenu1 onlineonly disabled" name="finduser">Find a user</button></p>';
+			buf += '<p><button class="button mainmenu2 onlineonly disabled" name="send" value="/friends">Friends</button></p>';
+			buf += '<p><button class="button mainmenu3" name="joinRoom" value="resources">Info & Resources</button></p></div>';
 
 			this.$('.mainmenu').html(buf);
 
