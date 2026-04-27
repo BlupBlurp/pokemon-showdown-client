@@ -2337,7 +2337,7 @@ export class BattleTooltips {
 			value.modify(2, move.name + ' + status');
 		}
 		if (move.id === 'lastrespects') {
-			value.set(Math.min(50 + 50 * pokemon.side.faintCounter));
+			value.set(Math.min(3050, 50 + 30 * pokemon.side.faintCounter));
 		}
 		if (move.id === 'punishment' && target) {
 			let boostCount = 0;
@@ -2478,7 +2478,7 @@ export class BattleTooltips {
 		}
 		// Base power based on times hit
 		if (move.id === 'ragefist') {
-			value.set(Math.min(350, 50 + 50 * pokemon.timesAttacked),
+			value.set(Math.min(200, 50 + 25 * pokemon.timesAttacked),
 				pokemon.timesAttacked > 0 ?
 					`Hit ${pokemon.timesAttacked} time${pokemon.timesAttacked > 1 ? 's' : ''}` :
 					undefined);
