@@ -340,13 +340,31 @@
 		if (!relumiTable || !relumiTable.overrideSpeciesData) return speciesId;
 		if (relumiTable.overrideSpeciesData[speciesId]) return speciesId;
 
-		// Compare cosmetics against their base diff source when only base has overrides.
+		// Fall back to base form only if base has overrides AND this form is effectively
+		// the same as base (either custom form with no vanilla data, or cosmetic form
+		// with identical vanilla stats to base).
 		var currentDex = (this.engine && this.engine.dex) || Dex;
 		if (!currentDex || !currentDex.species) return speciesId;
 		var species = currentDex.species.get(speciesId);
 		if (!species || !species.exists) return speciesId;
 		var baseId = toID(species.baseSpecies || speciesId);
 		if (baseId !== speciesId && relumiTable.overrideSpeciesData[baseId]) {
+			var vanillaSpecies = Dex.forGen(9).species.get(speciesId);
+			var vanillaBase = Dex.forGen(9).species.get(baseId);
+			// No vanilla data = custom form, fall back to base
+			if (!vanillaSpecies || !vanillaSpecies.exists) return baseId;
+			// Vanilla stats differ from base = form has different stats (e.g., Rotom appliances)
+			// Compare using currentRelumiDex to get the actual base stats used in the mod
+			if (vanillaBase && vanillaBase.exists && vanillaSpecies.baseStats && vanillaBase.baseStats) {
+				var stats = vanillaSpecies.baseStats;
+				var baseStats = vanillaBase.baseStats;
+				if (stats.hp !== baseStats.hp || stats.atk !== baseStats.atk ||
+					stats.def !== baseStats.def || stats.spa !== baseStats.spa ||
+					stats.spd !== baseStats.spd || stats.spe !== baseStats.spe) {
+					return speciesId;
+				}
+			}
+			// Cosmetic form (identical vanilla stats to base) - fall back to base
 			return baseId;
 		}
 		return speciesId;
