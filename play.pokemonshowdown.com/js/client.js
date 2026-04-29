@@ -2281,6 +2281,8 @@ function toId() {
 			var format = value || 'gen9randombattle';
 			app.addPopup(FormatPopup, { format: format, sourceEl: target, selectType: 'watch', onselect: function (newFormat) {
 				target.value = newFormat;
+				// Update button label to reflect the newly selected format
+				target.innerHTML = BattleLog.escapeFormat(newFormat);
 			} });
 		},
 
