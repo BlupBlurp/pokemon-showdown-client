@@ -1166,6 +1166,7 @@ function toId() {
 				}
 				var parsed = BattleTextParser.parseNameParts(parts[1]);
 				var named = !!+parts[2];
+				var wasNamed = this.user.get('named');
 
 				var userid = toUserid(parsed.name);
 				if (userid === this.user.get('userid') && parsed.name !== this.user.get('name')) {
@@ -1198,6 +1199,13 @@ function toId() {
 				this.user.setPersistentName(named ? parsed.name : null);
 				if (named) {
 					this.trigger('init:choosename');
+				}
+				// Load remote teams on login transition (covers auto-login via
+				// session upkeep, which doesn't fire the 'loggedin' event).
+				if (named && !wasNamed) {
+					Storage.loadRemoteTeams(function () {
+						if (app.rooms.teambuilder) app.rooms.teambuilder.update();
+					});
 				}
 				if (app.ignore[userid]) {
 					delete app.ignore[userid];

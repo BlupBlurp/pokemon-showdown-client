@@ -682,6 +682,7 @@ Storage.loadRemoteTeams = function (after) {
 				Storage.teams.unshift(team);
 			}
 		}
+		Storage.saveTeams();
 		if (typeof after === 'function') after();
 	}));
 };
