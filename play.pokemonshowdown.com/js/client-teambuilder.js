@@ -3063,13 +3063,13 @@
 				buf += '<label class="checkbox inline"><input type="radio" name="shiny" value="no"' + (!set.shiny ? ' checked' : '') + ' /> No</label>';
 				buf += '</div></div>';
 
-				if (this.curTeam.gen === 8 && !isBDSP) {
+				var isRelumi = this.curTeam.format.includes('relumi');
+				var isRelumiTesting = isRelumi && this.curTeam.format.includes('testing');
+				if (this.curTeam.gen === 8 && !isBDSP && (!isRelumi || isRelumiTesting)) {
 					if (!species.cannotDynamax) {
 						buf += '<div class="formrow"><label class="formlabel">Dmax Level:</label><div><input type="number" min="0" max="10" step="1" name="dynamaxlevel" value="' + (typeof set.dynamaxLevel === 'number' ? set.dynamaxLevel : 10) + '" class="textbox inputform numform" /></div></div>';
 					}
-					var isRelumi = this.curTeam.format.includes('relumi');
-					var isRelumiTesting = isRelumi && this.curTeam.format.includes('testing');
-					if ((species.canGigantamax || species.forme === 'Gmax') && (!isRelumi || isRelumiTesting)) {
+					if (species.canGigantamax || species.forme === 'Gmax') {
 						buf += '<div class="formrow"><label class="formlabel">Gigantamax:</label><div>';
 						if (species.forme === 'Gmax') {
 							buf += 'Yes';
