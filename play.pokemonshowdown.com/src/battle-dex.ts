@@ -243,7 +243,6 @@ export const Dex = new class implements ModdedDex {
 
 	loadedSpriteData = { xy: 1, bw: 0 };
 	moddedDexes: { [mod: string]: ModdedDex } = {};
-	relumiFormIndexByIdCache: { [id: string]: number } | null = null;
 
 	/**
 	 * April Fools' Day setting:
@@ -728,11 +727,6 @@ export const Dex = new class implements ModdedDex {
 		if (!miscData && window.BattlePokemonSpritesBW) miscData = BattlePokemonSpritesBW[speciesid];
 		if (!miscData) miscData = {};
 
-		const relumiBasename = this.getRelumiIconsBasename(species, {
-			speciesId: requestedId,
-			shiny: !!options.shiny,
-		});
-
 		if (miscData.num !== 0 && miscData.num > -5000) {
 			let baseSpeciesid = toID(species.baseSpecies);
 			spriteData.cryurl = 'audio/cries/' + baseSpeciesid;
@@ -823,12 +817,6 @@ export const Dex = new class implements ModdedDex {
 			}
 		}
 		if (!animatedSprite) {
-			if (relumiBasename) {
-				spriteData.url += `pokemonicons-relumi/${relumiBasename}.png`;
-				spriteData.pixelated = false;
-				return spriteData;
-			}
-
 			// There is no entry or enough data in pokedex-mini.js
 			// Handle these in case-by-case basis; either using BW sprites or matching the played gen.
 			dir = (baseDir || 'gen5') + dir;
@@ -897,183 +885,6 @@ export const Dex = new class implements ModdedDex {
 		return num;
 	}
 
-	isRelumiCustomFormCandidate(species: Species) {
-		if (!species?.exists) return false;
-		if (!species.num || species.num < 1) return false;
-		if (toID(species.baseSpecies) === species.id) return false;
-		return true;
-	}
-
-	getRelumiFormIndexBySpeciesId(speciesId: ID) {
-		const relumiData =
-			window.BattleTeambuilderTable?.gen8relumi?.overrideSpeciesData;
-		if (!relumiData?.[speciesId]) return null;
-
-		const directEntry = relumiData[speciesId] as AnyObject;
-		if (!directEntry?.num || directEntry.num < 1) return null;
-		if (toID(directEntry.baseSpecies) === speciesId) return null;
-
-		const numericForme = /^Form\s+(\d+)$/i.exec(
-			String(directEntry.forme || ""),
-		);
-		if (numericForme) {
-			const directForm = parseInt(numericForme[1], 10);
-			if (directForm >= 1 && directForm <= 99) return directForm;
-		}
-
-		if (!this.relumiFormIndexByIdCache) {
-			const grouped: { [key: string]: ID[] } = {};
-			for (const [rawId, rawData] of Object.entries(relumiData)) {
-				const data = rawData as AnyObject;
-				if (!data?.num || data.num < 1) continue;
-
-				const id = toID(rawId) as ID;
-				const baseId = toID(data.baseSpecies || id) as ID;
-				const key = `${data.num}:${baseId}`;
-				if (!grouped[key]) grouped[key] = [];
-				const ids = grouped[key];
-				if (!ids.includes(id)) ids.push(id);
-			}
-
-			this.relumiFormIndexByIdCache = {};
-			for (const ids of Object.values(grouped)) {
-				if (!ids.length) continue;
-				const firstData = relumiData[ids[0]] as AnyObject;
-				const baseId = toID(firstData?.baseSpecies || ids[0]) as ID;
-				const orderedIds: ID[] = [];
-				if (ids.includes(baseId)) {
-					orderedIds.push(baseId);
-					for (const currentId of ids) {
-						if (currentId !== baseId) orderedIds.push(currentId);
-					}
-				} else {
-					for (const currentId of ids) {
-						orderedIds.push(currentId);
-					}
-				}
-				for (let i = 0; i < orderedIds.length; i++) {
-					this.relumiFormIndexByIdCache[orderedIds[i]] = i + 1;
-				}
-			}
-		}
-
-		const formIndex = this.relumiFormIndexByIdCache[speciesId];
-		if (!formIndex || formIndex < 1 || formIndex > 99) return null;
-		return formIndex;
-	}
-
-	hasNativeGraphicsForSpeciesId(speciesId: ID) {
-		const hasIconIndex = !!window.BattlePokemonIconIndexes?.[speciesId];
-		const hasSpriteData =
-			!!window.BattlePokemonSprites?.[speciesId] ||
-			!!window.BattlePokemonSpritesBW?.[speciesId];
-		return hasIconIndex || hasSpriteData;
-	}
-
-	isGigantamaxSpecies(species: Species, speciesId?: ID) {
-		const id = toID(speciesId || species.id);
-		if (id.endsWith("gmax") || id.includes("gigantamax")) return true;
-		if (toID(species.forme) === "gigantamax") return true;
-		if (species.name?.endsWith("-Gmax")) return true;
-		return false;
-	}
-
-	shouldUseRelumiIconsFallback(species: Species, speciesId?: ID) {
-		if (!this.isRelumiCustomFormCandidate(species)) return false;
-		if (this.isGigantamaxSpecies(species, speciesId)) return false;
-		const effectiveId = toID(speciesId || species.id) as ID;
-		if (this.hasNativeGraphicsForSpeciesId(effectiveId)) return false;
-		return true;
-	}
-
-	getRelumiIconsBasename(
-		species: Species,
-		options: {
-			speciesId?: ID;
-			gender?: Dex.GenderName;
-			shiny?: boolean;
-			force?: boolean;
-		} = {},
-	): string | null {
-		const requestedId = toID(options.speciesId || species.id) as ID;
-		let relumiSpecies = species;
-		if (requestedId && requestedId !== species.id) {
-			relumiSpecies = this.species.get(requestedId);
-		}
-		if (this.isGigantamaxSpecies(relumiSpecies, requestedId)) return null;
-		if (this.hasNativeGraphicsForSpeciesId(requestedId)) return null;
-
-		if (options.force) {
-			if (!this.isRelumiCustomFormCandidate(relumiSpecies)) {
-				const relumiData = window.BattleTeambuilderTable?.gen8relumi
-					?.overrideSpeciesData?.[requestedId] as AnyObject | undefined;
-				if (!relumiData?.baseSpecies) return null;
-				if (toID(relumiData.baseSpecies) === requestedId) return null;
-			}
-		} else {
-			if (!this.shouldUseRelumiIconsFallback(relumiSpecies, requestedId)) {
-				const relumiData = window.BattleTeambuilderTable?.gen8relumi
-					?.overrideSpeciesData?.[requestedId] as AnyObject | undefined;
-				if (!relumiData?.baseSpecies) return null;
-				if (toID(relumiData.baseSpecies) === requestedId) return null;
-			}
-		}
-
-		let formIndex = this.getRelumiFormIndexBySpeciesId(requestedId) || 0;
-		const formTarget = relumiSpecies;
-
-		if (!formIndex && formTarget.forme) {
-			const numericForme = /^Form\s+(\d+)$/i.exec(formTarget.forme);
-			if (numericForme) formIndex = parseInt(numericForme[1], 10);
-		}
-
-		if (!formIndex) {
-			const speciesFormeOrder = (formTarget as any).formeOrder as
-				| string[]
-				| undefined;
-			if (Array.isArray(speciesFormeOrder) && speciesFormeOrder.length) {
-				const orderIds = speciesFormeOrder.map((forme) => toID(forme));
-				formIndex = orderIds.indexOf(formTarget.id);
-			}
-		}
-
-		if (!formIndex) {
-			const baseSpecies = this.species.get(formTarget.baseSpecies);
-			if (baseSpecies?.exists) {
-				const baseFormeOrder = (baseSpecies as any).formeOrder as
-					| string[]
-					| undefined;
-				if (Array.isArray(baseFormeOrder) && baseFormeOrder.length) {
-					const orderIds = baseFormeOrder.map((forme) => toID(forme));
-					formIndex = orderIds.indexOf(formTarget.id);
-				}
-			}
-		}
-
-		if (!formIndex) {
-			const baseSpecies = this.species.get(formTarget.baseSpecies);
-			if (baseSpecies?.exists) {
-				const formIds = [
-					baseSpecies.id,
-					...(baseSpecies.otherFormes || []).map((forme) => toID(forme)),
-				];
-				formIndex = formIds.indexOf(formTarget.id);
-			}
-		}
-
-		if (!formIndex || formIndex < 1 || formIndex > 99) return null;
-
-		const relumiData = window.BattleTeambuilderTable?.gen8relumi
-			?.overrideSpeciesData?.[requestedId] as AnyObject | undefined;
-		const speciesNum = `0000${relumiData?.num || formTarget.num}`.slice(-4);
-		const formNum = `00${formIndex}`.slice(-2);
-		const variants = [];
-		if (options.gender === "F") variants.push("female");
-		if (options.shiny) variants.push("shiny");
-		const variantSuffix = variants.length ? `-${variants.join("-")}` : "";
-		return `species${speciesNum}-form${formNum}${variantSuffix}`;
-	}
-
 	getPokemonIcon(pokemon: string | Pokemon | ServerPokemon | Dex.PokemonSet | null, facingLeft?: boolean) {
 		if (pokemon === 'pokeball') {
 			return `background:transparent url(${Dex.resourcePrefix}sprites/pokemonicons-pokeball-sheet.png) no-repeat scroll -0px 4px`;
@@ -1100,24 +911,6 @@ export const Dex = new class implements ModdedDex {
 			? `;opacity:.3;filter:grayscale(100%) brightness(.5)`
 			: ``;
 
-		const species = this.species.get(id);
-		let relumiBasename: string | null = null;
-		if (species?.exists) {
-			relumiBasename = this.getRelumiIconsBasename(species, {
-				speciesId: id,
-				gender: pokemon?.gender as Dex.GenderName | undefined,
-			});
-		}
-		if (relumiBasename) {
-			const relumiIconPath = `${Dex.resourcePrefix}sprites/pokemonicons-relumi/${relumiBasename}.png`;
-			if (relumiBasename.includes("-female")) {
-				const fallbackBasename = relumiBasename.replace("-female", "");
-				const fallbackIconPath = `${Dex.resourcePrefix}sprites/pokemonicons-relumi/${fallbackBasename}.png`;
-				return `background:transparent url(${relumiIconPath}) no-repeat center center / contain, transparent url(${fallbackIconPath}) no-repeat center center / contain${fainted}`;
-			}
-			return `background:transparent url(${relumiIconPath}) no-repeat center center / contain${fainted}`;
-		}
-
 		let num = this.getPokemonIconNum(id, pokemon?.gender === "F", facingLeft);
 
 		let top = Math.floor(num / 12) * 30;
@@ -1139,21 +932,6 @@ export const Dex = new class implements ModdedDex {
 			}
 		}
 		if (species.exists === false) return { spriteDir: 'sprites/gen5', spriteid: '0', x: 10, y: 5 };
-
-		const relumiBasename = this.getRelumiIconsBasename(species, {
-			speciesId: id,
-			shiny: !!pokemon?.shiny,
-			force: true,
-		});
-		if (relumiBasename) {
-			return {
-				spriteid: relumiBasename,
-				spriteDir: "sprites/pokemonicons-relumi",
-				x: 0,
-				y: 0,
-				h: 96,
-			};
-		}
 
 		if (Dex.afdMode) {
 			return {
