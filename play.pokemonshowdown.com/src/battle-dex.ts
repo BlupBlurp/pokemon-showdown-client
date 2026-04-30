@@ -486,12 +486,15 @@ export const Dex = new class implements ModdedDex {
 				) {
 					return;
 				}
-				window.BattlePokedex[speciesId] = {
+				const hydratedData = {
 					exists: true,
 					id: speciesId,
 					name: relumiData.name || name,
 					...relumiData,
 				};
+				// Store as a proper Species instance so spriteid and other computed
+				// fields are available when getSpriteData reads species.spriteid.
+				window.BattlePokedex[speciesId] = new Species(speciesId, hydratedData.name, hydratedData);
 				if (
 					relumiData.baseSpecies &&
 					toID(relumiData.baseSpecies) !== speciesId
@@ -547,7 +550,7 @@ export const Dex = new class implements ModdedDex {
 			}
 
 			let species: Species;
-			if (data && typeof data.exists === 'boolean') {
+			if (data && typeof data.exists === 'boolean' && data.spriteid) {
 				species = data;
 			} else {
 				if (!data) data = { exists: false };
