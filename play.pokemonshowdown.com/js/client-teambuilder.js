@@ -905,6 +905,42 @@
 			this.update();
 		},
 		psExport: function () {
+			if (!Storage.exportTeam(this.curSetList)) {
+				return app.addPopupMessage("Add a Pokémon to your team before uploading it!");
+			}
+			if (app.isDisconnected) {
+				return app.addPopupMessage("You must be connected to validate and upload a team.");
+			}
+
+			var self = this;
+			var format = this.curTeam.format || 'gen8relumisinglesanythinggoes';
+			if (window.BattleFormats && BattleFormats[format] && BattleFormats[format].battleFormat) {
+				format = BattleFormats[format].battleFormat;
+			}
+
+			// Validate before uploading; intercept the next vtm popup to check the result.
+			var originalAddPopup = app.addPopup.bind(app);
+			app.addPopup = function (type, data) {
+				// Restore immediately so only the next popup is intercepted.
+				app.addPopup = originalAddPopup;
+
+				var message = data && data.message;
+				// The server prefixes valid results with "Your team is valid".
+				if (message && message.indexOf('Your team is valid') !== -1) {
+					// Team passed — suppress the popup and proceed with the upload.
+					self._doUpload();
+				} else {
+					// Team failed or unexpected popup — show it normally.
+					originalAddPopup(type, data);
+				}
+			};
+
+			app.sendTeam(this.curTeam, function () {
+				app.send('/vtm ' + format);
+			});
+		},
+		_doUpload: function () {
+			// Perform the actual database upload after legality check passes.
 			var cmd = '/teams ';
 			cmd += this.curTeam.teamid ? 'update' : 'save';
 			// teamName, formatid, rawPrivacy, rawTeam
@@ -914,7 +950,6 @@
 			buf.push(this.curTeam.format);
 			buf.push(this.$('input[name=teamprivacy]').get(0).checked ? 1 : 0);
 			var team = Storage.exportTeam(this.curSetList);
-			if (!team) return app.addPopupMessage("Add a Pokémon to your team before uploading it!");
 			buf.push(team);
 			app.send(cmd + " " + buf.join(', '));
 			this.exported = true;
@@ -1707,7 +1742,7 @@
 			if (this.curTeam.teamid && !this.curTeam.loaded) {
 				return app.loadTeam(this.curTeam, this.validate.bind(this));
 			}
-			var format = this.curTeam.format || 'gen7anythinggoes';
+			var format = this.curTeam.format || 'gen8relumisinglesanythinggoes';
 
 			if (!this.curSetList.length) {
 				app.addPopupMessage("You need at least one Pokémon to validate.");
