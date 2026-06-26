@@ -1240,12 +1240,68 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 				});
 			}
 
+			// Build form ordering index map from the pokedex data file's formeOrder.
+			// Forms not in formeOrder are sorted alphabetically after all formeOrder entries.
+			// All variables use 'var' to avoid Babel block-scoping closure limits in this file.
+			function buildRelumiFormIndexMap(
+				rows: { id: ID; baseId: ID; isBase: boolean }[],
+				dex: ModdedDex
+			): Record<string, number> {
+				// Pre-computed map from export-relumi-client-overrides.js — always correct
+				// because it's built from the server-side Dex (which has formeOrder).
+				var precomputed = (window.BattleTeambuilderTable &&
+					window.BattleTeambuilderTable.gen8relumi &&
+					window.BattleTeambuilderTable.gen8relumi.relumiFormIndexMap) || {};
+
+				var map: Record<string, number> = {};
+				for (var i = 0; i < rows.length; i++) {
+					var row = rows[i];
+					// Pre-computed map is authoritative — use it if the entry exists.
+					if (row.id in precomputed) {
+						map[row.id] = precomputed[row.id];
+						continue;
+					}
+					// Fallback for species not in the pre-computed map (shouldn't happen in practice).
+					if (row.isBase) {
+						map[row.id] = 0;
+						continue;
+					}
+					var baseSpecies = dex.species.get(row.baseId);
+					var formeOrder: string[] = [baseSpecies.name];
+					var foIDs = formeOrder.map(toID);
+					var fi = foIDs.indexOf(row.id);
+					if (fi >= 0) {
+						map[row.id] = fi;
+						continue;
+					}
+					// Gmax always goes at formeOrder.length, before custom forms.
+					var gmaxId = row.baseId + 'gmax';
+					if (row.id === gmaxId) {
+						map[row.id] = formeOrder.length;
+						continue;
+					}
+					// Custom forms not in formeOrder: sorted alphabetically after Gmax.
+					var hasGmax = dex.species.get(gmaxId).exists;
+					var offset = hasGmax ? formeOrder.length + 1 : formeOrder.length;
+					var otherIDs = (baseSpecies.otherFormes || [])
+						.map(function (f: string) { return toID(f); })
+						.filter(function (f: string) { return !foIDs.includes(f) && !f.endsWith('gmax'); });
+					otherIDs.sort();
+					var oi = otherIDs.indexOf(row.id);
+					map[row.id] = offset + Math.max(0, oi);
+				}
+				return map;
+			}
+
+			var formIndexMap = buildRelumiFormIndexMap(relumiSpeciesRows, this.dex);
 			relumiSpeciesRows.sort((a, b) => {
 				if (a.gen !== b.gen) return a.gen - b.gen;
 				if (a.baseNum !== b.baseNum) return a.baseNum - b.baseNum;
 				if (a.baseId !== b.baseId) return a.baseId.localeCompare(b.baseId);
 				if (a.isBase !== b.isBase) return a.isBase ? -1 : 1;
-				if (a.forme !== b.forme) return a.forme.localeCompare(b.forme);
+				var aFormIdx = formIndexMap[a.id] != null ? formIndexMap[a.id] : 99;
+				var bFormIdx = formIndexMap[b.id] != null ? formIndexMap[b.id] : 99;
+				if (aFormIdx !== bFormIdx) return aFormIdx - bFormIdx;
 				return a.id.localeCompare(b.id);
 			});
 

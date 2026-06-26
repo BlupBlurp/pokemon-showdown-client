@@ -19,7 +19,8 @@ export class PSSearchResults extends preact.Component<{
 	  * null means a sort was selected (clear not needed) */
 	onSelect?: (type: SearchType | '' | null, name: string, moveSlot?: string) => void,
 }> {
-	readonly URL_ROOT = `//${Config.routes.dex}/`;
+	// Relumi: use Config.routes.dex for the dex site root URL.
+	get URL_ROOT() { return `//${Config.routes.dex}/`; }
 	speciesId: ID = '' as ID;
 	itemId: ID = '' as ID;
 	abilityId: ID = '' as ID;
@@ -567,7 +568,7 @@ export class PSSearchResults extends preact.Component<{
 
 		if (errorMessage) {
 			return <li class="result"><a
-				href={`${this.URL_ROOT}pokemon/${id}`} class={id === this.speciesId ? 'cur' : ''}
+				href={Dex.getLuminescentUrl('pokemon', id)} class={id === this.speciesId ? 'cur' : ''}
 				data-target="push" data-entry={`pokemon|${pokemon.name}`}
 			>
 				<span class="col numcol">{search.getTier(pokemon)}</span>
@@ -584,7 +585,7 @@ export class PSSearchResults extends preact.Component<{
 
 		return <li class="result">
 			<a
-				href={`${this.URL_ROOT}pokemon/${id}`} class={id === this.speciesId ? 'cur' : ''}
+				href={Dex.getLuminescentUrl('pokemon', id)} class={id === this.speciesId ? 'cur' : ''}
 				data-target="push" data-entry={`pokemon|${pokemon.name}`}
 			>
 				<span class="col numcol">{search.getTier(pokemon)}</span>
@@ -689,7 +690,7 @@ export class PSSearchResults extends preact.Component<{
 		if (!item) return <li class="result">Unrecognized item</li>;
 
 		return <li class="result"><a
-			href={`${this.URL_ROOT}items/${id}`} class={id === this.itemId ? 'cur' : ''}
+			href={Dex.getLuminescentUrl('item', id)} class={id === this.itemId ? 'cur' : ''}
 			data-target="push" data-entry={`item|${item.name}`}
 		>
 			<span class="col itemiconcol">
@@ -711,7 +712,7 @@ export class PSSearchResults extends preact.Component<{
 
 		return <li class="result">
 			<a
-				href={`${this.URL_ROOT}abilities/${id}`} class={id === this.abilityId ? 'cur' : ''}
+				href={Dex.getLuminescentUrl('ability', id)} class={id === this.abilityId ? 'cur' : ''}
 				data-target="push" data-entry={`ability|${ability.name}`}
 			>
 				<span class="col namecol">{id ? this.renderName(ability.name, matchStart, matchEnd) : <i>(no ability)</i>}</span>
@@ -746,7 +747,7 @@ export class PSSearchResults extends preact.Component<{
 
 		if (errorMessage) {
 			return <li class="result"><a
-				href={`${this.URL_ROOT}moves/${id}`} class={this.moveIds.includes(id) ? 'cur' : ''}
+				href={Dex.getLuminescentUrl('move', id)} class={this.moveIds.includes(id) ? 'cur' : ''}
 				data-target="push" data-entry={entry}
 			>
 				<span class="col movenamecol">{this.renderName(move.name, matchStart, matchEnd, tagStart)}</span>
@@ -805,7 +806,7 @@ export class PSSearchResults extends preact.Component<{
 			return `Vanilla ${label}: ${fmtValue(diff.vanilla)} → ${fmtValue(current)} (${sign}${diff.delta})`;
 		};
 		return <li class="result"><a
-			href={`${this.URL_ROOT}moves/${id}`} class={this.moveIds.includes(id) ? 'cur' : ''}
+			href={Dex.getLuminescentUrl('move', id)} class={this.moveIds.includes(id) ? 'cur' : ''}
 			data-target="push" data-entry={entry}
 		>
 			<span class="col movenamecol">

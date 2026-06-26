@@ -766,9 +766,9 @@ class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
 				<div class="mainmenu-footer">
 					<div class="bgcredit">{this.renderBackgroundCredit()}</div>
 					<small>
-						<a href={`//${Config.routes.dex}/`} target="_blank">Pok&eacute;dex</a> | {}
-						<a href={`//${Config.routes.replays}/`} target="_blank">Replays</a> | {}
-						<a href="//smogon.com/forums/" target="_blank">Forum</a> | {}
+						<a href={`//${Config.routes.dex}/pokedex`} target="_blank">Pok&eacute;dex</a> | {}
+						{/* <a href={`//${Config.routes.replays}/`} target="_blank">Replays</a> | {} */}
+						<a href="//discord.gg/luminescent" target="_blank">Discord</a> | {}
 						<a href={`//${Config.routes.root}/rules`} target="_blank">Rules</a> | {}
 						<a href={`//${Config.routes.root}/credits`} target="_blank">Credits</a> | {}
 						<a href={`//${Config.routes.root}/privacy`} target="_blank">Privacy</a>

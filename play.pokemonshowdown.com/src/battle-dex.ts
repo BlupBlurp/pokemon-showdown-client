@@ -1089,6 +1089,68 @@ export const Dex = new class implements ModdedDex {
 		return `<img src="${Dex.resourcePrefix}sprites/categories/${sanitizedCategory}.png" alt="${sanitizedCategory}" height="14" width="32" class="pixelated" />`;
 	}
 
+	// Relumi: luminescent.team URL builder for client-side dex links.
+	// For abilities, returns '#' since luminescent.team has no data pages yet.
+	// Uses formeOrder for official forms, formeOrder.length for Gmax, and
+	// custom forms after otherFormes for mod-specific forms.
+	getLuminescentUrl(type: 'pokemon' | 'move' | 'item' | 'ability', nameOrId: string): string {
+		switch (type) {
+		case 'pokemon': {
+			const species = Dex.species.get(nameOrId);
+			if (!species.exists) return '#';	if (species.baseSpecies && species.forme && species.baseSpecies !== species.name) {
+			// Pre-computed form index map from export-relumi-client-overrides.js.
+			// Uses the server-side Dex (which has formeOrder) so it's always correct.
+				const precomputed = (window.BattleTeambuilderTable &&
+					window.BattleTeambuilderTable.gen8relumi &&
+					window.BattleTeambuilderTable.gen8relumi.relumiFormIndexMap) || {};
+				if (species.id in precomputed) {
+					return `//${Config.routes.dex}/pokedex/${species.num}_${precomputed[species.id]}`;
+				}
+				// Fallback runtime computation for species not in pre-computed map.
+				const base = Dex.species.get(species.baseSpecies);
+				const formeOrder: string[] = [base.name];
+				const foIDs = formeOrder.map((f: string) => toID(f));
+				const formIndex = foIDs.indexOf(species.id);
+				if (formIndex >= 0) {
+					return `//${Config.routes.dex}/pokedex/${species.num}_${formIndex}`;
+				}
+				// Gmax always goes at formeOrder.length, before custom forms.
+				const gmaxId = `${toID(species.baseSpecies)}gmax`;
+				if (species.id === gmaxId || (species.id.endsWith('gmax') && Dex.species.get(gmaxId).exists)) {
+					return `//${Config.routes.dex}/pokedex/${species.num}_${formeOrder.length}`;
+				}
+				// Custom forms after Gmax, sorted alphabetically among themselves.
+				const hasGmax = Dex.species.get(gmaxId).exists;
+				const offset = hasGmax ? formeOrder.length + 1 : formeOrder.length;
+				const otherIDs = (base.otherFormes || [])
+					.map((f: string) => toID(f))
+					.filter((f: string) => !foIDs.includes(f) && !f.endsWith('gmax'));
+				otherIDs.sort();
+				const otherIndex = Math.max(0, otherIDs.indexOf(species.id));
+				return `//${Config.routes.dex}/pokedex/${species.num}_${offset + otherIndex}`;
+			}
+			return `//${Config.routes.dex}/pokedex/${species.id}`;
+		}
+		case 'move': {
+			const move = Dex.moves.get(nameOrId);
+			if (!move.exists) return '#';
+			// Luminescent uses lowercase-with-hyphens: "Karate Chop" -> "karate-chop"
+			const slug = move.name.toLowerCase().replace(/\s+/g, '-');
+			return `//${Config.routes.dex}/moves/${slug}`;
+		}
+		case 'item': {
+			const item = Dex.items.get(nameOrId);
+			if (!item.exists) return '#';
+			// Luminescent uses lowercase-with-hyphens: "Leftovers" -> "leftovers"
+			const slug = item.name.toLowerCase().replace(/\s+/g, '-');
+			return `//${Config.routes.dex}/items/${slug}`;
+		}
+		case 'ability':
+			// Placeholder: luminescent.team has no ability pages yet.
+			return '#';
+		}
+	}
+
 	getPokeballs() {
 		if (this.pokeballs) return this.pokeballs;
 		this.pokeballs = [];
