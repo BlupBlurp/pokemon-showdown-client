@@ -958,8 +958,6 @@ export const Dex = new class implements ModdedDex {
 			}
 			// Nested variants (e.g. Alcremie cream + topping) or leaf formes with siblings on base.
 			if (names.length > 1) return names;
-			if (base.cosmeticFormes?.length) return [base.name, ...base.cosmeticFormes];
-			return [species.name];
 		}
 
 		const cosmeticFormes = base.cosmeticFormes;
@@ -1097,7 +1095,8 @@ export const Dex = new class implements ModdedDex {
 		switch (type) {
 		case 'pokemon': {
 			const species = Dex.species.get(nameOrId);
-			if (!species.exists) return '#';	if (species.baseSpecies && species.forme && species.baseSpecies !== species.name) {
+			if (!species.exists) return '#';
+			if (species.baseSpecies && species.forme && species.baseSpecies !== species.name) {
 			// Pre-computed form index map from export-relumi-client-overrides.js.
 			// Uses the server-side Dex (which has formeOrder) so it's always correct.
 				const precomputed = (window.BattleTeambuilderTable &&
@@ -1106,28 +1105,6 @@ export const Dex = new class implements ModdedDex {
 				if (species.id in precomputed) {
 					return `//${Config.routes.dex}/pokedex/${species.num}_${precomputed[species.id]}`;
 				}
-				// Fallback runtime computation for species not in pre-computed map.
-				const base = Dex.species.get(species.baseSpecies);
-				const formeOrder: string[] = [base.name];
-				const foIDs = formeOrder.map((f: string) => toID(f));
-				const formIndex = foIDs.indexOf(species.id);
-				if (formIndex >= 0) {
-					return `//${Config.routes.dex}/pokedex/${species.num}_${formIndex}`;
-				}
-				// Gmax always goes at formeOrder.length, before custom forms.
-				const gmaxId = `${toID(species.baseSpecies)}gmax`;
-				if (species.id === gmaxId || (species.id.endsWith('gmax') && Dex.species.get(gmaxId).exists)) {
-					return `//${Config.routes.dex}/pokedex/${species.num}_${formeOrder.length}`;
-				}
-				// Custom forms after Gmax, sorted alphabetically among themselves.
-				const hasGmax = Dex.species.get(gmaxId).exists;
-				const offset = hasGmax ? formeOrder.length + 1 : formeOrder.length;
-				const otherIDs = (base.otherFormes || [])
-					.map((f: string) => toID(f))
-					.filter((f: string) => !foIDs.includes(f) && !f.endsWith('gmax'));
-				otherIDs.sort();
-				const otherIndex = Math.max(0, otherIDs.indexOf(species.id));
-				return `//${Config.routes.dex}/pokedex/${species.num}_${offset + otherIndex}`;
 			}
 			return `//${Config.routes.dex}/pokedex/${species.id}`;
 		}
