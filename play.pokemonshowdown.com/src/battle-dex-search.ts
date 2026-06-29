@@ -984,9 +984,8 @@ abstract class BattleTypedSearch<T extends SearchType> {
 			}
 		}
 		let learnsetid = this.firstLearnsetid(speciesid);
-		const table = this.getLearnsetTable();
 		while (learnsetid) {
-			let table = BattleTeambuilderTable;
+			let table = this.getRelumiTable(BattleTeambuilderTable);
 			if (this.formatType?.startsWith('bdsp')) table = table['gen8bdsp'];
 			if (this.formatType === 'letsgo') table = table['gen7letsgo'];
 			if (this.formatType === 'bw1') table = table['gen5bw1'];
@@ -1006,11 +1005,12 @@ abstract class BattleTypedSearch<T extends SearchType> {
 		}
 		return false;
 	}
+	protected getRelumiTable(table: any): any {
+		if (this.format.includes('relumi') && table?.gen8relumi) return table.gen8relumi;
+		return table;
+	}
 	private getLearnsetTable() {
-		let table = BattleTeambuilderTable;
-		if (this.format.includes('relumi') && table?.gen8relumi) {
-			table = table.gen8relumi;
-		}
+		let table = this.getRelumiTable(BattleTeambuilderTable);
 		if (this.formatType?.startsWith('bdsp')) table = table['gen8bdsp'];
 		if (this.formatType === 'letsgo') table = table['gen7letsgo'];
 		if (this.formatType === 'bw1') table = table['gen5bw1'];
@@ -1023,10 +1023,7 @@ abstract class BattleTypedSearch<T extends SearchType> {
 		if (this.formatType === 'metronome') {
 			return pokemon.num >= 0 ? String(pokemon.num) : pokemon.tier;
 		}
-		let table = window.BattleTeambuilderTable;
-		if (this.format.includes("relumi") && table?.gen8relumi) {
-			table = table.gen8relumi;
-		}
+		let table = this.getRelumiTable(window.BattleTeambuilderTable);
 		const gen = this.dex.gen;
 		const tableKey = this.formatType === 'doubles' ? `gen${gen}doubles` :
 			this.formatType === 'letsgo' ? 'gen7letsgo' :
@@ -1167,14 +1164,6 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 			}[] = [];
 
 			// Pre-computed tag-ban check to avoid arrow-function closures in the species loop
-			const checkTagBan = (speciesId: string): boolean => {
-				for (let ti = 0; ti < relumiBaseTagBans.length; ti++) {
-					const tagId = toID(relumiBaseTagBans[ti].replace(/^tag:/, ''));
-					if (bannedSpeciesByTag[tagId]?.includes(speciesId)) return true;
-				}
-				return false;
-			};
-
 			for (const id in BattlePokedex) {
 				if (id === "missingno") continue;
 				const species = this.dex.species.get(id);
@@ -1188,19 +1177,22 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 					if (!relumiGen9Allowed.includes(species.id)) continue;
 				}
 				if (isRelumiOU && relumiOUBans.includes(species.id)) continue;
-				const isRevavroomCustomForm =
-					species.baseSpecies === "Revavroom" &&
-					species.id !== "revavroom";
-				const hasRelumiBaseTagBan = checkTagBan(species.id);
 				const hasRelumiBasePokemonBan =
 					relumiBasePokemonBans.includes(species.id) ||
 					relumiBasePokemonBans.includes(toID(species.name));
+				// All variables use 'var' here to avoid Babel block-scoping closure limits in this file.
+				var hasRelumiBaseTagBan = false;
+				for (var ti = 0; ti < relumiBaseTagBans.length; ti++) {
+					if (bannedSpeciesByTag[toID(relumiBaseTagBans[ti].replace(/^tag:/, ''))]?.includes(species.id)) {
+						hasRelumiBaseTagBan = true;
+						break;
+					}
+				}
 				if (
 					isRelumiMainLadder &&
 					(species.isPrimal ||
 						hasRelumiBaseTagBan ||
-						hasRelumiBasePokemonBan ||
-						isRevavroomCustomForm)
+						hasRelumiBasePokemonBan)
 				) {
 					continue;
 				}
