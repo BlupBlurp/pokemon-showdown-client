@@ -487,6 +487,7 @@ export class DexSearch {
 				// Exception: Alcremie-Salted-Cream has no vanilla BattlePokedex entry so it
 				// never appears in the prebuilt BattleSearchIndex; allow it through explicitly.
 				const species = this.dex.species.get(id);
+				if (!species.exists) continue;
 				if (species.isCosmeticForme && id !== 'alcremiesaltedcream') continue;
 
 				let typeIndex = 1;
@@ -555,8 +556,9 @@ export class DexSearch {
 				let type = fId.charAt(0).toUpperCase() + fId.slice(1) as Dex.TypeName;
 				buf.push(['header', `${type}-type Pok\u00e9mon`]);
 				for (let id in BattlePokedex) {
-					if (!BattlePokedex[id].types) continue;
-					if (this.dex.species.get(id).types.includes(type)) {
+					const instaSpecies = this.dex.species.get(id);
+					if (!instaSpecies.exists || !BattlePokedex[id].types) continue;
+					if (instaSpecies.types.includes(type)) {
 						(illegal && id in illegal ? illegalBuf : buf).push(['pokemon', id as ID]);
 					}
 				}
@@ -565,8 +567,9 @@ export class DexSearch {
 				let ability = Dex.abilities.get(fId).name;
 				buf.push(['header', `${ability} Pok\u00e9mon`]);
 				for (let id in BattlePokedex) {
-					if (!BattlePokedex[id].abilities) continue;
-					if (Dex.hasAbility(this.dex.species.get(id), ability)) {
+					const instaSpecies = this.dex.species.get(id);
+					if (!instaSpecies.exists || !BattlePokedex[id].abilities) continue;
+					if (Dex.hasAbility(instaSpecies, ability)) {
 						(illegal && id in illegal ? illegalBuf : buf).push(['pokemon', id as ID]);
 					}
 				}
@@ -851,6 +854,7 @@ abstract class BattleTypedSearch<T extends SearchType> {
 						// Cosmetic formes are selectable via sprite picker - don't mark as illegal.
 						// Exception: Alcremie-Salted-Cream (see runtime loop above).
 						const species = this.dex.species.get(id);
+						if (!species.exists) continue;
 						if (species.isCosmeticForme && id !== 'alcremiesaltedcream') continue;
 						this.baseIllegalResults.push([this.searchType, id as ID]);
 						this.illegalReasons[id] = 'Illegal';
@@ -1129,6 +1133,7 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 			// Filter out cosmetic formes - they are selectable via sprite picker on base species.
 			// Exception: Alcremie-Salted-Cream (see runtime loop above).
 			const species = this.dex.species.get(id);
+			if (!species.exists) continue;
 			if (species.isCosmeticForme && id !== 'alcremiesaltedcream') continue;
 			results.push(['pokemon', id as ID]);
 		}
