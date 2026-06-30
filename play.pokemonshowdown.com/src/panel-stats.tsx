@@ -35,9 +35,22 @@ export class StatsRoom extends PSRoom {
 	}
 }
 
+// ---- Constants ----
+
+// Short stat labels for the team export helper (matches Showdown's teambuilder format).
+const STAT_SHORT_NAMES: Record<string, string> = {
+	hp: 'HP', atk: 'Atk', def: 'Def', spa: 'SpA', spd: 'SpD', spe: 'Spe',
+};
+
 // ---- Types ----
 
 type LeaderboardTab = 'topByBattles' | 'topByWinRate' | 'topByCurrentWinStreak';
+type DetailTab = 'detail' | 'trends';
+
+interface SpeciesTrendData {
+	species: string;
+	days: Array<{ date: string; usagePct: number; winRate: number }>;
+}
 
 interface StatsState {
 	format: string;
@@ -49,8 +62,48 @@ interface StatsState {
 	sortCol: string;
 	sortAsc: boolean;
 	expandedSpecies: string | null;
+	expandedTab: DetailTab;
+	trendsLoading: boolean;
+	trendsError: string | null;
+	trendsData: SpeciesTrendData | null;
+	randomTeamLoading: boolean;
+	copyNotice: string | null;
 	searchQuery: string;
 	showPersonal: boolean;
+}
+
+// ---- Helpers ----
+
+/**
+ * Builds canonical Showdown-importable text for a team. Used by both the
+ * "Top Teams" export buttons and the "Random team" button so the format
+ * stays consistent. Strips empty EV/IV/nature fields so imported teams
+ * remain legal in the teambuilder.
+ */
+function generateTeamExportText(team: any[]): string {
+	return team.map((mon: any) => {
+		const lines: string[] = [];
+		const item = mon.item || '';
+		lines.push(item ? `${mon.species} @ ${item}` : `${mon.species}`);
+		if (mon.ability) lines.push(`Ability: ${mon.ability}`);
+		const evs: string[] = [];
+		for (const stat of Object.keys(STAT_SHORT_NAMES)) {
+			const v = mon.evs?.[stat];
+			if (v && v > 0) evs.push(`${v} ${STAT_SHORT_NAMES[stat]}`);
+		}
+		if (evs.length) lines.push(`EVs: ${evs.join(' / ')}`);
+		if (mon.nature) lines.push(`${mon.nature} Nature`);
+		const ivs: string[] = [];
+		for (const stat of Object.keys(STAT_SHORT_NAMES)) {
+			const v = mon.ivs?.[stat];
+			if (v !== undefined && v !== 31) ivs.push(`${v} ${STAT_SHORT_NAMES[stat]}`);
+		}
+		if (ivs.length) lines.push(`IVs: ${ivs.join(' / ')}`);
+		for (const move of mon.moves || []) {
+			if (move) lines.push(`- ${move}`);
+		}
+		return lines.join('\n');
+	}).join('\n\n');
 }
 
 // ---- Panel ----
@@ -65,7 +118,7 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 
 	override state: StatsState = {
 		format: FORMATS[0].id,
-		range: '7d',
+		range: 'all',
 		loading: true,
 		error: null,
 		data: null,
@@ -73,6 +126,12 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 		sortCol: 'usagePct',
 		sortAsc: false,
 		expandedSpecies: null,
+		expandedTab: 'detail',
+		trendsLoading: false,
+		trendsError: null,
+		trendsData: null,
+		randomTeamLoading: false,
+		copyNotice: null,
 		searchQuery: '',
 		showPersonal: false,
 	};
@@ -132,8 +191,124 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 
 	toggleExpand = (species: string) => {
 		this.setState((prev: StatsState) => ({
+			// Closing the row clears the trends cache + active tab so a fresh
+			// expand starts clean; opening pre-selects the detail tab.
 			expandedSpecies: prev.expandedSpecies === species ? null : species,
+			expandedTab: prev.expandedSpecies === species ? prev.expandedTab : 'detail',
+			trendsLoading: prev.expandedSpecies === species ? prev.trendsLoading : false,
+			trendsError: prev.expandedSpecies === species ? prev.trendsError : null,
+			trendsData: prev.expandedSpecies === species ? prev.trendsData : null,
 		}));
+	};
+
+	setDetailTab = (tab: DetailTab) => {
+		this.setState({ expandedTab: tab });
+		if (tab === 'trends') this.fetchTrendData();
+	};
+
+	fetchTrendData = async () => {
+		const { expandedSpecies, format, range } = this.state;
+		if (!expandedSpecies) return;
+		this.setState({ trendsLoading: true, trendsError: null });
+		try {
+			const url = `/api/battlestats/species-trends?format=${encodeURIComponent(format)}&range=${encodeURIComponent(range)}&species=${encodeURIComponent(expandedSpecies)}`;
+			const res = await fetch(url);
+			if (!res.ok) {
+				let detail = '';
+				try { const errBody = await res.json(); detail = errBody.error || ''; } catch {}
+				throw new Error(detail || `Server returned ${res.status}`);
+			}
+			const data: SpeciesTrendData = await res.json();
+			this.setState({ trendsData: data, trendsLoading: false });
+		} catch (err: any) {
+			this.setState({ trendsError: err.message || 'Unknown error', trendsLoading: false });
+		}
+	};
+
+	exportTeam = (team: any[]) => {
+		this.copyToClipboard(
+			generateTeamExportText(team),
+			'Team copied to clipboard',
+		);
+	};
+
+	fetchRandomTeam = async () => {
+		const { format } = this.state;
+		this.setState({ randomTeamLoading: true });
+		try {
+			const url = `/api/battlestats/random-team?format=${encodeURIComponent(format)}`;
+			const res = await fetch(url);
+			if (!res.ok) {
+				let detail = '';
+				try { const errBody = await res.json(); detail = errBody.error || ''; } catch {}
+				throw new Error(detail || `Server returned ${res.status}`);
+			}
+			const data: { team: any[] | null } = await res.json();
+			if (!data.team || !data.team.length) {
+				throw new Error('No team data available for this format.');
+			}
+			this.copyToClipboard(
+				generateTeamExportText(data.team),
+				'Random team copied to clipboard',
+			);
+			this.setState({ randomTeamLoading: false });
+		} catch (err: any) {
+			this.setState({
+				randomTeamLoading: false,
+				copyNotice: `Error: ${err.message || 'Unknown error'}`,
+			});
+		}
+	};
+
+	/**
+	 * Copy `text` to the system clipboard and flash a short confirmation
+	 * banner in the panel. Falls back to a hidden textarea + execCommand
+	 * for environments without the modern Clipboard API.
+	 */
+	copyToClipboard = async (text: string, message: string) => {
+		let copied = false;
+		try {
+			if (navigator.clipboard?.writeText) {
+				await navigator.clipboard.writeText(text);
+				copied = true;
+			} else {
+				const ta = document.createElement('textarea');
+				ta.value = text;
+				ta.style.position = 'fixed';
+				ta.style.opacity = '0';
+				document.body.appendChild(ta);
+				ta.focus();
+				ta.select();
+				copied = document.execCommand('copy');
+				document.body.removeChild(ta);
+			}
+		} catch {}
+		if (!copied) {
+			// eslint-disable-next-line no-console
+			console.log(text);
+		}
+		this.setState({
+			copyNotice: copied
+				? message
+				: 'Could not copy automatically — the full team text was logged to your browser console (open DevTools).',
+		});
+		// Auto-dismiss the banner after a few seconds. Bump a generation
+		// counter so a stale timer cannot wipe a newer banner, and track
+		// the timer id so we can cancel on unmount.
+		const gen = ++this.copyGeneration;
+		if (this.copyTimeoutId !== null) clearTimeout(this.copyTimeoutId);
+		this.copyTimeoutId = setTimeout(() => {
+			this.copyTimeoutId = null;
+			if (this.copyGeneration === gen) this.setState({ copyNotice: null });
+		}, 3500);
+	};
+
+	dismissCopyNotice = () => {
+		if (this.copyTimeoutId !== null) {
+			clearTimeout(this.copyTimeoutId);
+			this.copyTimeoutId = null;
+		}
+		this.setState({ copyNotice: null });
 	};
 
 	// ---- Render ----
@@ -193,12 +368,13 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 		}
 
 		return <div>
+			{this.renderCopyNotice()}
 			{categories.map((cat: any) => <div class="stats-category" key={cat.id}>
 				<h3 class="stats-cat-header">{cat.displayFormat || cat.label}</h3>
-				{this.renderOverview(cat.battleStats)}
+				{this.renderOverview(cat.battleStats, cat.metaTrends)}
 				{this.renderHighlights(cat.pokemonUsage)}
 				{this.renderLeaderboards(cat.userLeaderboard)}
-				{this.renderTrends(cat.metaTrends)}
+				{this.renderTrends(cat.metaTrends, cat.topTeams)}
 				{this.renderUsage(cat.pokemonUsage)}
 			</div>)}
 		</div>;
@@ -248,19 +424,24 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 
 	// ---- Overview Metrics ----
 
-	renderOverview(stats: any) {
+	renderOverview(stats: any, metaTrends: any) {
 		if (!stats) return null;
 
 		const metrics = [
 			{ label: 'All-Time Battles', value: stats.totalBattlesAllTime.toLocaleString() },
 			{ label: 'Last 24h', value: stats.battlesLast24h.toLocaleString() },
-			{ label: 'Last 7 Days', value: stats.battlesLast7d.toLocaleString() },
 			{ label: 'Last 30 Days', value: stats.battlesLast30d.toLocaleString() },
 			{ label: 'Avg Battles/Day (30d)', value: stats.averageBattlesPerDay30d.toFixed(1) },
 			{ label: 'Avg Turns/Battle', value: stats.averageBattleDurationTurns ? stats.averageBattleDurationTurns.toFixed(1) : 'N/A' },
 			{ label: 'Forfeit/DC Rate', value: (stats.forfeitDisconnectRate * 100).toFixed(1) + '%' },
 			{ label: 'Peak Hour (UTC)', value: stats.peakHourOfDay !== null ? stats.peakHourOfDay + ':00' : 'N/A' },
 		];
+		if (metaTrends?.formatHealthIndicator !== undefined) {
+			metrics.push({
+				label: 'Format Health',
+				value: (metaTrends.formatHealthIndicator * 100).toFixed(1) + '% unique players',
+			});
+		}
 
 		return <div class="stats-section">
 			<h4>Overview</h4>
@@ -388,9 +569,9 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 					<tbody>
 						{							sortedPokemon.map((p: any, i: number) => {
 							const topAbility = p.abilities?.[0]
-								? `${p.abilities[0].name} (${p.abilities[0].pct.toFixed(0)}%)` : '\u2014';
+								? `${p.abilities[0].name} (${p.abilities[0].pct.toFixed(0)}%, ${p.abilities[0].winRate.toFixed(0)}% wr)` : '\u2014';
 							const topMoves = p.moves?.length
-								? p.moves.slice(0, 3).map((m: any) => `${m.name} (${m.pct.toFixed(0)}%)`).join(', ')
+								? p.moves.slice(0, 3).map((m: any) => `${m.name} (${m.pct.toFixed(0)}%, ${m.winRate.toFixed(0)}% wr)`).join(', ')
 								: '\u2014';
 							const isExpanded = this.state.expandedSpecies === p.species;
 
@@ -407,7 +588,7 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 								<td>{p.dominantScore != null ? (p.dominantScore * 100).toFixed(1) + '%' : '\u2014'}</td>
 								<td>{topAbility}</td>
 								<td class="stats-itemcell">
-									{p.items?.[0] ? <><PSIcon item={p.items[0].name} /> {p.items[0].name} ({p.items[0].pct.toFixed(0)}%)</> : '\u2014'}
+									{p.items?.[0] ? <><PSIcon item={p.items[0].name} /> {p.items[0].name} ({p.items[0].pct.toFixed(0)}%, {p.items[0].winRate.toFixed(0)}% wr)</> : '\u2014'}
 								</td>
 								<td class="stats-moves-cell">{topMoves}</td>
 								<td>{p.versatilityCount}</td>
@@ -424,7 +605,7 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 	// ---- Expanded Detail Row ----
 
 	renderExpandedDetail(p: any) {
-		// Helper: render a simple list of {name, pct} entries
+		// Helper: render a simple list of {name, pct, winRate} entries
 		const renderSimpleList = (items: any[], showIcon: boolean) => {
 			if (!items || !items.length) return <p class="stats-empty">No data</p>;
 			return <ul class="stats-detail-list">
@@ -434,7 +615,12 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 							{showIcon && <PSIcon item={entry.name} />}
 							{entry.name}
 						</span>
-						<span class="stats-detail-pct">{entry.pct.toFixed(1)}%</span>
+						<span class="stats-detail-numbers">
+							<span class="stats-detail-pct">{entry.pct.toFixed(1)}%</span>
+							{typeof entry.winRate === 'number' && (
+								<span class="stats-detail-winrate" title="Win rate when this ability/item/move is used">{entry.winRate.toFixed(1)}% wr</span>
+							)}
+						</span>
 					</li>
 				))}
 			</ul>;
@@ -458,9 +644,21 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 			</ul>;
 		};
 
+		const { expandedTab, trendsLoading, trendsError } = this.state;
+
 		return <tr class="stats-expanded-row" key={`${p.species}-detail`}>
 			<td colSpan={9} class="stats-expanded-cell">
-				<div class="stats-detail-grid">
+				<div class="stats-detail-tabs">
+					<button
+						class={`button stats-detail-tab${expandedTab === 'detail' ? ' cur' : ''}`}
+						onClick={() => this.setDetailTab('detail')}
+					>Details</button>
+					<button
+						class={`button stats-detail-tab${expandedTab === 'trends' ? ' cur' : ''}`}
+						onClick={() => this.setDetailTab('trends')}
+					>Trends</button>
+				</div>
+				{expandedTab === 'detail' && <div class="stats-detail-grid">
 					<div class="stats-detail-col">
 						<h5>Abilities</h5>
 						{renderSimpleList(p.abilities, false)}
@@ -477,33 +675,145 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 						<h5>Counters</h5>
 						{renderCounters(p.counters)}
 					</div>
-				</div>
+				</div>}
+				{expandedTab === 'trends' && <div class="stats-trend-pane">
+					{trendsLoading && <div class="message message-loading"><p>Loading trends…</p></div>}
+					{trendsError && <div class="message message-error"><p>{trendsError}</p></div>}
+					{!trendsLoading && !trendsError && this.renderTrendChart(p)}
+				</div>}
 			</td>
 		</tr>;
 	}
 
-	// ---- Meta Trends ----
+	// ---- Meta Trends (now includes Top Teams above "Most Common Core") ----
 
-	renderTrends(trends: any) {
-		if (!trends) return null;
+	renderTrends(trends: any, teams: any[]) {
+		if (!trends && !(teams && teams.length)) return null;
 
 		return <div class="stats-section">
 			<h4>Meta Trends</h4>
-			{trends.mostCommonCore && <div class="stats-meta-item">
-				<strong>Most Common Core:</strong> {trends.mostCommonCore.pokemonA} + {trends.mostCommonCore.pokemonB}{' '}
+			{teams && teams.length > 0 && <div class="stats-teams-block">
+				<h5 class="stats-team-subheader">Top Teams</h5>
+				<div class="stats-team-list">
+					{teams.map((t: any, i: number) => <div class="stats-team-card" key={t.signature}>
+						<div class="stats-team-header">
+							<strong>#{i + 1}</strong>
+							<span class="stats-team-stats">
+								{t.appearances} appearances · {(t.winRate || 0).toFixed(1)}% win rate
+							</span>
+							<button
+								class="button stats-team-export-btn"
+								onClick={() => this.exportTeam(t.team)}
+								title="Copy this team in Showdown importable format"
+							>
+								<i class="fa fa-download"></i> Export to text
+							</button>
+						</div>
+						<div class="stats-team-species">
+							{(t.signature || '').split('/').filter(Boolean).map((species: string) =>
+								<span class="stats-team-mon" key={species}>
+									<PSIcon pokemon={species} />{' '}{species}
+								</span>
+							)}
+						</div>
+					</div>)}
+				</div>
+				<div class="stats-teams-footer">
+					<button
+						class="button"
+						disabled={this.state.randomTeamLoading}
+						onClick={this.fetchRandomTeam}
+						title="Pick a random team from recorded battles and copy it"
+					>
+						<i class="fa fa-random"></i>{' '}
+						{this.state.randomTeamLoading ? 'Loading…' : 'Random team'}
+					</button>
+				</div>
+			</div>}
+			{trends && trends.mostCommonCore && <div class="stats-meta-item">
+				<strong>Most Common Core:</strong>{' '}
+				<PSIcon pokemon={trends.mostCommonCore.pokemonA} /> {trends.mostCommonCore.pokemonA} +{' '}
+				<PSIcon pokemon={trends.mostCommonCore.pokemonB} /> {trends.mostCommonCore.pokemonB}{' '}
 				<small>({trends.mostCommonCore.count} teams)</small>
 			</div>}
-			{trends.topCommonCores?.length > 1 && <ul class="stats-core-list">
+			{trends && trends.topCommonCores?.length > 1 && <ul class="stats-core-list">
 				{trends.topCommonCores.slice(1, 6).map((core: any) =>
 					<li key={core.pokemonA + core.pokemonB}>
-						{core.pokemonA} + {core.pokemonB} ({core.count} teams)
+						<PSIcon pokemon={core.pokemonA} /> {core.pokemonA} +{' '}
+						<PSIcon pokemon={core.pokemonB} /> {core.pokemonB}{' '}
+						({core.count} teams)
 					</li>
 				)}
 			</ul>}
-			{trends.formatHealthIndicator !== undefined && <div class="stats-meta-item">
-				<strong>Format Health:</strong> {(trends.formatHealthIndicator * 100).toFixed(1)}% unique player ratio
-			</div>}
 		</div>;
+	}
+
+	// ---- Copy Notice (flash banner after clipboard copy) ----
+
+	renderCopyNotice() {
+		if (!this.state.copyNotice) return null;
+		return <div class="stats-copy-notice">
+			<span>{this.state.copyNotice}</span>
+			<button class="button" onClick={this.dismissCopyNotice} title="Dismiss">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>;
+	}
+
+	// ---- Trends Chart (inline SVG) ----
+
+	renderTrendChart(p: any) {
+		const days = this.state.trendsData?.days || [];
+		if (!days.length) {
+			return <p class="stats-empty">No trend data yet.</p>;
+		}
+		const W = 480, H = 150;
+		const pad = { top: 26, right: 14, bottom: 30, left: 38 };
+		const cw = W - pad.left - pad.right;
+		const ch = H - pad.top - pad.bottom;
+		const xAt = (i: number) => pad.left + (days.length === 1 ? cw / 2 : (i / (days.length - 1)) * cw);
+		const yAt = (pct: number) => pad.top + ch - (Math.min(pct, 100) / 100) * ch;
+		const usagePts = days.map((d, i) => `${xAt(i)},${yAt(d.usagePct)}`).join(' ');
+		const winPts = days.map((d, i) => `${xAt(i)},${yAt(d.winRate)}`).join(' ');
+		// Show ~5–6 x labels even when many days are present.
+		const labelEvery = Math.max(1, Math.ceil(days.length / 6));
+		const gridLevels = [0, 25, 50, 75, 100];
+		return <svg viewBox={`0 0 ${W} ${H}`} class="stats-trend-chart" preserveAspectRatio="xMidYMid meet">
+			{gridLevels.map(p => <g>
+				<line x1={pad.left} y1={yAt(p)} x2={W - pad.right} y2={yAt(p)} stroke="#dddddd" stroke-dasharray="3,3" />
+				<text x={pad.left - 6} y={yAt(p)} text-anchor="end" dominant-baseline="middle" font-size="11" fill="#888">{p}%</text>
+			</g>)}
+			<polyline points={usagePts} fill="none" stroke="#337ab7" stroke-width="2" />
+			<polyline points={winPts} fill="none" stroke="#28a745" stroke-width="2" />
+			{days.map((d, i) => <g>
+				<circle cx={xAt(i)} cy={yAt(d.usagePct)} r="3" fill="#337ab7">
+					<title>{`${d.date}: usage ${d.usagePct.toFixed(1)}%`}</title>
+				</circle>
+				<circle cx={xAt(i)} cy={yAt(d.winRate)} r="3" fill="#28a745">
+					<title>{`${d.date}: win rate ${d.winRate.toFixed(1)}%`}</title>
+				</circle>
+				{i % labelEvery === 0 || i === days.length - 1 ? <text x={xAt(i)} y={H - 10} text-anchor="middle" font-size="10" fill="#666">{d.date.slice(5)}</text> : null}
+			</g>)}
+			<g transform={`translate(${pad.left}, ${pad.top - 12})`}>
+				<line x1="0" y1="0" x2="14" y2="0" stroke="#337ab7" stroke-width="2" />
+				<text x="20" y="4" font-size="11" fill="#337ab7">Usage %</text>
+				<line x1="80" y1="0" x2="94" y2="0" stroke="#28a745" stroke-width="2" />
+				<text x="100" y="4" font-size="11" fill="#28a745">Win Rate %</text>
+			</g>
+		</svg>;
+	}
+
+	// Tracks the in-flight auto-dismiss timeout + the active notice so we
+	// can cancel on unmount and stop a stale timer from dismissing a newer
+	// banner (each invocation bumps `copyGeneration`).
+	private copyTimeoutId: ReturnType<typeof setTimeout> | null = null;
+	private copyGeneration = 0;
+
+	override componentWillUnmount() {
+		if (this.copyTimeoutId !== null) {
+			clearTimeout(this.copyTimeoutId);
+			this.copyTimeoutId = null;
+		}
 	}
 }
 

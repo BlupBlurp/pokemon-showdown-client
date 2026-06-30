@@ -3060,6 +3060,150 @@ button.team:active {
 	background: rgba(255, 255, 255, 0.02);
 }
 
+/* ---- Expanded detail tabs (Details / Trends) ---- */
+.stats-detail-tabs {
+	display: flex;
+	gap: 6px;
+	margin-bottom: 10px;
+}
+.stats-detail-tab {
+	font-size: 11px;
+	padding: 4px 10px;
+	opacity: 0.65;
+	transition: opacity 0.1s;
+}
+.stats-detail-tab.cur {
+	opacity: 1;
+	font-weight: bold;
+}
+.stats-detail-tab:hover {
+	opacity: 0.9;
+}
+
+/* ---- Win-rate badge inside ability/item/move lists ---- */
+.stats-detail-numbers {
+	display: inline-flex;
+	gap: 8px;
+	align-items: baseline;
+}
+.stats-detail-winrate {
+	color: #556677;
+	font-size: 10px;
+	background: rgba(0, 0, 0, 0.05);
+	padding: 1px 5px;
+	border-radius: 3px;
+	white-space: nowrap;
+}
+.dark .stats-detail-winrate {
+	color: #99aabb;
+	background: rgba(255, 255, 255, 0.06);
+}
+
+/* ---- Trends tab pane + inline SVG chart ---- */
+.stats-trend-pane {
+	padding: 6px 4px 12px;
+	overflow-x: auto;
+}
+.stats-trend-chart {
+	display: block;
+	max-width: 480px;
+	width: 100%;
+	height: auto;
+}
+.stats-trend-chart polyline {
+	transition: stroke-width 0.15s;
+}
+.stats-trend-chart:hover polyline {
+	stroke-width: 2.5;
+}
+.stats-trend-chart circle {
+	cursor: default;
+}
+
+/* ---- Top Teams section (inline inside Meta Trends) ---- */
+.stats-teams-block {
+	margin-bottom: 12px;
+}
+.stats-team-subheader {
+	font-size: 12px;
+	margin: 4px 0 8px;
+	opacity: 0.85;
+}
+.stats-team-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+.stats-team-card {
+	background: rgba(0, 0, 0, 0.025);
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 4px;
+	padding: 8px 10px;
+}
+.dark .stats-team-card {
+	background: rgba(255, 255, 255, 0.03);
+	border-color: rgba(255, 255, 255, 0.08);
+}
+.stats-team-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 6px;
+	flex-wrap: wrap;
+}
+.stats-team-header strong {
+	font-size: 13px;
+}
+.stats-team-stats {
+	font-size: 11px;
+	opacity: 0.75;
+	margin-right: auto;
+}
+.stats-team-export-btn {
+	font-size: 11px;
+	padding: 3px 8px;
+}
+.stats-team-species {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	font-size: 12px;
+}
+.stats-team-mon {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+.stats-teams-footer {
+	margin-top: 10px;
+	display: flex;
+	justify-content: flex-start;
+}
+
+/* ---- Copy notice (flash banner after clipboard copy) ---- */
+.stats-copy-notice {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background: rgba(40, 167, 69, 0.10);
+	border: 1px solid rgba(40, 167, 69, 0.30);
+	border-radius: 4px;
+	padding: 6px 10px;
+	margin-bottom: 10px;
+	font-size: 12px;
+}
+.stats-copy-notice span {
+	flex: 1;
+}
+.stats-copy-notice .button {
+	padding: 2px 8px;
+	font-size: 11px;
+}
+.dark .stats-copy-notice {
+	background: rgba(60, 200, 100, 0.10);
+	border-color: rgba(60, 200, 100, 0.30);
+}
+
 .stats-detail-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
