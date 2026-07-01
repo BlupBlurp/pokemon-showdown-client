@@ -67,6 +67,7 @@ interface StatsState {
 	trendsError: string | null;
 	trendsData: SpeciesTrendData | null;
 	randomTeamLoading: boolean;
+	randomTeam: any[] | null;
 	copyNotice: string | null;
 	searchQuery: string;
 	showPersonal: boolean;
@@ -131,6 +132,7 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 		trendsError: null,
 		trendsData: null,
 		randomTeamLoading: false,
+		randomTeam: null,
 		copyNotice: null,
 		searchQuery: '',
 		showPersonal: false,
@@ -247,11 +249,9 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 			if (!data.team || !data.team.length) {
 				throw new Error('No team data available for this format.');
 			}
-			this.copyToClipboard(
-				generateTeamExportText(data.team),
-				'Random team copied to clipboard',
-			);
-			this.setState({ randomTeamLoading: false });
+			// Display the rolled team visually in the panel; subsequent clicks
+			// reroll by replacing this state value with a fresh team.
+			this.setState({ randomTeam: data.team, randomTeamLoading: false });
 		} catch (err: any) {
 			this.setState({
 				randomTeamLoading: false,
@@ -723,12 +723,17 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 						class="button"
 						disabled={this.state.randomTeamLoading}
 						onClick={this.fetchRandomTeam}
-						title="Pick a random team from recorded battles and copy it"
+						title={this.state.randomTeam
+							? 'Pick another random team from recorded battles'
+							: 'Pick a random team from recorded battles'}
 					>
 						<i class="fa fa-random"></i>{' '}
-						{this.state.randomTeamLoading ? 'Loading…' : 'Random team'}
+						{this.state.randomTeamLoading
+							? 'Loading…'
+							: this.state.randomTeam ? 'Reroll' : 'Random team'}
 					</button>
 				</div>
+				{this.state.randomTeam && this.renderRandomTeam()}
 			</div>}
 			{trends && trends.mostCommonCore && <div class="stats-meta-item">
 				<strong>Most Common Core:</strong>{' '}
@@ -745,6 +750,36 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 					</li>
 				)}
 			</ul>}
+		</div>;
+	}
+
+	// ---- Random Team (display card after the first roll; rerolls from the same button) ----
+
+	renderRandomTeam() {
+		const team = this.state.randomTeam;
+		if (!team) return null;
+		// Match the top-teams card visually (icon + name per slot) so users
+		// can scan the rolled team at a glance, and offer the same Export
+		// button so a picked team can be moved into the teambuilder.
+		// Iterate in API order rather than sorting, since the server returns
+		// BattleStatsPokemon[] without a sorted signature.
+		return <div class="stats-team-card stats-random-team-card">
+			<div class="stats-team-header">
+				<strong>Random Team</strong>
+				<span class="stats-team-stats">Press the button to reroll</span>
+				<button
+					class="button stats-team-export-btn"
+					onClick={() => this.exportTeam(team)}
+					title="Copy this team in Showdown importable format"
+				>
+					<i class="fa fa-download"></i> Export to text
+				</button>
+			</div>
+			<div class="stats-team-species">
+				{team.map((mon: any) => <span class="stats-team-mon" key={mon.species}>
+					<PSIcon pokemon={mon.species} />{' '}{mon.species}
+				</span>)}
+			</div>
 		</div>;
 	}
 
