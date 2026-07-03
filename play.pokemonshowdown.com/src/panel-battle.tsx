@@ -1161,12 +1161,6 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 			</ChatLog>
 			<ChatTextEntry room={room} onMessage={this.send} onKey={this.onKey} left={chatLeft} />
 			<ChatUserList room={room} left={chatLeft} minimized />
-			<button
-				data-href="battleoptions" class="button"
-				style={{ position: 'absolute', right: '10px', top: '2px' }}
-			>
-				Battle options
-			</button>
 			<div class="battle-controls-container">
 				<div
 					class="battle-controls" role="complementary" aria-label="Battle Controls"
