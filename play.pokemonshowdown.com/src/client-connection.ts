@@ -395,8 +395,10 @@ export class PSStorage {
 	static onMessage = (e: MessageEvent) => {
 		if (e.origin !== PSStorage.origin) return;
 
-		this.frame = e.source as WindowProxy;
 		const data = e.data;
+		if (typeof data !== 'string') return; // we don't do this but external code can
+
+		this.frame = e.source as WindowProxy;
 		// console.log(`top recv: ${data}`);
 		switch (data.charAt(0)) {
 		case 'c':

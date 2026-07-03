@@ -1261,7 +1261,7 @@ export class ChatTextEntry extends preact.Component<{
 					rows={1}
 					onInput={this.update}
 					onKeyDown={this.onKeyDown}
-					style={{ resize: 'none', width: '100%', height: '16px', padding: '2px 3px 1px 3px' }}
+					style={{ minHeight: '16px', padding: '2px 3px 1px 3px' }}
 					placeholder={PSView.focusPreview(room)}
 				/> : <ChatTextBox
 					disabled={!connected || !canTalk}
@@ -1394,7 +1394,10 @@ class ChatPanel extends PSRoomPanel<ChatRoom> {
 				{room.teamSent && <button class="button" disabled>
 					Accepting...
 				</button>}
-				{!room.teamSent && <button type="submit" class={room.challenged.formatName ? `button button-first` : `button`}>
+				{!room.teamSent && <button
+					type="submit" class={room.challenged.formatName ? `button button-first` : `button`}
+					data-cmdpreview="/accept"
+				>
 					<strong>{room.challenged.acceptButtonLabel || 'Accept'}</strong>
 				</button>}
 				{!room.teamSent && room.challenged.formatName && <button
@@ -1419,7 +1422,7 @@ class ChatPanel extends PSRoomPanel<ChatRoom> {
 
 	override render() {
 		const room = this.props.room;
-		const tinyLayout = room.width < 450;
+		const tinyLayout = room.width < 550;
 		const challengeOpen = room.challengeMenuOpen || room.challenging || room.challenged;
 
 		return <PSPanelWrapper room={room} focusClick noScroll fullSize>
@@ -1458,6 +1461,11 @@ export class ChatUserList extends preact.Component<{
 				<>
 					<button class="button button-middle" data-cmd="/challenge">Challenge</button>
 					<button class="button button-middle" data-href={`useroptions-${pmTargetid}`}>{'\u2026'}</button>
+				</>
+			) : room.battle ? (
+				<>
+					<button data-href="userlist" class="button button-middle">{room.userCount} users</button>
+					<button data-href="battleoptions" class="button button-middle">Battle options</button>
 				</>
 			) : (
 				<button data-href="userlist" class="button button-middle">{room.userCount} users</button>

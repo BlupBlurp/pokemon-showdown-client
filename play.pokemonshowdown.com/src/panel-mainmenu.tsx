@@ -20,7 +20,7 @@ import type { Args } from "./battle-text-parser";
 import { BattleLog } from "./battle-log"; // optional
 
 export type RoomInfo = {
-	title: string, desc?: string, userCount?: number, section?: string, privacy?: 'hidden',
+	title: string, id?: RoomID, desc?: string, userCount?: number, section?: string, privacy?: 'hidden',
 	spotlight?: string, subRooms?: string[],
 };
 
@@ -1089,7 +1089,7 @@ export class TeamForm extends preact.Component<{
 				<textarea
 					name="customrules" class="textbox" rows={3} placeholder="Rules separated by commas or lines"
 					value={this.customRuleText} onInput={this.changeCustomRules}
-					style="width: 100%; box-sizing: border-box; resize: none; field-sizing: content; min-height: 3em;"
+					style="min-height:3em"
 				/>
 				<small><a
 					href="https://github.com/smogon/pokemon-showdown/blob/master/config/CUSTOM-RULES.md" target="_blank"

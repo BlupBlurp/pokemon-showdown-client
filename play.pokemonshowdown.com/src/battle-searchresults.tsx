@@ -13,20 +13,33 @@ import type { DexSearch, SearchRow, SearchType } from "./battle-dex-search";
 import { Config } from "./client-main";
 import { RelumiDiffHelper } from "./battle-relumi-diff";
 
+const RESULT_ROW_HEIGHT = 33;
+const RESULT_OVERSCAN_ROWS = 12;
+const RESULT_REFILL_THRESHOLD_ROWS = 4;
+
+function escapeHTML(text: string | number | null | undefined) {
+	if (typeof text === 'number') text = `${text}`;
+	if (typeof text !== 'string') return '';
+	if (!/[&<>"]/.test(text)) return text;
+	return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 export class PSSearchResults extends preact.Component<{
-	search: DexSearch, windowing?: number | null, hideFilters?: boolean, firstRow?: SearchRow,
-	resultIndex?: number,
+	search: DexSearch, class?: string, style?: string | null,
+	prepend?: preact.ComponentChildren, children?: preact.ComponentChildren,
+	hideFilters?: boolean,
 	/** type = '' means a filter was selected,
 	  * null means a sort was selected (clear not needed) */
 	onSelect?: (type: SearchType | '' | null, name: string, moveSlot?: string) => void,
 }> {
-	// Relumi: use Config.routes.dex for the dex site root URL.
-	get URL_ROOT() { return `//${Config.routes.dex}/`; }
 	speciesId: ID = '' as ID;
 	itemId: ID = '' as ID;
 	abilityId: ID = '' as ID;
 	moveIds: ID[] = [];
-	resultIndex = -1;
+	scrollFrame = 0;
+	renderedStart = -1;
+	renderedEnd = -1;
+	renderedLength = -1;
 
 	// Per-search memos for Relumi diff/lookup helpers. Cleared at the start of
 	// each render cycle so the same species/move/move-field lookups don't repeat.
@@ -264,63 +277,64 @@ export class PSSearchResults extends preact.Component<{
 		return parts.length ? parts.join(' / ') : null;
 	}
 
-	private parseDescriptionTags(desc: string): preact.ComponentChild {
+	private parseDescriptionTags(desc: string): string {
 		if (!desc) return '';
 		// [buff]text[/buff] → relumi-change-up, [nerf]text[/nerf] → relumi-change-down.
-		// Match the old client's replace semantics: capture inner text and wrap it.
-		const out: preact.ComponentChild[] = [];
+		const out: string[] = [];
 		const regex = /\[(buff|nerf)\](.*?)\[\/\1\]/g;
 		let lastIndex = 0;
 		let match: RegExpExecArray | null;
 		while ((match = regex.exec(desc)) !== null) {
-			if (match.index > lastIndex) out.push(desc.slice(lastIndex, match.index));
+			if (match.index > lastIndex) out.push(escapeHTML(desc.slice(lastIndex, match.index)));
 			const tag = match[1];
 			const inner = match[2];
 			const cls = tag === 'buff' ? 'relumi-change-up' : 'relumi-change-down';
-			out.push(<span class={cls}>{inner}</span>);
+			out.push(`<span class="${cls}">${escapeHTML(inner)}</span>`);
 			lastIndex = match.index + match[0].length;
 		}
-		if (lastIndex < desc.length) out.push(desc.slice(lastIndex));
-		return <>{out}</>;
+		if (lastIndex < desc.length) out.push(escapeHTML(desc.slice(lastIndex)));
+		return out.join('');
 	}
 
-	renderPokemonSortRow() {
+	renderPokemonSortRowHTML(index: number) {
 		const search = this.props.search;
 		const sortCol = search.sortCol;
-		return <li class="result"><div class="sortrow">
-			<button class={`sortcol numsortcol${!sortCol ? ' cur' : ''}`}>{!sortCol ? 'Sort: ' : search.firstPokemonColumn}</button>
-			<button class={`sortcol pnamesortcol${sortCol === 'name' ? ' cur' : ''}`} data-sort="name">Name</button>
-			<button class={`sortcol typesortcol${sortCol === 'type' ? ' cur' : ''}`} data-sort="type">Types</button>
-			<button class={`sortcol abilitysortcol${sortCol === 'ability' ? ' cur' : ''}`} data-sort="ability">Abilities</button>
-			<button class={`sortcol statsortcol${sortCol === 'hp' ? ' cur' : ''}`} data-sort="hp">HP</button>
-			<button class={`sortcol statsortcol${sortCol === 'atk' ? ' cur' : ''}`} data-sort="atk">Atk</button>
-			<button class={`sortcol statsortcol${sortCol === 'def' ? ' cur' : ''}`} data-sort="def">Def</button>
-			<button class={`sortcol statsortcol${sortCol === 'spa' ? ' cur' : ''}`} data-sort="spa">SpA</button>
-			<button class={`sortcol statsortcol${sortCol === 'spd' ? ' cur' : ''}`} data-sort="spd">SpD</button>
-			<button class={`sortcol statsortcol${sortCol === 'spe' ? ' cur' : ''}`} data-sort="spe">Spe</button>
-			<button class={`sortcol statsortcol${sortCol === 'bst' ? ' cur' : ''}`} data-sort="bst">BST</button>
-		</div></li>;
+		return [
+			`<li class="result" value="${index}"><div class="sortrow">`,
+			`<button class="sortcol numsortcol${!sortCol ? ' cur' : ''}">`,
+			`${!sortCol ? 'Sort: ' : escapeHTML(search.firstPokemonColumn)}</button>`,
+			`<button class="sortcol pnamesortcol${sortCol === 'name' ? ' cur' : ''}" data-sort="name">Name</button>`,
+			`<button class="sortcol typesortcol${sortCol === 'type' ? ' cur' : ''}" data-sort="type">Types</button>`,
+			`<button class="sortcol abilitysortcol${sortCol === 'ability' ? ' cur' : ''}" data-sort="ability">Abilities</button>`,
+			`<button class="sortcol statsortcol${sortCol === 'hp' ? ' cur' : ''}" data-sort="hp">HP</button>`,
+			`<button class="sortcol statsortcol${sortCol === 'atk' ? ' cur' : ''}" data-sort="atk">Atk</button>`,
+			`<button class="sortcol statsortcol${sortCol === 'def' ? ' cur' : ''}" data-sort="def">Def</button>`,
+			`<button class="sortcol statsortcol${sortCol === 'spa' ? ' cur' : ''}" data-sort="spa">SpA</button>`,
+			`<button class="sortcol statsortcol${sortCol === 'spd' ? ' cur' : ''}" data-sort="spd">SpD</button>`,
+			`<button class="sortcol statsortcol${sortCol === 'spe' ? ' cur' : ''}" data-sort="spe">Spe</button>`,
+			`<button class="sortcol statsortcol${sortCol === 'bst' ? ' cur' : ''}" data-sort="bst">BST</button>`,
+			`</div></li>`,
+		].join('');
 	}
 
-	renderMoveSortRow() {
+	renderMoveSortRowHTML(index: number) {
 		const sortCol = this.props.search.sortCol;
-		return <li class="result"><div class="sortrow">
-			<button class={`sortcol movenamesortcol${sortCol === 'name' ? ' cur' : ''}`} data-sort="name">Name</button>
-			<button class={`sortcol movetypesortcol${sortCol === 'type' ? ' cur' : ''}`} data-sort="type">Type</button>
-			<button class={`sortcol movetypesortcol${sortCol === 'category' ? ' cur' : ''}`} data-sort="category">Cat</button>
-			<button class={`sortcol powersortcol${sortCol === 'power' ? ' cur' : ''}`} data-sort="power">Pow</button>
-			<button class={`sortcol accuracysortcol${sortCol === 'accuracy' ? ' cur' : ''}`} data-sort="accuracy">Acc</button>
-			<button class={`sortcol ppsortcol${sortCol === 'pp' ? ' cur' : ''}`} data-sort="pp">PP</button>
-		</div></li>;
+		return `<li class="result" value="${index}"><div class="sortrow">` +
+			`<button class="sortcol movenamesortcol${sortCol === 'name' ? ' cur' : ''}" data-sort="name">Name</button>` +
+			`<button class="sortcol movetypesortcol${sortCol === 'type' ? ' cur' : ''}" data-sort="type">Type</button>` +
+			`<button class="sortcol movetypesortcol${sortCol === 'category' ? ' cur' : ''}" data-sort="category">Cat</button>` +
+			`<button class="sortcol powersortcol${sortCol === 'power' ? ' cur' : ''}" data-sort="power">Pow</button>` +
+			`<button class="sortcol accuracysortcol${sortCol === 'accuracy' ? ' cur' : ''}" data-sort="accuracy">Acc</button>` +
+			`<button class="sortcol ppsortcol${sortCol === 'pp' ? ' cur' : ''}" data-sort="pp">PP</button>` +
+			`</div></li>`;
 	}
 
-	renderPokemonRow(id: ID, matchStart: number, matchEnd: number, errorMessage?: preact.ComponentChildren) {
+	renderPokemonRowHTML(index: number, id: ID, matchStart: number, matchEnd: number, errorMessage?: string) {
 		const search = this.props.search;
 		const pokemon = search.dex.species.get(id);
-		if (!pokemon) return <li class="result">Unrecognized pokemon</li>;
+		if (!pokemon) return `<li class="result" value="${index}">Unrecognized pokemon</li>`;
 
-		let tagStart = (pokemon.forme ? pokemon.name.length - pokemon.forme.length - 1 : 0);
-
+		const tagStart = (pokemon.forme ? pokemon.name.length - pokemon.forme.length - 1 : 0);
 		const stats = pokemon.baseStats;
 		const hpClass = this._relumi.getStatClass(id, 'hp', stats.hp);
 		const atkClass = this._relumi.getStatClass(id, 'atk', stats.atk);
@@ -353,202 +367,123 @@ export class PSSearchResults extends preact.Component<{
 			`Vanilla BST: ${bstDiff.vanilla} → ${bst} (${bstDiff.delta > 0 ? '+' : ''}${bstDiff.delta})` :
 			'';
 
-		if (errorMessage) {
-			return <li class="result"><a
-				href={Dex.getLuminescentUrl('pokemon', id)} class={id === this.speciesId ? 'cur' : ''}
-				data-target="push" data-entry={`pokemon|${pokemon.name}`}
-			>
-				<span class="col numcol">{search.getTier(pokemon)}</span>
+		let buf = `<li class="result" value="${index}"><a href="${Dex.getLuminescentUrl('pokemon', id)}" ` +
+			`class="${id === this.speciesId ? 'cur' : ''}" data-target="push" ` +
+			`data-entry="pokemon|${escapeHTML(pokemon.name)}">` +
+			`<span class="col numcol">${escapeHTML(search.getTier(pokemon))}</span>` +
+			`<span class="col iconcol"><span class="pixelated" style="${escapeHTML(Dex.getPokemonIcon(pokemon.id))}"></span></span>` +
+			`<span class="col pokemonnamecol">${this.renderNameHTML(pokemon.name, matchStart, matchEnd, tagStart)}</span>`;
+		if (errorMessage) return `${buf}${errorMessage}</a></li>`;
 
-				<span class="col iconcol">
-					<span class="pixelated" style={Dex.getPokemonIcon(pokemon.id)}></span>
-				</span>
+		buf += `<span class="col typecol">${pokemon.types.map(type =>
+			`<img src="${Dex.resourcePrefix}sprites/types/${type}.png" alt="${escapeHTML(type)}" height="14" width="32" class="pixelated" />`
+		).join('')}</span>`;
 
-				<span class="col pokemonnamecol">{this.renderName(pokemon.name, matchStart, matchEnd, tagStart)}</span>
-
-				{errorMessage}
-			</a></li>;
+		if (search.dex.gen >= 3) {
+			buf += pokemon.abilities['1'] ?
+				`<span class="col twoabilitycol"><span class="${ability0NewClass}">${escapeHTML(pokemon.abilities['0'])}</span><br /><span class="${ability1NewClass}">${escapeHTML(pokemon.abilities['1'])}</span></span>` :
+				`<span class="col abilitycol"><span class="${ability0NewClass}">${escapeHTML(pokemon.abilities['0'])}</span></span>`;
+		}
+		if (search.dex.gen >= 5) {
+			if (pokemon.abilities['S']) {
+				buf += `<span class="col twoabilitycol${pokemon.unreleasedHidden ? ' unreleasedhacol' : ''}">` +
+					`<span class="${hiddenAbilityNewClass}">${escapeHTML(pokemon.abilities['H'] || '')}</span><br /><span class="${specialAbilityNewClass}">${escapeHTML(pokemon.abilities['S'])}</span></span>`;
+			} else if (pokemon.abilities['H']) {
+				buf += `<span class="col abilitycol${pokemon.unreleasedHidden ? ' unreleasedhacol' : ''}">` +
+					`<span class="${hiddenAbilityNewClass}">${escapeHTML(pokemon.abilities['H'])}</span></span>`;
+			} else {
+				buf += `<span class="col abilitycol"></span>`;
+			}
 		}
 
-		return <li class="result">
-			<a
-				href={Dex.getLuminescentUrl('pokemon', id)} class={id === this.speciesId ? 'cur' : ''}
-				data-target="push" data-entry={`pokemon|${pokemon.name}`}
-			>
-				<span class="col numcol">{search.getTier(pokemon)}</span>
-
-				<span class="col iconcol">
-					<span class="pixelated" style={Dex.getPokemonIcon(pokemon.id)}></span>
-				</span>
-
-				<span class="col pokemonnamecol">{this.renderName(pokemon.name, matchStart, matchEnd, tagStart)}</span>
-
-				<span class="col typecol">
-					{pokemon.types.map(type =>
-						<img src={`${Dex.resourcePrefix}sprites/types/${type}.png`} alt={type} height="14" width="32" class="pixelated" />
-					)}
-				</span>
-
-				{search.dex.gen >= 3 && (
-					pokemon.abilities['1'] ? (
-						<span class="col twoabilitycol">
-							<span class={ability0NewClass}>{pokemon.abilities['0']}</span><br />
-							<span class={ability1NewClass}>{pokemon.abilities['1']}</span>
-						</span>
-					) : (
-						<span class="col abilitycol"><span class={ability0NewClass}>{pokemon.abilities['0']}</span></span>
-					)
-				)}
-				{search.dex.gen >= 5 && (
-					pokemon.abilities['S'] ? (
-						<span class={`col twoabilitycol${pokemon.unreleasedHidden ? ' unreleasedhacol' : ''}`}>
-							<span class={hiddenAbilityNewClass}>{pokemon.abilities['H'] || ''}</span><br />
-							<span class={specialAbilityNewClass}>{pokemon.abilities['S']}</span>
-						</span>
-					) : pokemon.abilities['H'] ? (
-						<span class={`col abilitycol${pokemon.unreleasedHidden ? ' unreleasedhacol' : ''}`}>
-							<span class={hiddenAbilityNewClass}>{pokemon.abilities['H']}</span>
-						</span>
-					) : (
-						<span class="col abilitycol"></span>
-					)
-				)}
-
-				<span class="col statcol" title={fmtStatTitle(hpDiff)}><em>HP</em><br /><span class={hpClass}>{stats.hp}</span></span>
-				<span class="col statcol" title={fmtStatTitle(atkDiff)}>
-					<em>Atk</em><br /><span class={atkClass}>{stats.atk}</span>
-				</span>
-				<span class="col statcol" title={fmtStatTitle(defDiff)}>
-					<em>Def</em><br /><span class={defClass}>{stats.def}</span>
-				</span>
-				{search.dex.gen >= 2 && <span class="col statcol" title={fmtStatTitle(spaDiff)}>
-					<em>SpA</em><br /><span class={spaClass}>{stats.spa}</span>
-				</span>}
-				{search.dex.gen >= 2 && <span class="col statcol" title={fmtStatTitle(spdDiff)}>
-					<em>SpD</em><br /><span class={spdClass}>{stats.spd}</span>
-				</span>}
-				{search.dex.gen < 2 && <span class="col statcol" title={fmtStatTitle(spaDiff)}>
-					<em>Spc</em><br /><span class={spaClass}>{stats.spa}</span>
-				</span>}
-				<span class="col statcol" title={fmtStatTitle(speDiff)}>
-					<em>Spe</em><br /><span class={speClass}>{stats.spe}</span>
-				</span>
-				<span class={`col bstcol ${bstClass}`} title={fmtBSTTitle}>
-					<em>BST<br />{bst}</em>
-				</span>
-			</a>
-		</li>;
+		buf += `<span class="col statcol" title="${fmtStatTitle(hpDiff)}"><em>HP</em><br /><span class="${hpClass}">${stats.hp}</span></span>` +
+			`<span class="col statcol" title="${fmtStatTitle(atkDiff)}"><em>Atk</em><br /><span class="${atkClass}">${stats.atk}</span></span>` +
+			`<span class="col statcol" title="${fmtStatTitle(defDiff)}"><em>Def</em><br /><span class="${defClass}">${stats.def}</span></span>` +
+			(search.dex.gen >= 2 ?
+				`<span class="col statcol" title="${fmtStatTitle(spaDiff)}"><em>SpA</em><br /><span class="${spaClass}">${stats.spa}</span></span>` +
+				`<span class="col statcol" title="${fmtStatTitle(spdDiff)}"><em>SpD</em><br /><span class="${spdClass}">${stats.spd}</span></span>` :
+				`<span class="col statcol" title="${fmtStatTitle(spaDiff)}"><em>Spc</em><br /><span class="${spaClass}">${stats.spa}</span></span>`) +
+				`<span class="col statcol" title="${fmtStatTitle(speDiff)}"><em>Spe</em><br /><span class="${speClass}">${stats.spe}</span></span>` +
+				`<span class="col bstcol ${bstClass}" title="${fmtBSTTitle}"><em>BST<br />${bst}</em></span></a></li>`;
+		return buf;
 	}
 
-	renderName(name: string, matchStart: number, matchEnd: number, tagStart?: number) {
-		if (name === 'No Ability') return <i>(no ability)</i>;
+	renderNameHTML(name: string, matchStart: number, matchEnd: number, tagStart?: number) {
+		if (name === 'No Ability') return `<i>(no ability)</i>`;
 
 		if (!matchEnd) {
-			if (!tagStart) return name;
-			return [
-				name.slice(0, tagStart), <small>{name.slice(tagStart)}</small>,
-			];
+			if (!tagStart) return escapeHTML(name);
+			return `${escapeHTML(name.slice(0, tagStart))}<small>${escapeHTML(name.slice(tagStart))}</small>`;
 		}
 
-		let output: preact.ComponentChild[] = [
-			name.slice(0, matchStart),
-			<b>{name.slice(matchStart, matchEnd)}</b>,
-			name.slice(matchEnd, tagStart || name.length),
-		];
+		let output = escapeHTML(name.slice(0, matchStart)) +
+			`<b>${escapeHTML(name.slice(matchStart, matchEnd))}</b>` +
+			escapeHTML(name.slice(matchEnd, tagStart || name.length));
 		if (!tagStart) return output;
 
 		if (matchEnd && matchEnd > tagStart) {
-			if (matchStart < tagStart) {
-				matchStart = tagStart;
-			}
-			output.push(
-				<small>{name.slice(matchEnd)}</small>
-			);
+			output += `<small>${escapeHTML(name.slice(matchEnd))}</small>`;
 		} else {
-			output.push(<small>{name.slice(tagStart)}</small>);
+			output += `<small>${escapeHTML(name.slice(tagStart))}</small>`;
 		}
 
 		return output;
 	}
 
-	renderItemRow(id: ID, matchStart: number, matchEnd: number, errorMessage?: preact.ComponentChildren) {
+	renderItemRowHTML(index: number, id: ID, matchStart: number, matchEnd: number, errorMessage?: string) {
 		const search = this.props.search;
 		const item = search.dex.items.get(id);
-		if (!item) return <li class="result">Unrecognized item</li>;
+		if (!item) return `<li class="result" value="${index}">Unrecognized item</li>`;
 
-		return <li class="result"><a
-			href={Dex.getLuminescentUrl('item', id)} class={id === this.itemId ? 'cur' : ''}
-			data-target="push" data-entry={`item|${item.name}`}
-		>
-			<span class="col itemiconcol">
-				<span class="pixelated" style={Dex.getItemIcon(item)}></span>
-			</span>
-
-			<span class="col namecol">{id ? this.renderName(item.name, matchStart, matchEnd) : <i>(no item)</i>}</span>
-
-			{!!id && errorMessage}
-
-			{!errorMessage && <span class="col itemdesccol">{item.shortDesc}</span>}
-		</a></li>;
+		return `<li class="result" value="${index}"><a href="${Dex.getLuminescentUrl('item', id)}" ` +
+			`class="${id === this.itemId ? 'cur' : ''}" data-target="push" data-entry="item|${escapeHTML(item.name)}">` +
+			`<span class="col itemiconcol"><span class="pixelated" style="${escapeHTML(Dex.getItemIcon(item))}"></span></span>` +
+			`<span class="col namecol">${id ? this.renderNameHTML(item.name, matchStart, matchEnd) : '<i>(no item)</i>'}</span>` +
+			(id ? (errorMessage || '') : '') +
+			(!errorMessage ? `<span class="col itemdesccol">${escapeHTML(item.shortDesc)}</span>` : '') +
+			`</a></li>`;
 	}
 
-	renderAbilityRow(id: ID, matchStart: number, matchEnd: number, errorMessage?: preact.ComponentChildren) {
+	renderAbilityRowHTML(index: number, id: ID, matchStart: number, matchEnd: number, errorMessage?: string) {
 		const search = this.props.search;
 		const ability = search.dex.abilities.get(id);
-		if (!ability) return <li class="result">Unrecognized ability</li>;
+		if (!ability) return `<li class="result" value="${index}">Unrecognized ability</li>`;
 
-		return <li class="result">
-			<a
-				href={Dex.getLuminescentUrl('ability', id)} class={id === this.abilityId ? 'cur' : ''}
-				data-target="push" data-entry={`ability|${ability.name}`}
-			>
-				<span class="col namecol">{id ? this.renderName(ability.name, matchStart, matchEnd) : <i>(no ability)</i>}</span>
-
-				{errorMessage}
-
-				{!errorMessage && <span class="col abilitydesccol">{this.parseDescriptionTags(ability.shortDesc)}</span>}
-			</a>
-		</li>;
+		return `<li class="result" value="${index}"><a href="${Dex.getLuminescentUrl('ability', id)}" ` +
+			`class="${id === this.abilityId ? 'cur' : ''}" data-target="push" data-entry="ability|${escapeHTML(ability.name)}">` +
+			`<span class="col namecol">${id ? this.renderNameHTML(ability.name, matchStart, matchEnd) : '<i>(no ability)</i>'}</span>` +
+			(errorMessage || '') +
+			(!errorMessage ? `<span class="col abilitydesccol">${this.parseDescriptionTags(ability.shortDesc)}</span>` : '') +
+			`</a></li>`;
 	}
 
-	renderMoveRow(id: ID, matchStart: number, matchEnd: number, errorMessage?: preact.ComponentChildren) {
+	renderMoveRowHTML(index: number, id: ID, matchStart: number, matchEnd: number, errorMessage?: string) {
 		let slot = null;
 		if (id.startsWith('_')) {
 			[slot, id] = id.slice(1).split('_') as [string, ID];
 			if (!id) {
-				return <li class="result"><a
-					href={`${this.URL_ROOT}moves/`} class="cur"
-					data-target="push" data-entry={`move||${slot}`}
-				>
-					<span class="col movenamecol"><i>(slot {slot} empty)</i></span>
-				</a></li>;
+				return `<li class="result" value="${index}"><a href="//${Config.routes.dex}/moves/" class="cur" ` +
+					`data-target="push" data-entry="move||${escapeHTML(slot)}">` +
+					`<span class="col movenamecol"><i>(slot ${escapeHTML(slot)} empty)</i></span></a></li>`;
 			}
 		}
 
 		const search = this.props.search;
 		const move = search.dex.moves.get(id);
+		if (!move) return `<li class="result" value="${index}">Unrecognized move</li>`;
 		const entry = slot ? `move|${move.name}|${slot}` : `move|${move.name}`;
-		if (!move) return <li class="result">Unrecognized move</li>;
-
 		const tagStart = (move.name.startsWith('Hidden Power') ? 12 : 0);
 
-		if (errorMessage) {
-			return <li class="result"><a
-				href={Dex.getLuminescentUrl('move', id)} class={this.moveIds.includes(id) ? 'cur' : ''}
-				data-target="push" data-entry={entry}
-			>
-				<span class="col movenamecol">{this.renderName(move.name, matchStart, matchEnd, tagStart)}</span>
-
-				{errorMessage}
-			</a></li>;
-		}
-
+		// Compute all Relumi-derived data before building HTML, so we can insert
+		// `nameWithTitle` (move-name wrapping with relumi-change-up / flags
+		// tooltip) directly into the movenamecol span.
 		let pp = (move.pp === 1 || move.noPPBoosts ? move.pp : move.pp * 8 / 5);
 		if (search.dex.gen < 3) pp = Math.min(61, pp);
 		if (search.dex.modid === 'champions') {
 			pp = move.pp > 20 ? 20 : move.pp;
 			if (!move.noPPBoosts) pp = (pp / 5 + 1) * 4;
 		}
+
 		const movePowerClass = this.getMoveChangeClass(id, 'basePower', move.basePower);
 		const moveAccuracyClass = this.getMoveChangeClass(id, 'accuracy', move.accuracy);
 		const movePowerDiff = this.getMoveDiff(id, 'basePower', move.basePower);
@@ -568,16 +503,16 @@ export class PSSearchResults extends preact.Component<{
 				: (window as any).BattleTeambuilderTable;
 			const rawLearnsets = table?.learnsets;
 			if (rawLearnsets) {
-				// Walk the learnset chain (like canLearnInChain) so egg moves
-				// show for evolved Pokémon, not just the base form.
+				// Walk the learnset chain so egg moves show for evolved Pokémon,
+				// not just the base form.
 				let cur: ID = this.getFirstLearnsetId(speciesId, rawLearnsets);
 				const visited: Record<string, true> = Object.create(null);
 				while (cur) {
 					if (visited[cur]) break;
 					visited[cur] = true;
-					const entry = rawLearnsets[cur]?.[id];
-					if (entry) {
-						methodCode = entry;
+					const learnEntry = rawLearnsets[cur]?.[id];
+					if (learnEntry) {
+						methodCode = learnEntry;
 						break;
 					}
 					cur = this.getNextLearnsetId(cur, speciesId, rawLearnsets);
@@ -592,107 +527,85 @@ export class PSSearchResults extends preact.Component<{
 			const sign = diff.delta > 0 ? '+' : '';
 			return `Vanilla ${label}: ${fmtValue(diff.vanilla)} → ${fmtValue(current)} (${sign}${diff.delta})`;
 		};
-		return <li class="result"><a
-			href={Dex.getLuminescentUrl('move', id)} class={this.moveIds.includes(id) ? 'cur' : ''}
-			data-target="push" data-entry={entry}
-		>
-			<span class="col movenamecol">
-				<span
-					class={`${moveNameClass}${flagsTooltip ? ' has-move-flags' : ''}`}
-					title={flagsTooltip || undefined}
-				>{this.renderName(move.name, matchStart, matchEnd, tagStart)}</span>
-				{method && <span class="move-method-badge">{method}</span>}
-			</span>
+		const nameWithTitle = moveNameClass || flagsTooltip
+			? `<span class="${moveNameClass}${flagsTooltip ? ' has-move-flags' : ''}" title="${escapeHTML(flagsTooltip)}">${this.renderNameHTML(move.name, matchStart, matchEnd, tagStart)}</span>`
+			: this.renderNameHTML(move.name, matchStart, matchEnd, tagStart);
 
-			<span class="col typecol">
-				<img
-					src={`${Dex.resourcePrefix}sprites/types/${encodeURIComponent(move.type)}.png`}
-					alt={move.type} height="14" width="32" class="pixelated"
-				/>
-				<img
-					src={`${Dex.resourcePrefix}sprites/categories/${move.category}.png`}
-					alt={move.category} height="14" width="32" class="pixelated"
-				/>
-			</span>
+		let buf = `<li class="result" value="${index}"><a href="${Dex.getLuminescentUrl('move', id)}" ` +
+			`class="${this.moveIds.includes(id) ? 'cur' : ''}" data-target="push" data-entry="${escapeHTML(entry)}">` +
+			`<span class="col movenamecol">${nameWithTitle}${method ? ` <span class="move-method-badge">${method}</span>` : ''}</span>`;
 
-			<span class="col labelcol" title={fmtMoveTitle('Power', movePowerDiff, move.basePower)}>
-				{move.category !== 'Status' ? [
-					<em>Power</em>, <br />, <span class={movePowerClass}>{move.basePower || '\u2014'}</span>,
-				] : ''}
-			</span>
-			<span class="col widelabelcol" title={fmtMoveTitle('Accuracy', moveAccuracyDiff, move.accuracy)}>
-				<em>Accuracy</em><br />
-				<span class={moveAccuracyClass}>
-					{move.accuracy && move.accuracy !== true ? `${move.accuracy}%` : '\u2014'}
-				</span>
-			</span>
-			<span class="col pplabelcol">
-				<em>PP</em><br />{pp}
-			</span>
+		if (errorMessage) return `${buf}${errorMessage}</a></li>`;
 
-			<span class="col movedesccol">{this.parseDescriptionTags(move.shortDesc)}</span>
+		buf += `<span class="col typecol">` +
+			`<img src="${Dex.resourcePrefix}sprites/types/${encodeURIComponent(move.type)}.png" ` +
+			`alt="${escapeHTML(move.type)}" height="14" width="32" class="pixelated" />` +
+			`<img src="${Dex.resourcePrefix}sprites/categories/${escapeHTML(move.category)}.png" ` +
+			`alt="${escapeHTML(move.category)}" height="14" width="32" class="pixelated" />` +
+			`</span>` +
+			`<span class="col labelcol" title="${fmtMoveTitle('Power', movePowerDiff, move.basePower)}">` +
+			(move.category !== 'Status' ? `<em>Power</em><br /><span class="${movePowerClass}">${move.basePower || '&mdash;'}</span>` : '') +
+			`</span>` +
+			`<span class="col widelabelcol" title="${fmtMoveTitle('Accuracy', moveAccuracyDiff, move.accuracy)}">` +
+			`<em>Accuracy</em><br /><span class="${moveAccuracyClass}">` +
+			`${move.accuracy && move.accuracy !== true ? `${move.accuracy}%` : '&mdash;'}</span></span>` +
+			`<span class="col pplabelcol"><em>PP</em><br />${pp}</span>` +
+			`<span class="col movedesccol" data-name="${escapeHTML(move.name)}">` +
+			`${this.parseDescriptionTags(move.shortDesc)}` +
+			`</span>` +
+			`</a></li>`;
 
-		</a></li>;
+		return buf;
 	}
 
-	renderTypeRow(id: ID, matchStart: number, matchEnd: number, errorMessage?: preact.ComponentChildren) {
+	renderTypeRowHTML(index: number, id: ID, matchStart: number, matchEnd: number, errorMessage?: string) {
 		const name = id.charAt(0).toUpperCase() + id.slice(1);
+		const urlRoot = `//${Config.routes.dex}/`;
 
-		return <li class="result"><a href={`${this.URL_ROOT}types/${id}`} data-target="push" data-entry={`type|${name}`}>
-			<span class="col namecol">{this.renderName(name, matchStart, matchEnd)}</span>
-
-			<span class="col typecol">
-				<img
-					src={`${Dex.resourcePrefix}sprites/types/${encodeURIComponent(name)}.png`}
-					alt={name} height="14" width="32" class="pixelated"
-				/>
-			</span>
-
-			{errorMessage}
-		</a></li>;
+		return `<li class="result" value="${index}"><a href="${urlRoot}types/${id}" ` +
+			`data-target="push" data-entry="type|${escapeHTML(name)}">` +
+			`<span class="col namecol">${this.renderNameHTML(name, matchStart, matchEnd)}</span>` +
+			`<span class="col typecol"><img src="${Dex.resourcePrefix}sprites/types/${encodeURIComponent(name)}.png" ` +
+			`alt="${escapeHTML(name)}" height="14" width="32" class="pixelated" /></span>` +
+			(errorMessage || '') +
+			`</a></li>`;
 	}
 
-	renderCategoryRow(id: ID, matchStart: number, matchEnd: number, errorMessage?: preact.ComponentChildren) {
+	renderCategoryRowHTML(index: number, id: ID, matchStart: number, matchEnd: number, errorMessage?: string) {
 		const name = id.charAt(0).toUpperCase() + id.slice(1);
+		const urlRoot = `//${Config.routes.dex}/`;
 
-		return <li class="result">
-			<a href={`${this.URL_ROOT}categories/${id}`} data-target="push" data-entry={`category|${name}`}>
-				<span class="col namecol">{this.renderName(name, matchStart, matchEnd)}</span>
-
-				<span class="col typecol">
-					<img src={`${Dex.resourcePrefix}sprites/categories/${name}.png`} alt={name} height="14" width="32" class="pixelated" />
-				</span>
-
-				{errorMessage}
-			</a>
-		</li>;
+		return `<li class="result" value="${index}"><a href="${urlRoot}categories/${id}" ` +
+			`data-target="push" data-entry="category|${escapeHTML(name)}">` +
+			`<span class="col namecol">${this.renderNameHTML(name, matchStart, matchEnd)}</span>` +
+			`<span class="col typecol"><img src="${Dex.resourcePrefix}sprites/categories/${escapeHTML(name)}.png" ` +
+			`alt="${escapeHTML(name)}" height="14" width="32" class="pixelated" /></span>` +
+			(errorMessage || '') +
+			`</a></li>`;
 	}
 
-	renderFlagRow(id: ID, matchStart: number, matchEnd: number, errorMessage?: preact.ComponentChildren) {
+	renderFlagRowHTML(index: number, id: ID, matchStart: number, matchEnd: number) {
 		const name = id.charAt(0).toUpperCase() + id.slice(1);
-		return <li class="result">
-			<a href="#" data-target="push" data-entry={`flag|${id}`}>
-				<span class="col namecol">{this.renderName(name, matchStart, matchEnd)}</span>
-				<span class="col movedesccol">(flag)</span>
-				{errorMessage}
-			</a>
-		</li>;
+		return `<li class="result" value="${index}"><a href="#" data-target="push" data-entry="flag|${id}">` +
+			`<span class="col namecol">${this.renderNameHTML(name, matchStart, matchEnd)}</span>` +
+			`<span class="col movedesccol">(flag)</span>` +
+			`</a></li>`;
 	}
 
-	renderArticleRow(id: ID, matchStart: number, matchEnd: number, errorMessage?: preact.ComponentChildren) {
+	renderArticleRowHTML(index: number, id: ID, matchStart: number, matchEnd: number, errorMessage?: string) {
 		const isSearchType = (id === 'pokemon' || id === 'moves');
 		const name = window.BattleArticleTitles?.[id] || (id.charAt(0).toUpperCase() + id.substr(1));
+		const urlRoot = `//${Config.routes.dex}/`;
 
-		return <li class="result"><a href={`${this.URL_ROOT}articles/${id}`} data-target="push" data-entry={`article|${name}`}>
-			<span class="col namecol">{this.renderName(name, matchStart, matchEnd)}</span>
-
-			<span class="col movedesccol">{isSearchType ? "(search type)" : "(article)"}</span>
-
-			{errorMessage}
-		</a></li>;
+		return `<li class="result" value="${index}"><a href="${urlRoot}articles/${id}" ` +
+			`data-target="push" data-entry="article|${escapeHTML(name)}">` +
+			`<span class="col namecol">${this.renderNameHTML(name, matchStart, matchEnd)}</span>` +
+			`<span class="col movedesccol">${isSearchType ? "(search type)" : "(article)"}</span>` +
+			(errorMessage || '') +
+			`</a></li>`;
 	}
 
-	renderEggGroupRow(id: ID, matchStart: number, matchEnd: number, errorMessage?: preact.ComponentChildren) {
+	renderEggGroupRowHTML(index: number, id: ID, matchStart: number, matchEnd: number, errorMessage?: string) {
 		// very hardcode
 		let name: string | undefined;
 		if (id === 'humanlike') name = 'Human-Like';
@@ -704,19 +617,17 @@ export class PSSearchResults extends preact.Component<{
 		} else {
 			name = id.charAt(0).toUpperCase() + id.slice(1);
 		}
+		const urlRoot = `//${Config.routes.dex}/`;
 
-		return <li class="result">
-			<a href={`${this.URL_ROOT}egggroups/${id}`} data-target="push" data-entry={`egggroup|${name}`}>
-				<span class="col namecol">{this.renderName(name, matchStart, matchEnd)}</span>
-
-				<span class="col movedesccol">(egg group)</span>
-
-				{errorMessage}
-			</a>
-		</li>;
+		return `<li class="result" value="${index}"><a href="${urlRoot}egggroups/${id}" ` +
+			`data-target="push" data-entry="egggroup|${escapeHTML(name)}">` +
+			`<span class="col namecol">${this.renderNameHTML(name, matchStart, matchEnd)}</span>` +
+			`<span class="col movedesccol">(egg group)</span>` +
+			(errorMessage || '') +
+			`</a></li>`;
 	}
 
-	renderTierRow(id: ID, matchStart: number, matchEnd: number, errorMessage?: preact.ComponentChildren) {
+	renderTierRowHTML(index: number, id: ID, matchStart: number, matchEnd: number, errorMessage?: string) {
 		// very hardcode
 		const tierTable: { [id: string]: string } = {
 			uber: "Uber",
@@ -724,17 +635,17 @@ export class PSSearchResults extends preact.Component<{
 			capnfe: "CAP NFE",
 		};
 		const name = tierTable[id] || id.toUpperCase();
+		const urlRoot = `//${Config.routes.dex}/`;
 
-		return <li class="result"><a href={`${this.URL_ROOT}tiers/${id}`} data-target="push" data-entry={`tier|${name}`}>
-			<span class="col namecol">{this.renderName(name, matchStart, matchEnd)}</span>
-
-			<span class="col movedesccol">(tier)</span>
-
-			{errorMessage}
-		</a></li>;
+		return `<li class="result" value="${index}"><a href="${urlRoot}tiers/${id}" ` +
+			`data-target="push" data-entry="tier|${escapeHTML(name)}">` +
+			`<span class="col namecol">${this.renderNameHTML(name, matchStart, matchEnd)}</span>` +
+			`<span class="col movedesccol">(tier)</span>` +
+			(errorMessage || '') +
+			`</a></li>`;
 	}
 
-	renderRow(row: SearchRow) {
+	renderRowHTML(row: SearchRow, index: number) {
 		const search = this.props.search;
 		const [type, id] = row;
 		let matchStart = 0;
@@ -744,51 +655,50 @@ export class PSSearchResults extends preact.Component<{
 			matchEnd = row[3]!;
 		}
 
-		let errorMessage: preact.ComponentChild = null;
+		let errorMessage = '';
 		let label;
 		if ((label = search.filterLabel(type))) {
-			errorMessage = <span class="col filtercol"><em>{label}</em></span>;
+			errorMessage = `<span class="col filtercol"><em>${escapeHTML(label)}</em></span>`;
 		} else if ((label = search.illegalLabel(id as ID))) {
-			errorMessage = <span class="col illegalcol"><em>{label}</em></span>;
+			errorMessage = `<span class="col illegalcol"><em>${escapeHTML(label)}</em></span>`;
 		}
 
 		switch (type) {
 		case 'html':
-			const sanitizedHTML = id.replace(/</g, '&lt;')
-				.replace(/&lt;em>/g, '<em>').replace(/&lt;\/em>/g, '</em>')
-				.replace(/&lt;strong>/g, '<strong>').replace(/&lt;\/strong>/g, '</strong>');
-			return <li class="result">
-				<p dangerouslySetInnerHTML={{ __html: sanitizedHTML }}></p>
-			</li>;
+			const sanitizedHTML = escapeHTML(id)
+				.replace(/&lt;em&gt;/g, '<em>').replace(/&lt;\/em&gt;/g, '</em>')
+				.replace(/&lt;strong&gt;/g, '<strong>').replace(/&lt;\/strong&gt;/g, '</strong>');
+			return `<li class="result" value="${index}"><p>${sanitizedHTML}</p></li>`;
 		case 'header':
-			return <li class="result"><h3>{id}</h3></li>;
+			return `<li class="result" value="${index}"><h3>${escapeHTML(id)}</h3></li>`;
 		case 'sortpokemon':
-			return this.renderPokemonSortRow();
+			return this.renderPokemonSortRowHTML(index);
 		case 'sortmove':
-			return this.renderMoveSortRow();
+			return this.renderMoveSortRowHTML(index);
 		case 'pokemon':
-			return this.renderPokemonRow(id, matchStart, matchEnd, errorMessage);
+			return this.renderPokemonRowHTML(index, id, matchStart, matchEnd, errorMessage);
 		case 'move':
-			return this.renderMoveRow(id, matchStart, matchEnd, errorMessage);
+			return this.renderMoveRowHTML(index, id, matchStart, matchEnd, errorMessage);
 		case 'item':
-			return this.renderItemRow(id, matchStart, matchEnd, errorMessage);
+			return this.renderItemRowHTML(index, id, matchStart, matchEnd, errorMessage);
 		case 'ability':
-			return this.renderAbilityRow(id, matchStart, matchEnd, errorMessage);
+			return this.renderAbilityRowHTML(index, id, matchStart, matchEnd, errorMessage);
 		case 'type':
-			return this.renderTypeRow(id, matchStart, matchEnd, errorMessage);
+			return this.renderTypeRowHTML(index, id, matchStart, matchEnd, errorMessage);
 		case 'egggroup':
-			return this.renderEggGroupRow(id, matchStart, matchEnd, errorMessage);
+			return this.renderEggGroupRowHTML(index, id, matchStart, matchEnd, errorMessage);
 		case 'tier':
-			return this.renderTierRow(id, matchStart, matchEnd, errorMessage);
+			return this.renderTierRowHTML(index, id, matchStart, matchEnd, errorMessage);
 		case 'category':
-			return this.renderCategoryRow(id, matchStart, matchEnd, errorMessage);
+			return this.renderCategoryRowHTML(index, id, matchStart, matchEnd, errorMessage);
 		case 'article':
-			return this.renderArticleRow(id, matchStart, matchEnd, errorMessage);
+			return this.renderArticleRowHTML(index, id, matchStart, matchEnd, errorMessage);
 		case 'flag':
-			return this.renderFlagRow(id, matchStart, matchEnd, errorMessage);
+			return this.renderFlagRowHTML(index, id, matchStart, matchEnd);
 		}
-		return <li>Error: not found</li>;
+		return `<li>Error: not found</li>`;
 	}
+
 	static renderFilters(search: DexSearch, showHints?: boolean) {
 		return search.filters && <li class="dexlist-filters">
 			{showHints && "Filters: "}
@@ -800,6 +710,19 @@ export class PSSearchResults extends preact.Component<{
 			{!search.query && showHints && <small style="color: #888">(backspace = delete filter)</small>}
 		</li>;
 	}
+
+	static renderFiltersHTML(search: DexSearch, showHints?: boolean) {
+		if (!search.filters) return '';
+		return `<li class="dexlist-filters">` +
+			(showHints ? `Filters: ` : ``) +
+			search.filters.map(([type, name]) =>
+				`<button class="filter" data-filter="${escapeHTML(type)}:${escapeHTML(name)}">` +
+				`${escapeHTML(name)} <i class="fa fa-times-circle" aria-hidden></i></button>`
+			).join('') +
+			(!search.query && showHints ? `<small style="color: #888">(backspace = delete filter)</small>` : ``) +
+			`</li>`;
+	}
+
 	handleClick = (ev: Event) => {
 		const search = this.props.search;
 		let target = ev.target as HTMLElement | null;
@@ -850,40 +773,131 @@ export class PSSearchResults extends preact.Component<{
 		}
 	};
 
-	override componentDidUpdate() {
-		if (this.props.resultIndex !== undefined) {
-			this.base!.children[this.resultIndex + 1]?.children[0]?.classList.remove('hover');
-			this.resultIndex = this.props.resultIndex;
-			this.base!.children[this.resultIndex + 1]?.children[0]?.classList.add('hover');
+	handleMouseDown = (ev: MouseEvent) => {
+		// bypass blur handlers, so the buttons don't get re-rendered before the click
+		// handler can run
+		let target = ev.target as HTMLElement | null;
+		while (target && target.className !== 'dexlist') {
+			if (target.tagName === 'A') {
+				ev.preventDefault();
+				return;
+			}
+			if (target.tagName === 'BUTTON' && (target.hasAttribute('data-filter') || target.hasAttribute('data-sort'))) {
+				ev.preventDefault();
+				return;
+			}
+			target = target.parentElement;
 		}
-	}
-	override componentDidMount() {
-		this.componentDidUpdate();
-	}
-	override render() {
+	};
+
+	handleScroll = () => {
+		if (this.base?.scrollTop && document.documentElement.clientWidth === document.documentElement.scrollWidth) {
+			(this.base as any).scrollIntoViewIfNeeded?.();
+		}
+		if (this.scrollFrame) return;
+		this.scrollFrame = requestAnimationFrame(() => {
+			this.scrollFrame = 0;
+			this.updateDOM(false);
+		});
+	};
+
+	updateCurrentSet() {
 		const search = this.props.search;
-
-		// Invalidate per-search memos so Relumi diff lookups don't return stale
-		// data when the search dex or current species changes between renders.
-		this._relumi.clearCache();
-		this._relumiHighlightCached = undefined;
-
 		const set = search.typedSearch?.set;
 		if (set) {
 			this.speciesId = toID(set.species);
 			this.itemId = toID(set.item);
 			this.abilityId = toID(set.ability);
 			this.moveIds = set.moves.map(toID);
+		} else {
+			this.speciesId = '' as ID;
+			this.itemId = '' as ID;
+			this.abilityId = '' as ID;
+			this.moveIds = [];
 		}
+	}
 
-		let results = search.results;
-		if (this.props.windowing) results = results?.slice(0, this.props.windowing) || null;
+	updateHover() {
+		const list = this.base?.querySelector<HTMLElement>('.dexlist') || null;
+		if (!list) return;
+		list.querySelector('.hover')?.classList.remove('hover');
+		list.querySelector(`li.result[value="${this.props.search.resultIndex}"] > a`)?.classList.add('hover');
+	}
 
-		return <ul
-			class="dexlist" style={`min-height: ${(1 + (search.results?.length || 1)) * 33}px;`} onClick={this.handleClick}
-		>
-			{(!this.props.hideFilters && PSSearchResults.renderFilters(search, true)) || <li></li>}
-			{results?.map(result => this.renderRow(result))}
-		</ul>;
+	scrollSelectedResult() {
+		if (!this.base) return;
+		this.base.scrollTop = Math.max(
+			0,
+			this.props.search.resultIndex * RESULT_ROW_HEIGHT - Math.trunc(this.base.clientHeight * 2 / 5)
+		);
+		this.updateDOM(true);
+	}
+
+	updateDOM(force = true) {
+		// Invalidate per-search memos so Relumi diff lookups don't return stale
+		// data when the search dex or current species changes between renders.
+		this._relumi.clearCache();
+		this._relumiHighlightCached = undefined;
+
+		const list = this.base?.querySelector<HTMLElement>('.dexlist') || null;
+		if (!list) return;
+		const search = this.props.search;
+		const results = search.results || [];
+		const scrollTop = this.base?.scrollTop || 0;
+		const viewHeight = this.base?.clientHeight || window.innerHeight;
+		const visibleStart = Math.max(0, Math.floor(scrollTop / RESULT_ROW_HEIGHT));
+		const visibleEnd = Math.min(results.length, Math.ceil((scrollTop + viewHeight) / RESULT_ROW_HEIGHT));
+		if (
+			!force && results.length === this.renderedLength &&
+			visibleStart >= this.renderedStart + RESULT_REFILL_THRESHOLD_ROWS &&
+			visibleEnd <= this.renderedEnd - RESULT_REFILL_THRESHOLD_ROWS
+		) {
+			this.updateHover();
+			return;
+		}
+		const start = Math.max(0, visibleStart - RESULT_OVERSCAN_ROWS);
+		const end = Math.min(results.length, visibleEnd + RESULT_OVERSCAN_ROWS);
+		this.renderedStart = start;
+		this.renderedEnd = end;
+		this.renderedLength = results.length;
+		const topSpacer = start * RESULT_ROW_HEIGHT;
+		const bottomSpacer = (results.length - end) * RESULT_ROW_HEIGHT;
+
+		this.updateCurrentSet();
+
+		let html = '';
+		if (!this.props.hideFilters) html += PSSearchResults.renderFiltersHTML(search, true);
+		if (topSpacer) html += `<li style="height:${topSpacer}px"></li>`;
+		for (let i = start; i < end; i++) {
+			html += this.renderRowHTML(results[i], i);
+		}
+		if (bottomSpacer) html += `<li style="height:${bottomSpacer}px"></li>`;
+		list.innerHTML = html;
+		this.updateHover();
+	}
+
+	override componentDidUpdate() {
+		this.updateDOM(true);
+	}
+
+	override componentDidMount() {
+		this.base?.addEventListener('scroll', this.handleScroll);
+		this.props.search.resultsComponent = this;
+		this.updateDOM(true);
+	}
+
+	override componentWillUnmount() {
+		this.base?.removeEventListener('scroll', this.handleScroll);
+		this.props.search.resultsComponent = null;
+		if (this.scrollFrame) cancelAnimationFrame(this.scrollFrame);
+	}
+
+	override render() {
+		// the <ul> contents are uncontrolled
+		return <div class={this.props.class} style={this.props.style}>
+			{this.props.prepend}
+			<ul class="dexlist" onMouseDown={this.handleMouseDown} onClick={this.handleClick}></ul>
+			{this.props.children}
+		</div>;
 	}
 }
