@@ -1066,7 +1066,7 @@ class BattleForfeitPanel extends PSRoomPanel {
 			<p>
 				<button data-cmd="/closeand /inopener /closeand /forfeit" class="button"><strong>Forfeit and close</strong></button> {}
 				<button data-cmd="/closeand /inopener /forfeit" class="button">Just forfeit</button> {}
-				{!battleRoom.battle.rated && <button type="button" data-href="replaceplayer" class="button">
+				{battleRoom.battle && !battleRoom.battle.rated && <button type="button" data-href="replaceplayer" class="button">
 					Replace player
 				</button>} {}
 				<button type="button" data-cmd="/close" class="button">

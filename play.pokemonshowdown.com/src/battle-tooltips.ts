@@ -1855,12 +1855,12 @@ export class BattleTooltips {
 				switch (this.battle.weather) {
 				case 'sunnyday':
 				case 'desolateland':
-					if (item.id === 'utilityumbrella') break;
+					if (value.tryItem('Utility Umbrella')) break;
 					moveType = 'Fire';
 					break;
 				case 'raindance':
 				case 'primordialsea':
-					if (item.id === 'utilityumbrella') break;
+					if (value.tryItem('Utility Umbrella')) break;
 					moveType = 'Water';
 					break;
 				case 'sandstorm':
@@ -1982,7 +1982,7 @@ export class BattleTooltips {
 				moveType = 'Stellar';
 			}
 			if (move.id === 'weatherball' && value.weatherModify(0)) {
-				if (this.battle.weather === 'stormsurge' && item.id !== 'utilityumbrella') moveType = 'Water';
+				if (this.battle.weather === 'stormsurge' && !value.tryItem('Utility Umbrella')) moveType = 'Water';
 				if (this.battle.weather === 'deserteddunes') moveType = 'Rock';
 			}
 			if (move.id === 'o' || move.id === 'worriednoises') {
@@ -2492,7 +2492,19 @@ export class BattleTooltips {
 		}
 		if (move.id === 'weatherball') {
 			if (!value.abilityModify(2, "Mega Sol") && this.battle.weather !== 'deltastream') {
-				value.weatherModify(2);
+				switch (this.battle.weather) {
+				case 'sunnyday':
+				case 'desolateland':
+				case 'raindance':
+				case 'primordialsea':
+				case 'stormsurge':
+					if (value.tryItem('Utility Umbrella')) break;
+					value.weatherModify(2);
+					break;
+				default:
+					value.weatherModify(2);
+					break;
+				}
 			}
 		}
 		if (move.id === 'hydrosteam') {
@@ -3127,7 +3139,7 @@ export class BattleStatGuesser {
 		let stats = species.baseStats;
 
 		if (set.moves.length < 1) return '?';
-		let needsFourMoves = !['unown', 'ditto'].includes(species.id);
+		let needsFourMoves = !['Unown', 'Ditto'].includes(species.baseSpecies);
 		let hasFourValidMoves = set.moves.length >= 4 && !set.moves.includes('');
 		let moveids = set.moves.map(toID);
 		if (moveids.includes('lastresort' as ID)) needsFourMoves = false;

@@ -1254,21 +1254,31 @@ export class ModdedDex {
 	species = {
 		get: (name: string): Species => {
 			let id = toID(name);
+			// Cosmetic forms (e.g. furfroudiamond→Furfrou in BattleAliases) need
+			// the original name so Dex.species.get synthesizes cosmetic formes
+			// instead of resolving them to the base species, which would then
+			// hide the cosmetic form picker in the teambuilder.
 			const origId = id;
 			const origName = name;
 			if (window.BattleAliases && id in BattleAliases && !(window.BattlePokedex && id in window.BattlePokedex)) {
 				name = BattleAliases[id];
 				id = toID(name);
 			}
-			// Cosmetic forms (e.g. furfroudiamond→Furfrou in BattleAliases) need
-			// the original name so Dex.species.get synthesizes cosmetic formes.
 			const isCosmeticAlias = origId !== id && window.BattleBaseSpeciesChart?.some(
-				base => origId.startsWith(base)
+				(base: ID) => origId.startsWith(base)
 			);
 			const cacheId = isCosmeticAlias ? origId : id;
+			// Keep both the resolved id/name and the original alias around so the
+			// synthesized Species matches the cosmetic forme that was requested
+			// (e.g. furfroudiamond instead of collapsing back to furfrou).
+			const speciesName = isCosmeticAlias ? origName : name;
 			if (this.cache.Species.hasOwnProperty(cacheId)) return this.cache.Species[cacheId];
 
-			let data = { ...Dex.species.get(isCosmeticAlias ? origName : name) };
+			let data = { ...Dex.species.get(speciesName) };
+			// Dex.species.get's cosmeticFormes loop synthesizes the canonical
+			// display name (e.g. "Furfrou-Diamond"); prefer it so lowercase
+			// input ids still produce a properly cased species.name.
+			const finalName = data.name || speciesName;
 
 			for (let i = Dex.gen - 1; i >= this.gen; i--) {
 				const table = window.BattleTeambuilderTable[`gen${i}`];
@@ -1302,7 +1312,7 @@ export class ModdedDex {
 					evoSpecies.isNonstandard === "Unobtainable";
 			});
 
-			const species = new Species(cacheId, name, data);
+			const species = new Species(cacheId, finalName, data);
 			this.cache.Species[cacheId] = species;
 			return species;
 		},

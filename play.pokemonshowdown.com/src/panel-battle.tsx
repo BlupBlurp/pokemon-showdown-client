@@ -115,7 +115,7 @@ class BattlesPanel extends PSRoomPanel<BattlesRoom> {
 
 				<form class="search" onSubmit={this.applyFilters}>
 					<p>
-						<input type="text" name="prefixsearch" class="textbox" placeholder="Username prefix" />
+						<input type="text" name="prefixsearch" class="textbox" placeholder="Username prefix" autocomplete="off" />
 						<button type="submit" class="button">Search</button>
 					</p>
 				</form>
@@ -147,13 +147,15 @@ export class BattleRoom extends ChatRoom {
 	request: BattleRequest | null = null;
 	choices: BattleChoiceBuilder | null = null;
 	autoTimerActivated: boolean | null = null;
+	requireForfeit = false;
 	/** should be false if we joined right after accepting or challenging a battle,
 	  * and true if we refreshed and rejoined a battle.
 		* null = initializing, we don't know yet */
 	rejoining: boolean | null = null;
 
 	override interruptClose(explicit?: boolean, elem?: HTMLElement | null) {
-		if (!this.battle.ended && this.users[PS.user.userid]?.startsWith('☆') && !this.battle.isReplay) {
+		const battle = this.battle;
+		if ((battle && !battle.ended && this.connected !== 'expired' && this.side && !battle.isReplay) || this.requireForfeit) {
 			PS.join('forfeitbattle' as RoomID, { parentElem: elem, parentRoomid: this.id });
 			return `You are still in ${this.title}`;
 		}
@@ -197,7 +199,7 @@ class BattleDiv extends preact.Component<{ room: BattleRoom }> {
 	}
 }
 
-class TimerButton extends preact.Component<{ room: BattleRoom }> {
+class TimerButton extends preact.Component<{ room: BattleRoom, top: number }> {
 	timerInterval: number | null = null;
 	override componentWillUnmount() {
 		if (this.timerInterval) {
@@ -249,7 +251,7 @@ class TimerButton extends preact.Component<{ room: BattleRoom }> {
 		}
 
 		return <button
-			style={{ position: "absolute", right: '10px' }}
+			style={{ position: "absolute", right: '10px', top: `${this.props.top}px` }}
 			data-href="battletimer" class={`button${timerTicking}`} role="timer"
 		>
 			<i class="fa fa-hourglass-start" aria-hidden></i> {time}
@@ -386,8 +388,9 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 	updateLayout() {
 		if (!this.base) return;
 		const room = this.props.room;
-		const width = this.base.offsetWidth;
-		if (width && width < 640) {
+		const width = room.width;
+		if (!width) return;
+		if (width < 640) {
 			const scale = (width / 640);
 			room.battle?.scene.$frame!.css('transform', `scale(${scale})`);
 			this.battleHeight = Math.round(360 * scale);
@@ -411,6 +414,12 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 	override receiveLine(args: Args) {
 		const room = this.props.room;
 		switch (args[0]) {
+		case 'cantleave':
+			room.requireForfeit = true;
+			return;
+		case 'allowleave':
+			room.requireForfeit = false;
+			return;
 		case 'initdone':
 			if (!PS.prefs.spectatefromstart) room.battle.seekTurn(Infinity);
 			return;
@@ -638,7 +647,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 				</label>}
 				{canTerastallize && <label class={`megaevo${choices.current.tera ? ' cur' : ''}`}>
 					<input type="checkbox" name="tera" checked={choices.current.tera} onChange={this.toggleBoostedMove} /> {}
-					Terastallize<br /><span dangerouslySetInnerHTML={{ __html: Dex.getTypeIcon(canTerastallize) }} />
+					Terastallize<br />{PSIcon({ type: canTerastallize, new: true, tera: true })}
 				</label>}
 			</div>
 		</div>;
@@ -897,14 +906,15 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 						buf.push(` at ${ally} ${target.name}`);
 					}
 				}
+				buf.push(`.`);
 			} else if (choice.choiceType === 'switch') {
 				const target = request.side.pokemon[choice.targetPokemon - 1];
-				buf.push(`${pokemon.name} will switch to `, <strong>{target.name}</strong>);
+				buf.push(`${pokemon.name} will switch to `, <strong>{target.name}</strong>, `.`);
 			} else if (choice.choiceType === 'shift') {
-				buf.push(`${pokemon.name} will `, <strong>shift</strong>, ` to the center`);
+				buf.push(`${pokemon.name} will `, <strong>shift</strong>, ` to the center.`);
 			} else if (choice.choiceType === 'team') {
 				const target = request.side.pokemon[choice.targetPokemon - 1];
-				buf.push(`You picked `, <strong>{target.name}</strong>);
+				buf.push(`You picked `, <strong>{target.name}</strong>, `.`);
 			}
 			buf.push(<br />);
 		}
@@ -992,7 +1002,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 			return <div class="controls">
 				<div class="whatdo">
 					{this.renderOldChoices(request, choices)}
-					What will <strong>{pokemon.name}</strong> do?
+					Who will replace <strong>{pokemon.name}</strong>?
 				</div>
 				<div class="switchcontrols">
 					<h3 class="switchselect">Switch</h3>
@@ -1101,14 +1111,14 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 	};
 
 	override render() {
-		const room = this.props.room;
 		this.updateLayout();
+		const room = this.props.room;
 		const id = `room-${room.id}`;
 		const hardcoreStyle = room.battle?.hardcoreMode ? <style
 			dangerouslySetInnerHTML={{ __html: `#${id} .battle .turn, #${id} .battle-history { display: none !important; }` }}
 		></style> : null;
 
-		if (room.width < 700) {
+		if (room.width <= 700) {
 			return <PSPanelWrapper room={room} focusClick noScroll="hidden">
 				{hardcoreStyle}
 				<BattleDiv room={room} />
@@ -1121,14 +1131,8 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 				</ChatLog>
 				<ChatTextEntry room={room} onMessage={this.send} onKey={this.onKey} left={0} />
 				<ChatUserList room={room} top={this.battleHeight} minimized />
-				<button
-					data-href="battleoptions" class="button"
-					style={{ position: 'absolute', right: '10px', top: this.battleHeight + 2 }}
-				>
-					Battle options
-				</button>
 				{(room.battle && !room.battle.ended && room.request && room.battle.mySide.id === PS.user.userid) &&
-					<TimerButton room={room} />}
+					<TimerButton room={room} top={this.battleHeight + 7} />}
 				<div class="battle-controls-container"></div>
 			</PSPanelWrapper>;
 		}
@@ -1168,7 +1172,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 					class="battle-controls" role="complementary" aria-label="Battle Controls"
 					style={`top: ${controlsTop}px;${bp ? ' width: 1280px;' : ''}`}
 				>
-					{showTimer && <TimerButton room={room} />}
+					{showTimer && <TimerButton room={room} top={0} />}
 					{this.renderControls()}
 				</div>
 			</div>
