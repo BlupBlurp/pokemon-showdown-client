@@ -3347,7 +3347,8 @@ class TeamEditorForm extends TeamWizard {
 		while (set.moves.length < 4) set.moves.push('');
 
 		const species = editor.dex.species.get(set.species);
-		const tintClass = ` tint-${species.types[0]}`;
+		const displayTypes = editor.getDisplayTypes(set, species);
+		const tintClass = ` tint-${displayTypes[0]}`;
 		const isCur = TeamEditorState.clipboard?.teams?.[editor.team.key]?.sets[i] ? ' cur' : '';
 		const overfull = set.moves.length > 5 ? ' overfull' : set.moves.length > 4 ? ' overfull overfull5' : '';
 		return <div class={`set-button set-form${isCur}`} data-set-index={i}>
@@ -3415,7 +3416,7 @@ class TeamEditorForm extends TeamWizard {
 							</button>
 						</label>
 						<div>
-							{species.types.map(type => <><PSIcon type={type} new={!editor.narrow} /> </>)}
+							{displayTypes.map(type => <><PSIcon type={type} new={!editor.narrow} /> </>)}
 						</div>
 					</div></td>
 					<td rowSpan={2} class={`set-moves${overfull}`}><div class="border-collapse">
