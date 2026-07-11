@@ -5,7 +5,8 @@ import { BattleLog } from "./battle-log";
 import { PSLoginServer } from "./client-connection";
 import { PSBackground } from "./client-core";
 import {
-	PS, PSRoom, Config, type RoomOptions, type PSLoginState, type RoomID, type TimestampOptions,
+	PS, PSRoom, Config, type PSRoomFocusOptions, type RoomOptions, type PSLoginState, type RoomID,
+	type TimestampOptions, type BattleLayoutPreference,
 } from "./client-main";
 import { type BattleRoom } from "./panel-battle";
 import { ChatUserList, type ChatRoom } from "./panel-chat";
@@ -13,6 +14,14 @@ import { PSRoomPanel, PSPanelWrapper, PSView } from "./panels";
 import { PSHeader } from "./panel-topbar";
 
 const WARNING_SECONDS = 5;
+const BATTLE_LAYOUT_LABELS: Record<BattleLayoutPreference, string> = {
+	'side-by-side': 'Side-by-side, controls below',
+	'side-by-side-overlay': 'Side-by-side, overlay controls',
+	'top-and-bottom': 'Top-and-bottom, controls below',
+	'top-and-bottom-overlay': 'Top-and-bottom, overlay controls',
+	'scrolling': 'Scrolling, controls below',
+	'scrolling-overlay': 'Scrolling, overlay controls',
+};
 
 /**
  * User popup
@@ -701,7 +710,11 @@ class OptionsPanel extends PSRoomPanel {
 					name="layout" class="button" onChange={this.setLayout}
 					value={PS.prefs.onepanel === true ? 'onepanel' : PS.prefs.onepanel || ''}
 				>
-					<option value="">Two panels (if wide enough)</option>
+					<option value="">
+						{window.innerWidth < 700 || window.innerHeight < 430 ? "Automatic (Vertical tabs)" :
+						window.innerWidth < 900 ? "Automatic (Single panel)" :
+						"Two panels (if wide enough)"}
+					</option>
 					<option value="onepanel">Single panel</option>
 					<option value="vertical">Vertical tabs</option>
 				</select></label>
@@ -915,7 +928,7 @@ class LoginPanel extends PSRoomPanel {
 	update = () => {
 		this.forceUpdate();
 	};
-	override focus() {
+	override focus(_options?: PSRoomFocusOptions) {
 		const passwordBox = this.base!.querySelector<HTMLInputElement>('input[name=password]');
 		const usernameBox = this.base!.querySelector<HTMLInputElement>('input[name=username]');
 		(passwordBox || usernameBox)?.select();
@@ -1679,6 +1692,17 @@ class BattleOptionsPanel extends PSRoomPanel {
 		}
 		}
 	};
+	handleBattleLayout = (ev: Event) => {
+		const value = (ev.currentTarget as HTMLSelectElement).value as BattleLayoutPreference | '';
+		PS.prefs.set('battlelayout', value || null);
+		// Big Picture Mode is only meant for the side-by-side (desktop) layout.
+		// When the explicit layout switches to anything else (top-and-bottom,
+		// scrolling, or an `-overlay` variant of either), untoggle it.
+		if (value && !value.startsWith('side-by-side')) {
+			PS.prefs.set('bigpicture', null);
+		}
+		PS.update();
+	};
 	getBattleRoom() {
 		const battleRoom = this.props.room.getParent() as BattleRoom | null;
 		return battleRoom?.battle ? battleRoom : null;
@@ -1689,6 +1713,12 @@ class BattleOptionsPanel extends PSRoomPanel {
 		const battleRoom = this.getBattleRoom();
 		const isPlayer = !!battleRoom?.battle.myPokemon;
 		const canOfferTie = battleRoom && ((battleRoom.battle.turn >= 100 && isPlayer) || PS.user.group === '~');
+		const sideBySideDisabled = !!battleRoom && battleRoom.width < 500;
+		let automaticLayout: BattleLayoutPreference | null = null;
+		if (battleRoom) {
+			const { layout, overlayControls } = PS.chooseBattleLayout(battleRoom.width, battleRoom.height);
+			automaticLayout = `${layout}${overlayControls ? '-overlay' : ''}` as BattleLayoutPreference;
+		}
 		return <PSPanelWrapper room={room} width={380}><div class="pad">
 			{battleRoom && <>
 				<p><strong>In this battle</strong></p>
@@ -1726,6 +1756,34 @@ class BattleOptionsPanel extends PSRoomPanel {
 				</p>
 			</>}
 			<p><strong>All battles</strong></p>
+			<p>
+				<label class="optlabel">Layout: <select
+					name="battlelayout" class="button" onChange={this.handleBattleLayout}
+					value={PS.prefs.battlelayout || ''}
+				>
+					<option value="">
+						Automatic{automaticLayout ? ` (${BATTLE_LAYOUT_LABELS[automaticLayout]})` : ''}
+					</option>
+					<option value="side-by-side" disabled={sideBySideDisabled}>
+						{BATTLE_LAYOUT_LABELS['side-by-side']} (DESKTOP)
+					</option>
+					<option value="side-by-side-overlay" disabled={sideBySideDisabled}>
+						{BATTLE_LAYOUT_LABELS['side-by-side-overlay']}
+					</option>
+					<option value="top-and-bottom">
+						{BATTLE_LAYOUT_LABELS['top-and-bottom']} (MOBILE VERTICAL)
+					</option>
+					<option value="top-and-bottom-overlay">
+						{BATTLE_LAYOUT_LABELS['top-and-bottom-overlay']}
+					</option>
+					<option value="scrolling">
+						{BATTLE_LAYOUT_LABELS['scrolling']}
+					</option>
+					<option value="scrolling-overlay">
+						{BATTLE_LAYOUT_LABELS['scrolling-overlay']} (MOBILE HORIZONTAL)
+					</option>
+				</select></label>
+			</p>
 			<p>
 				<label class="checkbox">
 					<input
@@ -1803,6 +1861,7 @@ class BattleOptionsPanel extends PSRoomPanel {
 					<input
 						name="bigpicture" checked={PS.prefs.bigpicture || false}
 						type="checkbox" onChange={this.handleAllSettings}
+						disabled={!!PS.prefs.battlelayout && !PS.prefs.battlelayout.startsWith('side-by-side')}
 					/> Big Picture Mode (scale battle to full height)
 				</label>
 			</p>}
@@ -1814,7 +1873,7 @@ class BattleOptionsPanel extends PSRoomPanel {
 					/> Highlight Relumi balance changes in battle tooltips
 				</label>
 			</p>
-			{!PS.prefs.onepanel && document.body.offsetWidth >= 800 && <p>
+			{!PS.prefs.onepanel && window.innerWidth >= 800 && <p>
 				<label class="checkbox">
 					<input
 						name="rightpanel" checked={PS.prefs.rightpanelbattles || false}
@@ -1940,7 +1999,7 @@ class RoomTabListPanel extends PSRoomPanel {
 class BattleTimerPanel extends PSRoomPanel {
 	static readonly id = 'battletimer';
 	static readonly routes = ['battletimer'];
-	static readonly location = 'modal-popup';
+	static readonly location = 'popup';
 	static readonly noURL = true;
 
 	override render() {

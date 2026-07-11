@@ -72,6 +72,13 @@ export declare const Config: PSConfig;
  */
 export type RoomID = Lowercase<string> & { __isRoomID: true };
 export type TimestampOptions = 'minutes' | 'seconds' | undefined;
+/**
+ * * `side-by-side`: desktop layout, with battle on left and chat on right, controls below battle
+ * * `top-and-bottom`: vertical phone layout, with battle on top and chat/controls on bottom
+ * * `scrolling`: horizontal phone layout, fully scrollable
+ */
+export type BattlePanelLayout = 'side-by-side' | 'top-and-bottom' | 'scrolling';
+export type BattleLayoutPreference = BattlePanelLayout | `${BattlePanelLayout}-overlay`;
 
 const PSPrefsDefaults: { [key: string]: any } = {};
 
@@ -104,6 +111,8 @@ class PSPrefs extends PSStreamModel<string | null> {
 	bwgfx: boolean | null = null;
 	nopastgens: boolean | null = null;
 	useupstreamsprites: boolean | null = null;
+	relumiHighlightBalanceChangesTB: boolean | null = null;
+	relumiShowLearnsetMethods: boolean | null = null;
 
 	/* Chat Preferences */
 	inchatpm: boolean | null = null;
@@ -126,13 +135,15 @@ class PSPrefs extends PSStreamModel<string | null> {
 	ignoreopp: boolean | null = null;
 	autotimer: boolean | null = null;
 	autohardcore: boolean | null = null;
-	extraoppinfo = true;
-	extraowninfo = true;
-	relumiHighlightBalanceChangesTB: boolean | null = null;
-	relumiShowLearnsetMethods: boolean | null = null;
-	relumiHighlightBalanceChangesBT: boolean | null = null;
+	extraoppinfo: boolean | null = null;
+	extraowninfo: boolean | null = null;
 	spectatefromstart: boolean | null = null;
-	bigpicture = false;
+	battlelayout: BattleLayoutPreference | null = null;
+	// Big Picture Mode is only usable with the side-by-side (desktop) layout.
+	// See panel-popups.tsx BattleOptionsPanel and panels.tsx PSView.posStyle
+	// for the layout gating that applies it.
+	bigpicture: boolean | null = null;
+	relumiHighlightBalanceChangesBT: boolean | null = null;
 	rightpanelbattles: boolean | null = null;
 	disallowspectators: boolean | null = null;
 	starredformats: { [formatid: string]: true | undefined } | null = null;
@@ -350,7 +361,7 @@ class PSPrefs extends PSStreamModel<string | null> {
 
 		for (const roomid in PS.rooms) {
 			const room = PS.rooms[roomid]!;
-			if (room.type === 'battle') {
+			if (room.type === 'battle' && room.connected === 'autoreconnect') {
 				room.connect();
 			}
 		}
@@ -969,6 +980,10 @@ class PSServer {
 
 type PSRoomLocation = 'left' | 'right' | 'popup' | 'mini-window' | 'modal-popup';
 
+export interface PSRoomFocusOptions {
+	preventScroll?: boolean;
+}
+
 export interface RoomOptions {
 	id: RoomID;
 	title?: string;
@@ -1059,11 +1074,10 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 	 * Set to 'init' during initialization, including while parsing
 	 * the lines after receiveing `'init'` from the server.
 	 *
-	 * Only connected to server when `=== true`. String options other
-	 * than `init` mean the room isn't connected to the game server
-	 * but to something else.
+	 * Use `.connectedToServer()` to check for the states that count
+	 * as "connected for real".
 	 *
-	 * 'client-only' for DMs
+	 * 'client-only' is used for DMs and for replay pages.
 	 */
 	connected: 'autoreconnect' | 'client-only' | 'expired' | 'init' | boolean = false;
 	/**
@@ -1073,7 +1087,7 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 	 */
 	readonly canConnect: boolean = false;
 	connectWhenLoggedIn = false;
-	onParentFocus: ((e?: Event) => boolean | void) | null = null;
+	onRequestFocus: ((options?: PSRoomFocusOptions) => boolean | void) | null = null;
 	onParentKeyDown: ((e?: Event) => boolean | void) | null = null;
 
 	width = 0;
@@ -1085,7 +1099,7 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 	 * their width/height without flickering. But hidden HTML elements can't be
 	 * focused, so this is a note-to-self to focus the next time they can be.
 	 */
-	focusNextUpdate = false;
+	focusNextUpdate: boolean | PSRoomFocusOptions = false;
 	parentElem: HTMLElement | null = null;
 	parentRoomid: RoomID | null = null;
 	rightPopup = false;
@@ -1118,6 +1132,14 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 	getParent() {
 		if (this.parentRoomid) return PS.rooms[this.parentRoomid] || null;
 		return null;
+	}
+	/**
+	 * True if this.connected is `true | 'init' | 'autoreconnect'`.
+	 * Determines whether we should send `/leave` if the room is closed, and
+	 * whether we should try to rejoin if the socket disconnects.
+	 */
+	connectedToServer() {
+		return this.connected === true || this.connected === 'init' || this.connected === 'autoreconnect';
 	}
 	notify(options: { title: string, body?: string, noAutoDismiss?: boolean, id?: string }) {
 		let desktopNotification: Notification | null = null;
@@ -1812,7 +1834,7 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 		PS.send(msg, this.id);
 	}
 	destroy() {
-		if (this.connected === true) {
+		if (this.connectedToServer()) {
 			this.sendDirect(`/noreply /leave ${this.id}`);
 			this.connected = false;
 		}
@@ -1984,16 +2006,55 @@ export const PS = new class extends PSModel {
 	 * * 0 = only one panel visible
 	 * * null = vertical nav layout
 	 * n.b. Resizes only trigger a re-render if the panel layout or a
-	 * width-dependent layout breakpoint changes.
+	 * width/height-dependent layout breakpoint changes.
 	 */
 	leftPanelWidth: number | null = 0;
 	mainmenu: MainMenuRoom = null!;
 	layoutViewportWidth = 0;
 
-	roomWidthBreakpointPassed(oldWidth: number, newWidth: number) {
-		return (oldWidth < 550) !== (newWidth < 550) || // chat-room userlists, teambuilder
+	roomLayoutBreakpointPassed(room: PSRoom, newWidth: number, newHeight: number) {
+		const oldWidth = room.width;
+		const oldHeight = room.height;
+		if ((oldWidth < 550) !== (newWidth < 550) || // chat-room userlists, teambuilder
 			(oldWidth < 620) !== (newWidth < 620) || // main menu and teambuilder tiny-layout class
-			(oldWidth <= 700) !== (newWidth <= 700); // battle tiny-layout
+			(oldWidth <= 780) !== (newWidth <= 780)) { // battle tiny-layout
+			return true;
+		}
+		if (room.type === 'battle') {
+			const oldLayoutState = this.chooseBattleLayout(oldWidth, oldHeight, this.prefs.battlelayout);
+			const newLayoutState = this.chooseBattleLayout(newWidth, newHeight, this.prefs.battlelayout);
+			if (oldLayoutState.layout !== newLayoutState.layout ||
+				oldLayoutState.battleHeight !== newLayoutState.battleHeight ||
+				oldLayoutState.battleWidth !== newLayoutState.battleWidth ||
+				oldLayoutState.overlayControls !== newLayoutState.overlayControls) {
+				return true;
+			}
+		}
+		return false;
+	}
+	chooseBattleLayout(width: number, height: number, preference?: BattleLayoutPreference | null) {
+		let scale = Math.min(1, width / 640, height / 360);
+		const uncappedBattleHeight = Math.round(360 * scale);
+		let layout: BattlePanelLayout = width > 780 ? 'side-by-side' :
+			height < uncappedBattleHeight + 150 ? 'scrolling' : 'top-and-bottom';
+
+		const preferredLayout = preference?.replace(/-overlay$/, '') as BattlePanelLayout;
+		if (preferredLayout && (width >= 500 || preferredLayout !== 'side-by-side')) {
+			layout = preferredLayout;
+		}
+		if (layout === 'side-by-side') {
+			scale = Math.min(scale, Math.max(0, width - 180) / 640);
+		} else if (layout === 'top-and-bottom') {
+			scale = Math.min(scale, Math.max(0, height - 180) / 360);
+		}
+
+		const battleHeight = Math.round(360 * scale);
+		const battleWidth = Math.round(640 * scale);
+		let overlayControls = height < battleHeight + 180;
+		if (preferredLayout) {
+			overlayControls = !!preference?.endsWith('-overlay');
+		}
+		return { layout, battleHeight, battleWidth, overlayControls };
 	}
 
 	/**
@@ -2131,31 +2192,40 @@ export const PS = new class extends PSModel {
 	/** @returns changed */
 	updateLayout(): boolean {
 		const leftPanelWidth = this.calculateLeftPanelWidth();
-		const viewportWidth = document.documentElement.clientWidth;
-		const totalWidth = document.body.offsetWidth;
-		const totalHeight = document.body.offsetHeight;
-		const roomHeight = totalHeight - 56;
-		// Big Picture Mode: give battle full viewport width when active
-		const effectiveLeftPanelWidth = (this.prefs.bigpicture && this.panel?.type === 'battle') ? 0 : leftPanelWidth;
+		const viewportWidth = window.innerWidth;
+		const viewportHeight = window.innerHeight;
+		const roomHeight = viewportHeight - 56;
+		// Big Picture Mode: hide the chat (right) panel so the battle canvas
+		// gets the full viewport. Only applies when the focused panel is a
+		// battle, when the viewport is wide enough to fit the 2x battle canvas
+		// (1280px), and when the layout is (or auto-resolves to) side-by-side.
+		// Same gating as panel-popups.tsx and panel-battle.tsx chooseLayout.
+		let effectiveLeftPanelWidth = leftPanelWidth;
+		if (
+			this.prefs.bigpicture && this.panel?.type === 'battle' &&
+			document.body.offsetWidth >= 800 &&
+			(!this.prefs.battlelayout || this.prefs.battlelayout.startsWith('side-by-side'))
+		) {
+			effectiveLeftPanelWidth = 0;
+		}
 		let needsUpdate = this.leftPanelWidth !== effectiveLeftPanelWidth;
 		if (effectiveLeftPanelWidth === null) {
-			const headerWidth = viewportWidth <= 700 ?
-				NARROW_MODE_HEADER_WIDTH : VERTICAL_HEADER_WIDTH;
-			const roomWidth = totalWidth + 1 - headerWidth;
-			needsUpdate ||= this.roomWidthBreakpointPassed(this.panel.width, roomWidth);
+			const headerWidthOffset = viewportWidth <= 700 ? 0 : VERTICAL_HEADER_WIDTH;
+			const roomWidth = viewportWidth + 1 - headerWidthOffset;
+			needsUpdate ||= this.roomLayoutBreakpointPassed(this.panel, roomWidth, viewportHeight - 30);
 			this.panel.width = roomWidth;
-			this.panel.height = totalHeight - 30;
+			this.panel.height = viewportHeight - 30;
 		} else if (effectiveLeftPanelWidth) {
-			const rightPanelWidth = totalWidth + 1 - effectiveLeftPanelWidth;
-			needsUpdate ||= this.roomWidthBreakpointPassed(this.leftPanel.width, effectiveLeftPanelWidth);
-			needsUpdate ||= this.roomWidthBreakpointPassed(this.rightPanel!.width, rightPanelWidth);
+			const rightPanelWidth = viewportWidth + 1 - effectiveLeftPanelWidth;
+			needsUpdate ||= this.roomLayoutBreakpointPassed(this.leftPanel, effectiveLeftPanelWidth, roomHeight);
+			needsUpdate ||= this.roomLayoutBreakpointPassed(this.rightPanel!, rightPanelWidth, roomHeight);
 			this.leftPanel.width = effectiveLeftPanelWidth;
 			this.leftPanel.height = roomHeight;
 			this.rightPanel!.width = rightPanelWidth;
 			this.rightPanel!.height = roomHeight;
 		} else {
-			needsUpdate ||= this.roomWidthBreakpointPassed(this.panel.width, totalWidth);
-			this.panel.width = totalWidth;
+			needsUpdate ||= this.roomLayoutBreakpointPassed(this.panel, viewportWidth, roomHeight);
+			this.panel.width = viewportWidth;
 			this.panel.height = roomHeight;
 		}
 
@@ -2341,10 +2411,9 @@ export const PS = new class extends PSModel {
 	 * @see {@link leftPanelWidth} for return value meaning
 	 */
 	calculateLeftPanelWidth() {
-		const available = document.body.offsetWidth;
-		if (document.documentElement.clientWidth < 800 || this.prefs.onepanel === 'vertical') {
-			return null;
-		}
+		if (this.prefs.onepanel === 'vertical') return null;
+		if (!this.prefs.onepanel && window.innerWidth < 700) return null;
+		if (!this.prefs.onepanel && window.innerHeight < 430) return null;
 		// If we don't have both a left room and a right room, obviously
 		// just show one room
 		if (!this.leftPanel || !this.rightPanel || this.prefs.onepanel) {
@@ -2354,6 +2423,7 @@ export const PS = new class extends PSModel {
 		// The rest of this code can assume we have both a left room and a
 		// right room, and also want to show both if they fit
 
+		const available = window.innerWidth;
 		const left = this.getWidthFor(this.leftPanel);
 		const right = this.getWidthFor(this.rightPanel);
 
@@ -2464,21 +2534,23 @@ export const PS = new class extends PSModel {
 			if (roomid === '') this.mainmenu = newRoom as MainMenuRoom;
 			if (this.room === room) {
 				this.room = newRoom;
-				newRoom.focusNextUpdate = true;
+				newRoom.focusNextUpdate = { preventScroll: true };
 			}
 
 			updated = true;
 		}
 		if (updated) this.update();
 	}
-	setFocus(room: PSRoom) {
-		room.onParentFocus?.();
+	setFocus(room: PSRoom, options?: PSRoomFocusOptions) {
+		room.onRequestFocus?.(options);
 	}
 	focusRoom(roomid: RoomID) {
 		const room = this.rooms[roomid];
 		if (!room) return false;
 		if (this.room === room) {
-			this.setFocus(room);
+			const focusOptions = room.focusNextUpdate === true ? undefined : room.focusNextUpdate || undefined;
+			room.focusNextUpdate = false;
+			this.setFocus(room, focusOptions);
 			return true;
 		}
 		this.closePopupsAbove(room, true);
@@ -2871,7 +2943,7 @@ export const PS = new class extends PSModel {
 		}
 
 		if (wasFocused) {
-			this.room.focusNextUpdate = true;
+			this.room.focusNextUpdate = { preventScroll: true };
 		}
 	}
 	/** do NOT use this in a while loop: see `closePopupsUntil */

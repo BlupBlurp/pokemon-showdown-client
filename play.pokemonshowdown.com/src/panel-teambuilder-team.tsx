@@ -20,8 +20,7 @@ class TeamRoom extends PSRoom {
 	team!: Team;
 	teamDeleted = false;
 	forceReload = false;
-	editor: TeamEditorState | null = null;
-	_pendingUpload: { isPrivate: boolean } | null = null;
+	editor?: TeamEditorState;
 	override clientCommands = this.parseClientCommands({
 		'validate'(target) {
 			if (this.team.format.length <= 4) {
@@ -60,46 +59,21 @@ class TeamRoom extends PSRoom {
 	}
 	upload(isPrivate: boolean) {
 		const team = this.team;
-		if (!team.packedTeam) return PS.alert(`Add a Pokemon to your team before uploading it.`);
-		if (team.format.length <= 4) return PS.alert(`You must select a format first.`);
-		if (team.teamid && !team.uploaded) {
-			return PS.alert(`This team is for a different account. Please log into the correct account to update it.`);
-		}
-
-		// Validate via /vtm before uploading, matching the old client's psExport flow.
-		const originalAlert = PS.alert.bind(PS);
-		this._pendingUpload = { isPrivate };
-		PS.alert = (message, opts) => {
-			if (message.includes('Your team is valid')) {
-				PS.alert = originalAlert;
-				this._pendingUpload = null;
-				this._doUpload(isPrivate);
-				return;
-			}
-			if (message.includes('Your team was rejected')) {
-				PS.alert = originalAlert;
-				this._pendingUpload = null;
-				originalAlert(message, opts);
-				return;
-			}
-			// Not a validation popup; keep the override in place.
-			originalAlert(message, opts);
-		};
-		this.send(`/utm ${team.packedTeam}`);
-		this.send(`/vtm ${team.format}`);
-	}
-	private _doUpload(isPrivate: boolean) {
-		const team = this.team;
 		const cmd = team.uploaded ? 'update' : 'save';
+		// teamName, formatid, rawPrivacy, rawTeam
 		const buf = [];
 		if (team.uploaded) {
 			buf.push(team.uploaded.teamid);
+		} else if (team.teamid) {
+			return PS.alert(`This team is for a different account. Please log into the correct account to update it.`);
 		}
 		buf.push(team.name, team.format, isPrivate ? 1 : 0);
-		buf.push(team.packedTeam);
+		const exported = team.packedTeam;
+		if (!exported) return PS.alert(`Add a Pokemon to your team before uploading it.`);
+		buf.push(exported);
 		PS.teams.uploading = team;
 		PS.send(`/teams ${cmd} ${buf.join(', ')}`);
-		team.uploadedPackedTeam = team.packedTeam;
+		team.uploadedPackedTeam = exported;
 		this.update(null);
 	}
 	cancelUpload() {
@@ -268,8 +242,8 @@ class TeamPanel extends PSRoomPanel<TeamRoom> {
 			PS.alert(`Must use on an uploaded team.`);
 			return;
 		}
-		const uploadedTeam = Teams.export(Teams.unpack(team.uploadedPackedTeam), undefined, true);
-		const localTeam = Teams.export(Teams.unpack(team.packedTeam), undefined, true);
+		const uploadedTeam = Teams.export(Teams.unpack(team.uploadedPackedTeam), undefined);
+		const localTeam = Teams.export(Teams.unpack(team.packedTeam), undefined);
 		PS.alert(TeamPanel.renderTeamDiff(localTeam, uploadedTeam), { width: 720 });
 		ev.preventDefault();
 		ev.stopImmediatePropagation();

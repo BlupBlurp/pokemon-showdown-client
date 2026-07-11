@@ -11,46 +11,8 @@ import { PSTeambuilder, TeamBox } from "./panel-teamdropdown";
 import { Dex, PSUtils, toID, type ID } from "./battle-dex";
 import { Teams } from "./battle-teams";
 import { BattleLog } from "./battle-log";
-import preact from "../js/lib/preact";
 import { TeamEditorState } from "./battle-team-editor";
-
-class PSTextarea extends preact.Component<{ initialValue?: string, name?: string }> {
-	cssAutosize = !!window.CSS?.supports?.('field-sizing', 'content');
-	updateSize = () => {
-		if (this.cssAutosize) return;
-
-		const textbox = this.base!.querySelector('textarea')!;
-		const textboxTest = this.base!.querySelector<HTMLTextAreaElement>('textarea.heighttester')!;
-		textboxTest.style.width = `${textbox.offsetWidth}px`;
-		textboxTest.value = textbox.value;
-		textbox.setAttribute('data-changed', textbox.value === this.props.initialValue ? '' : '1');
-		const newHeight = Math.max(textboxTest.scrollHeight + 40, 50);
-		textbox.style.height = `${newHeight}px`;
-	};
-	override componentDidMount(): void {
-		const textbox = this.base!.querySelector('textarea')!;
-		if (this.props.initialValue) {
-			textbox.value = this.props.initialValue;
-		}
-		this.updateSize();
-		window.addEventListener('resize', this.updateSize);
-	}
-	override componentWillUnmount(): void {
-		window.removeEventListener('resize', this.updateSize);
-	}
-	override render() {
-		return <div style="position:relative">
-			<textarea
-				name={this.props.name} class="textbox" onInput={this.updateSize} onKeyUp={this.updateSize}
-				style="min-height:3em"
-			/>
-			{!this.cssAutosize && <div><textarea
-				class="textbox heighttester"
-				style="height:50px;visibility:hidden;position:absolute;left:-200px"
-			/></div>}
-		</div>;
-	}
-}
+import { PSTextarea } from "./panel-chat";
 
 const ADD_FORMAT_FOLDER_VALUE = '+';
 const ADD_FOLDER_VALUE = '++';
