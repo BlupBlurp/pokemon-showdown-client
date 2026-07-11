@@ -1031,9 +1031,9 @@ class AvatarsPanel extends PSRoomPanel {
 		const protocol = (Config.server.port === 443) ? 'https' : 'http';
 		const serverUrl = `${protocol}://${Config.server.host}:${Config.server.port}`;
 
-		// Expose the trainers sprite-sheet URL via a CSS custom property on the
-		// .avatarlist container, so the sprite sheet is loaded from the user's
-		// server (not the play.pokemonshowdown.com URL hardcoded in client2.css).
+		// Inline the trainers sprite-sheet URL on each button so the sprite sheet is
+		// loaded from the user's server, not from the play.pokemonshowdown.com URL
+		// hardcoded in client2.css. Inline overrides the class via specificity.
 		// spriteResourcePrefix() also honors the useupstreamsprites preference.
 		const trainersSpriteSheet = `${Dex.spriteResourcePrefix()}sprites/trainers-sheet.png`;
 
@@ -1055,14 +1055,15 @@ class AvatarsPanel extends PSRoomPanel {
 				</div>
 				<div style="clear:left"></div>
 			</>}
-			<div class="avatarlist" style={`--trainers-sheet: url(${trainersSpriteSheet})`}>
+			<div class="avatarlist">
 				{avatars.map(([i, avatar]) => {
 					const col = (i - 1) % 16;
 					const row = Math.floor((i - 1) / 16);
 					return <button
 						data-cmd={`/closeand /avatar ${avatar}`} title={`/avatar ${avatar}`}
 						class={`option pixelated${avatar === PS.user.avatar ? ' cur' : ''}`}
-						style={`background-position: -${col * 80 + 1}px -${row * 80 + 1}px`}
+						style={`background: transparent url(${trainersSpriteSheet}) no-repeat;` +
+							` background-position: -${col * 80 + 1}px -${row * 80 + 1}px`}
 					></button>;
 				})}
 			</div>
