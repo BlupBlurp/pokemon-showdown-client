@@ -231,7 +231,7 @@ export class BattleChoiceBuilder {
 					return null;
 				}
 			}
-			if (this.currentMoveRequest()?.maybeDisabled && isLastChoice) {
+			if (this.currentMoveRequest()?.maybeDisabled && isLastChoice && this.requestLength() === 1) {
 				this.noCancel = true;
 			}
 			if (choice.mega || choice.megax || choice.megay) this.alreadyMega = true;

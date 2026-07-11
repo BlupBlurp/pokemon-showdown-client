@@ -24,6 +24,10 @@ function escapeHTML(text: string | number | null | undefined) {
 	return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function escapeCSSString(text: string) {
+	return text.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\a ').replace(/\r/g, '\\d ');
+}
+
 export class PSSearchResults extends preact.Component<{
 	search: DexSearch, class?: string, style?: string | null,
 	prepend?: preact.ComponentChildren, children?: preact.ComponentChildren,
@@ -723,6 +727,11 @@ export class PSSearchResults extends preact.Component<{
 			`</li>`;
 	}
 
+	renderPagerHTML(direction: -1 | 1) {
+		const label = direction < 0 ? 'Show previous search results' : 'Show next search results';
+		return `<li class="result resultpage"><button class="button" data-page="${direction}">${label}</button></li>`;
+	}
+
 	handleClick = (ev: Event) => {
 		const search = this.props.search;
 		let target = ev.target as HTMLElement | null;
@@ -747,6 +756,14 @@ export class PSSearchResults extends preact.Component<{
 				}
 			}
 			if (target.tagName === 'BUTTON') {
+				const page = target.getAttribute('data-page');
+				if (page) {
+					this.pageResults(parseInt(page) as -1 | 1);
+					ev.preventDefault();
+					ev.stopPropagation();
+					break;
+				}
+
 				const filter = target.getAttribute('data-filter');
 				if (filter) {
 					search.removeFilter(filter.split(':') as any);
@@ -817,23 +834,69 @@ export class PSSearchResults extends preact.Component<{
 		}
 	}
 
-	updateHover() {
+	updateSelection() {
 		const list = this.base?.querySelector<HTMLElement>('.dexlist') || null;
 		if (!list) return;
-		list.querySelector('.hover')?.classList.remove('hover');
-		list.querySelector(`li.result[value="${this.props.search.resultIndex}"] > a`)?.classList.add('hover');
+		list.querySelector('[aria-selected]')?.removeAttribute('aria-selected');
+		list.querySelector(`li.result[value="${this.props.search.selection}"] > a`)?.setAttribute('aria-selected', 'true');
+	}
+
+	getFocusedListSelector(list: HTMLElement) {
+		const active = document.activeElement as HTMLElement | null;
+		if (!active || !list.contains?.(active)) return null;
+		const filter = active.getAttribute('data-filter');
+		if (filter !== null) return `button[data-filter="${escapeCSSString(filter)}"]`;
+		const sort = active.getAttribute('data-sort');
+		const li = active.closest<HTMLLIElement>('li.result');
+		if (sort !== null && li) {
+			return `li.result[value="${li.value}"] button[data-sort="${escapeCSSString(sort)}"]`;
+		}
+		if (active.tagName === 'A' && li) return `li.result[value="${li.value}"] > a`;
+		return null;
+	}
+
+	restoreFocusedListElement(list: HTMLElement, selector: string | null) {
+		if (!selector) return;
+		const target = list.querySelector<HTMLElement>(selector);
+		if (!target || document.activeElement === target) return;
+		const scrollTop = this.base?.scrollTop;
+		target.focus();
+		if (this.base && scrollTop !== undefined) this.base.scrollTop = scrollTop;
+	}
+
+	focusResult(list: HTMLElement, index: number) {
+		const target = list.querySelector<HTMLElement>(`li.result[value="${index}"] > a`);
+		if (!target) return;
+		const scrollTop = this.base?.scrollTop;
+		target.focus();
+		if (this.base && scrollTop !== undefined) this.base.scrollTop = scrollTop;
+	}
+
+	pageResults(direction: -1 | 1) {
+		if (!this.base) return;
+		const results = this.props.search.results || [];
+		if (!results.length) return;
+		const viewRows = Math.max(1, Math.ceil(this.base.clientHeight / RESULT_ROW_HEIGHT));
+		const targetIndex = Math.max(0, Math.min(
+			results.length - 1,
+			direction > 0 ? this.renderedEnd : this.renderedStart - 1
+		));
+		this.base.scrollTop = direction > 0 ?
+			targetIndex * RESULT_ROW_HEIGHT :
+			Math.max(0, (targetIndex - viewRows + 1) * RESULT_ROW_HEIGHT);
+		this.updateDOM(true, targetIndex);
 	}
 
 	scrollSelectedResult() {
 		if (!this.base) return;
 		this.base.scrollTop = Math.max(
 			0,
-			this.props.search.resultIndex * RESULT_ROW_HEIGHT - Math.trunc(this.base.clientHeight * 2 / 5)
+			this.props.search.selection * RESULT_ROW_HEIGHT - Math.trunc(this.base.clientHeight * 2 / 5)
 		);
 		this.updateDOM(true);
 	}
 
-	updateDOM(force = true) {
+	updateDOM(force = true, focusIndex = -1) {
 		// Invalidate per-search memos so Relumi diff lookups don't return stale
 		// data when the search dex or current species changes between renders.
 		this._relumi.clearCache();
@@ -847,12 +910,17 @@ export class PSSearchResults extends preact.Component<{
 		const viewHeight = this.base?.clientHeight || window.innerHeight;
 		const visibleStart = Math.max(0, Math.floor(scrollTop / RESULT_ROW_HEIGHT));
 		const visibleEnd = Math.min(results.length, Math.ceil((scrollTop + viewHeight) / RESULT_ROW_HEIGHT));
+		const hasEnoughRowsAbove = (
+			this.renderedStart === 0 || visibleStart >= this.renderedStart + RESULT_REFILL_THRESHOLD_ROWS
+		);
+		const hasEnoughRowsBelow = (
+			this.renderedEnd === results.length || visibleEnd <= this.renderedEnd - RESULT_REFILL_THRESHOLD_ROWS
+		);
 		if (
 			!force && results.length === this.renderedLength &&
-			visibleStart >= this.renderedStart + RESULT_REFILL_THRESHOLD_ROWS &&
-			visibleEnd <= this.renderedEnd - RESULT_REFILL_THRESHOLD_ROWS
+			hasEnoughRowsAbove && hasEnoughRowsBelow
 		) {
-			this.updateHover();
+			this.updateSelection();
 			return;
 		}
 		const start = Math.max(0, visibleStart - RESULT_OVERSCAN_ROWS);
@@ -860,20 +928,30 @@ export class PSSearchResults extends preact.Component<{
 		this.renderedStart = start;
 		this.renderedEnd = end;
 		this.renderedLength = results.length;
-		const topSpacer = start * RESULT_ROW_HEIGHT;
-		const bottomSpacer = (results.length - end) * RESULT_ROW_HEIGHT;
+		const hasPrevPage = start > 0;
+		const hasNextPage = end < results.length;
+		const topSpacer = (start - (hasPrevPage ? 1 : 0)) * RESULT_ROW_HEIGHT;
+		const bottomSpacer = (results.length - end - (hasNextPage ? 1 : 0)) * RESULT_ROW_HEIGHT;
 
 		this.updateCurrentSet();
 
 		let html = '';
 		if (!this.props.hideFilters) html += PSSearchResults.renderFiltersHTML(search, true);
-		if (topSpacer) html += `<li style="height:${topSpacer}px"></li>`;
+		if (topSpacer) html += `<li aria-hidden="true" style="height:${topSpacer}px"></li>`;
+		if (hasPrevPage) html += this.renderPagerHTML(-1);
 		for (let i = start; i < end; i++) {
 			html += this.renderRowHTML(results[i], i);
 		}
-		if (bottomSpacer) html += `<li style="height:${bottomSpacer}px"></li>`;
+		if (hasNextPage) html += this.renderPagerHTML(1);
+		if (bottomSpacer) html += `<li aria-hidden="true" style="height:${bottomSpacer}px"></li>`;
+		const selector = this.getFocusedListSelector(list);
 		list.innerHTML = html;
-		this.updateHover();
+		this.updateSelection();
+		if (focusIndex >= 0) {
+			this.focusResult(list, focusIndex);
+		} else {
+			this.restoreFocusedListElement(list, selector);
+		}
 	}
 
 	override componentDidUpdate() {

@@ -94,6 +94,7 @@ export class Pokemon implements PokemonDetails, PokemonHealth {
 	itemEffect = '';
 	prevItem = '';
 	prevItemEffect = '';
+	nature: Dex.NatureName | undefined = undefined;
 	terastallized = '';
 	teraType = '';
 	moddedType: Dex.TypeName[] = [];
@@ -758,6 +759,7 @@ export class Side {
 		if (!poke.ability && poke.baseAbility) poke.ability = poke.baseAbility;
 		poke.reset();
 		if (oldPokemon?.moveTrack.length) poke.moveTrack = oldPokemon.moveTrack;
+		if (oldPokemon?.nature) poke.nature = oldPokemon.nature;
 
 		if (replaceSlot >= 0) {
 			this.pokemon[replaceSlot] = poke;
@@ -3704,6 +3706,7 @@ export class Battle {
 				for (const move of set.moves) {
 					pokemon.rememberMove(move, 0);
 				}
+				pokemon.nature = set.nature;
 				if (set.teraType) pokemon.teraType = set.teraType;
 			}
 			this.log(args, kwArgs);

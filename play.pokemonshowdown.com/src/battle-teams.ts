@@ -332,7 +332,8 @@ export const Teams = new class {
 	 * (You may wish to manually add two spaces to the end of every line so
 	 * linebreaks are preserved in Markdown; I assume mostly for Reddit.)
 	 */
-	exportSet(set: Teams.PokemonSet, dex: ModdedDex = Dex, newFormat?: boolean) {
+	exportSet(set: Teams.PokemonSet, dex: ModdedDex = Dex) {
+		const newFormat = false;
 		let text = '';
 
 		// core
@@ -463,11 +464,11 @@ export const Teams = new class {
 	// getFullSet(set: Teams.PokemonSet, dex: ModdedDex): Teams.FullPokemonSet {
 	// 	//
 	// }
-	export(sets: Teams.PokemonSet[], dex?: ModdedDex, newFormat?: boolean) {
+	export(sets: Teams.PokemonSet[], dex?: ModdedDex) {
 		let text = '';
 		for (const set of sets) {
 			// core
-			text += Teams.exportSet(set, dex, newFormat);
+			text += Teams.exportSet(set, dex);
 		}
 		return text;
 	}

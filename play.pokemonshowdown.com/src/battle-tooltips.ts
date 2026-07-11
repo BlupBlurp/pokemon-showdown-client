@@ -195,6 +195,10 @@ export class BattleTooltips {
 	static parentElem: HTMLElement | null = null;
 	static isLocked = false;
 	static isPressed = false;
+	static allowsTouchScroll(elem: EventTarget | null) {
+		if (!(elem instanceof HTMLElement)) return false;
+		return elem.dataset.tooltip?.startsWith('activepokemon|') || false;
+	}
 
 	static hideTooltip() {
 		BattleTooltips.cancelLongTap();
@@ -234,16 +238,16 @@ export class BattleTooltips {
 
 	listen(elem: HTMLElement | JQuery) {
 		const $elem = $(elem);
-		$elem.on('mouseover', '.has-tooltip', this.showTooltipEvent);
-		$elem.on('click', '.has-tooltip', this.clickTooltipEvent);
-		$elem.on('focus', '.has-tooltip', this.showTooltipEvent);
-		$elem.on('mouseout', '.has-tooltip', BattleTooltips.unshowTooltip);
-		$elem.on('mousedown', '.has-tooltip', this.holdLockTooltipEvent);
-		$elem.on('blur', '.has-tooltip', BattleTooltips.unshowTooltip);
-		$elem.on('mouseup', '.has-tooltip', BattleTooltips.unshowTooltip);
+		$elem.on('mouseover.battleTooltips', '.has-tooltip', this.mouseOverEvent);
+		$elem.on('click.battleTooltips', '.has-tooltip', this.clickTooltipEvent);
+		$elem.on('focus.battleTooltips', '.has-tooltip', this.showTooltipEvent);
+		$elem.on('mouseout.battleTooltips', '.has-tooltip', BattleTooltips.unshowTooltip);
+		$elem.on('mousedown.battleTooltips', '.has-tooltip', this.holdLockTooltipEvent);
+		$elem.on('blur.battleTooltips', '.has-tooltip', BattleTooltips.unshowTooltip);
+		$elem.on('mouseup.battleTooltips', '.has-tooltip', BattleTooltips.unshowTooltip);
 
-		$elem.on('touchstart', '.has-tooltip', e => {
-			e.preventDefault();
+		$elem.on('touchstart.battleTooltips', '.has-tooltip', e => {
+			if (!BattleTooltips.allowsTouchScroll(e.currentTarget)) e.preventDefault();
 			this.holdLockTooltipEvent(e);
 			if (!BattleTooltips.parentElem) {
 				// should never happen, but in case there's a bug in the tooltip handler
@@ -252,15 +256,20 @@ export class BattleTooltips {
 			$(BattleTooltips.parentElem!).addClass('pressed');
 			BattleTooltips.isPressed = true;
 		});
-		$elem.on('touchend', '.has-tooltip', e => {
-			e.preventDefault();
-			if (e.currentTarget === BattleTooltips.parentElem && BattleTooltips.isPressed) {
+		$elem.on('touchend.battleTooltips', '.has-tooltip', e => {
+			const allowScroll = BattleTooltips.allowsTouchScroll(e.currentTarget);
+			if (!allowScroll) e.preventDefault();
+			if (!allowScroll && e.currentTarget === BattleTooltips.parentElem && BattleTooltips.isPressed) {
 				BattleTooltips.parentElem!.click();
 			}
 			BattleTooltips.unshowTooltip();
 		});
-		$elem.on('touchleave', '.has-tooltip', BattleTooltips.unshowTooltip);
-		$elem.on('touchcancel', '.has-tooltip', BattleTooltips.unshowTooltip);
+		$elem.on('touchleave.battleTooltips', '.has-tooltip', BattleTooltips.unshowTooltip);
+		$elem.on('touchcancel.battleTooltips', '.has-tooltip', BattleTooltips.unshowTooltip);
+	}
+
+	unlisten(elem: HTMLElement | JQuery) {
+		$(elem).off('.battleTooltips');
 	}
 
 	clickTooltipEvent = (e: Event) => {
@@ -293,6 +302,12 @@ export class BattleTooltips {
 
 	showTooltipEvent = (e: Event) => {
 		if (BattleTooltips.isLocked) return;
+		this.showTooltip(e.currentTarget as HTMLElement);
+	};
+
+	mouseOverEvent = (e: Event) => {
+		// 2026-07-06 Firefox bug: can trigger mouseover after tapping a completely different button
+		if (BattleTooltips.isLocked || (e as any).originalEvent?.mozInputSource === 5) return;
 		this.showTooltip(e.currentTarget as HTMLElement);
 	};
 
@@ -1066,6 +1081,12 @@ export class BattleTooltips {
 			}
 		}
 
+		// Only display when you don't also have stats
+		if (clientPokemon?.nature && !serverPokemon) {
+			let natureText = '<small>Nature:</small> ' + clientPokemon.nature;
+			text += `<p>${natureText}</p>`;
+		}
+
 		text += this.renderStats(clientPokemon, serverPokemon, !isActive);
 
 		if (serverPokemon && !isActive) {
@@ -1658,9 +1679,12 @@ export class BattleTooltips {
 				return `<p><small>Spe</small> ${min} or ${ev84} <small>(before external modifiers)</small></p>`;
 			} else if (this.battle.tier.includes("Let's Go")) {
 				return `<p><small>Spe</small> ${min}<small class="gray">&ndash;${ev0}&ndash;</small>${max} <small>(before external modifiers)</small></p>`;
+			} else if (clientPokemon.nature) {
+				// Nature already taken into account in min/max
+				return `<p><small>Spe</small> ${min} to ${max} <small>(before external modifiers)</small></p>`;
 			} else {
 				return `<p><small>Spe</small> ${min}<small class="gray">&ndash;${ev0}&ndash;${ev252}&ndash;</small>${max}<br><small>(before external modifiers)</small></p>`;
-			};
+			}
 		}
 		const stats = serverPokemon.stats;
 		const modifiedStats = this.calculateModifiedStats(clientPokemon, serverPokemon);
@@ -1775,25 +1799,41 @@ export class BattleTooltips {
 		let gen = this.battle.gen;
 		let isCGT = tier.includes('Computer-Generated Teams');
 
+		let minNatureMult = 0.9;
+		let maxNatureMult = 1.1;
+		if (tier.includes('Random Battle')) {
+			minNatureMult = 1;
+			maxNatureMult = 1;
+		}
+		if (pokemon.nature) {
+			let natureVals = BattleNatures[pokemon.nature];
+			if (natureVals.minus === 'spe') maxNatureMult = 0.9;
+			else if (natureVals.plus === 'spe') minNatureMult = 1.1;
+			else {
+				minNatureMult = 1;
+				maxNatureMult = 1;
+			}
+		}
+
 		let min;
 		let ev0;
 		let ev84;
 		let ev252;
 		let max;
 		if (tier.includes("Let's Go")) {
-			min = tr(tr(tr(2 * baseSpe * level / 100 + 5) * 0.9) * tr((70 / 255 / 10 + 1) * 100) / 100);
+			min = tr(tr(tr(2 * baseSpe * level / 100 + 5) * minNatureMult) * tr((70 / 255 / 10 + 1) * 100) / 100);
 			ev0 = tr(tr(tr((2 * baseSpe + 31) * level / 100 + 5)) * tr((70 / 255 / 10 + 1) * 100) / 100);
 			ev84 = tr(tr(tr((2 * baseSpe + 31) * level / 100 + 5)) * tr((70 / 255 / 10 + 1) * 100) / 100);
 			ev252 = tr(tr(tr((2 * baseSpe + 31 + 63) * level / 100 + 5)) * tr((70 / 255 / 10 + 1) * 100) / 100);
-			max = tr(tr(tr((2 * baseSpe + 31) * level / 100 + 5) * 1.1) * tr((70 / 255 / 10 + 1) * 100) / 100);
+			max = tr(tr(tr((2 * baseSpe + 31) * level / 100 + 5) * maxNatureMult) * tr((70 / 255 / 10 + 1) * 100) / 100);
 			if (tier.includes('No Restrictions')) max += 200;
 			else if (tier.includes('Random')) max += 20;
 		} else if (tier.includes('Champions')) {
-			min = tr(0.9 * (baseSpe + 20));
+			min = tr(minNatureMult * (baseSpe + 20));
 			ev0 = tr((2 * baseSpe + 31) * level / 100) + 5;
 			ev84 = tr((2 * baseSpe + 31 + 21) * level / 100) + 5;
 			ev252 = tr(baseSpe + 32 + 20);
-			max = tr(1.1 * (baseSpe + 32 + 20));
+			max = tr(maxNatureMult * (baseSpe + 32 + 20));
 		} else if (gen < 3) {
 			max = tr((2 * baseSpe + 30 + 63) * level / 100 + 5);
 			ev252 = max;
@@ -1801,11 +1841,11 @@ export class BattleTooltips {
 			ev0 = tr((2 * baseSpe + 30) * level / 100 + 5);
 			min = isCGT ? max : tr(2 * baseSpe * level / 100 + 5);
 		} else {
-			max = tr(tr((2 * baseSpe + 94) * level / 100 + 5) * 1.1);
+			max = tr(tr((2 * baseSpe + 94) * level / 100 + 5) * maxNatureMult);
 			ev252 = tr(tr((2 * baseSpe + 94) * level / 100 + 5));
 			ev84 = tr(tr((2 * baseSpe + 31 + 21) * level / 100 + 5));
 			ev0 = tr(tr((2 * baseSpe + 31) * level / 100 + 5));
-			min = isCGT ? max : tr(tr(2 * baseSpe * level / 100 + 5) * 0.9);
+			min = isCGT ? max : tr(tr(2 * baseSpe * level / 100 + 5) * minNatureMult);
 		}
 		return { min, ev0, ev84, ev252, max };
 	}
@@ -2151,7 +2191,13 @@ export class BattleTooltips {
 		}
 
 		// status immunities
-		if (target.status && inflictsStatus) return 0;
+		if (target.status && inflictsStatus) {
+			if (dex.gen === 1 && inflictsStatus === 'slp' && target.volatiles['mustrecharge']) {
+				// unfortunately gen 1 can actually override status here
+			} else {
+				return 0;
+			}
+		}
 		if (targetAbility === "Comatose" && inflictsStatus) return 0;
 		if (targetAbility === "Purifying Salt" && inflictsStatus) return 0;
 		if (targetAbility === "Shields Down" && target.speciesForme === 'Minior-Meteor' && inflictsStatus) return 0;
@@ -2173,7 +2219,10 @@ export class BattleTooltips {
 		].includes(move.id)) return 0;
 
 		if (category === 'Status') {
-			if (!move.flags['bypasssub'] && target.volatiles['substitute'] && sourceAbility !== 'Infiltrator') return 0;
+			if (target.volatiles['substitute'] && !move.flags['bypasssub'] && sourceAbility !== 'Infiltrator') {
+				if (dex.gen !== 1) return 0;
+				if (inflictsStatus !== 'par' && inflictsStatus !== 'slp' && inflictsEffect !== 'confusion') return 0;
+			}
 			if (move.id === 'thunderwave') return factor * otherFactor === 0 ? 0 : null;
 			return otherFactor === 0 ? 0 : null;
 		}
