@@ -33,7 +33,9 @@ export class MiniEdit {
 	 */
 	_setContent: (text: string) => void;
 	pushHistory?: (text: string, selection: MiniEditSelection) => void;
+	composing = false;
 	onKeyDown = (ev: KeyboardEvent) => {
+		if (ev.isComposing) return;
 		if (ev.keyCode === 13) { // enter
 			this.replaceSelection('\n');
 			ev.preventDefault();
@@ -51,7 +53,17 @@ export class MiniEdit {
 		this.element.setAttribute('contentEditable', 'true');
 		this.element.setAttribute('autoComplete', 'off');
 		this.element.setAttribute('spellCheck', 'false');
-		this.element.addEventListener('input', () => {
+		this.element.addEventListener('input', ev => {
+			if (this.composing || (ev as any).isComposing) return;
+			this.reformat();
+		});
+		this.element.addEventListener('compositionstart', () => {
+			this.composing = true;
+		});
+		this.element.addEventListener('compositionend', () => {
+			// browsers disagree on whether input or compositionend happens first,
+			// so run reformat on both
+			this.composing = false;
 			this.reformat();
 		});
 		this.element.addEventListener('keydown', this.onKeyDown);
@@ -254,6 +266,7 @@ export class MiniEditUndoPlugin {
 	};
 
 	onKeyDown = (e: KeyboardEvent) => {
+		if (e.isComposing) return;
 		// ctrl+z or cmd+z
 		const undoPressed = (e.ctrlKey && e.keyCode === 90) || (e.metaKey && !e.shiftKey && e.keyCode === 90);
 		// ctrl+y or cmd+shift+z

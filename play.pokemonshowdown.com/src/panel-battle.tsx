@@ -107,8 +107,8 @@ class BattlesPanel extends PSRoomPanel<BattlesRoom> {
 				<p>
 					<label class="label">Format:</label><FormatDropdown onChange={this.changeFormat} placeholder="(All formats)" />
 				</p>
-				<label>
-					Minimum Elo: <select name="elofilter" onChange={this.applyFilters}>
+				<label class="label">
+					Minimum Elo: <select name="elofilter" class="select" onChange={this.applyFilters}>
 						<option value="none">None</option><option value="1100">1100</option><option value="1300">1300</option>
 						<option value="1500">1500</option><option value="1700">1700</option><option value="1900">1900</option>
 					</select>
@@ -157,7 +157,7 @@ export class BattleRoom extends ChatRoom {
 
 	override interruptClose(explicit?: boolean, elem?: HTMLElement | null) {
 		const battle = this.battle;
-		const activeBattle = battle && !battle.ended && this.request && this.connectedToServer();
+		const activeBattle = battle && !battle.ended && this.request && this.connectMode !== 'expired';
 		if (activeBattle || this.requireForfeit) {
 			PS.join('forfeitbattle' as RoomID, { parentElem: elem, parentRoomid: this.id });
 			return `You are still in ${this.title}`;
@@ -187,7 +187,7 @@ export class BattleRoom extends ChatRoom {
 				this.battle.atQueueEnd = false;
 				this.battle.pause();
 				this.battle.seekTurn(0);
-				this.connected = 'client-only';
+				this.connectMode = null;
 				this.update(null);
 			} catch {
 				this.receiveLine(['bigerror', `Battle "${replayid}" not found`]);
@@ -319,7 +319,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 				if (!room) return;
 
 				room.title = title;
-				room.connected = 'client-only';
+				room.connectMode = null;
 				PS.receive(`>battle-uploaded-${roomNum}\n${html}`);
 			});
 			return true;

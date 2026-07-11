@@ -32,7 +32,7 @@ export class SanitizedHTML extends preact.Component<{ children: string }> {
 class PageRoom extends PSRoom {
 	override readonly classType: string = 'html';
 	readonly page?: string = this.id.split("-")[1];
-	override readonly canConnect = true;
+	override connectMode: PSRoom['connectMode'] = 'normal';
 
 	loading = true;
 	htmlData?: string;
@@ -45,14 +45,19 @@ class PageRoom extends PSRoom {
 
 	constructor(options: RoomOptions) {
 		super(options);
+		if (options.connectMode !== undefined) this.connectMode = options.connectMode;
 		this.connect();
 		this.title = this.id.split('-')[1];
 	}
 	override connect() {
-		if (!this.connected && !PagePanel.clientRooms.hasOwnProperty(this.id.split('-')[1])) {
+		if (PagePanel.clientRooms.hasOwnProperty(this.id.split('-')[1])) {
+			this.connectMode = null;
+		} else if (!this.connected && (
+			this.connectMode === 'normal' || this.connectMode === 'pending-reconnect' ||
+			this.connectMode === 'pending-login'
+		)) {
 			PS.send(`/join ${this.id}`);
-			this.connected = true;
-			this.connectWhenLoggedIn = false;
+			this.connected = 'pending';
 		}
 	}
 }

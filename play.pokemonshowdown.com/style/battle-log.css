@@ -347,12 +347,10 @@ select.base-select::picker-icon {
 	border-color: #34373b;
 }
 
-.button.small,
 .button.small {
 	font-size: 8pt;
 	padding: 2px 5px;
 }
-.button.big,
 .button.big {
 	font-size: 12pt;
 	padding: 5px 10px;
@@ -432,11 +430,16 @@ select.base-select::picker-icon {
 	font-weight: normal;
 }
 .textbox {
-	border: 1px solid #AAAAAA;
-	border-radius: 3px;
-	padding: 2px 3px;
 	font-family: Verdana, Helvetica, Arial, sans-serif;
 	font-size: 9pt;
+	padding: 2px 3px;
+	border-radius: 3px;
+}
+.textbox,
+.textbox-subtle[data-changed="1"],
+textarea.textbox-subtle:empty,
+input.textbox-subtle[value=""] {
+	border: 1px solid #AAAAAA;
 
 	box-shadow: inset 0px 1px 2px #CCCCCC, 1px 1px 0 rgba(255,255,255,.6);
 	background: #F8FBFD;
@@ -482,7 +485,10 @@ pre.textbox {
 .textbox::-webkit-search-cancel-button {
 	cursor: pointer;
 }
-.dark .textbox {
+.dark .textbox,
+.dark .textbox-subtle[data-changed="1"],
+textarea.textbox-subtle:empty,
+input.textbox-subtle[value=""] {
 	border-color: #6b7178;
 
 	/* box-shadow: inset 0px -1px 2px #606060, -1px -1px 0 rgba(255,255,255,.2); */
@@ -509,6 +515,24 @@ pre.textbox {
 	color: #AAA;
 	border-color: #444;
 	box-shadow: none;
+}
+
+.textbox-subtle,
+.dark .textbox-subtle {
+	border-color: transparent;
+	background: transparent;
+	box-shadow: none;
+}
+
+/* like <input type="text"> but with dynamic size */
+textarea.textbox.textbox-singleline {
+	display: inline-block;
+	width: auto;
+	max-width: 100%;
+	field-sizing: content;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+	vertical-align: middle;
 }
 
 .option, .base-select option {

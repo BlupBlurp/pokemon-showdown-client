@@ -2346,7 +2346,8 @@ class TeamEditorForm extends preact.Component<{
 		];
 		target.classList.remove('incomplete');
 		this.startFocusAnimation(target);
-		this.changeFocus(focus);
+		const refocusing = editor.stringifyFocus(editor.innerFocus) === editor.stringifyFocus(focus);
+		this.changeFocus(focus, false, true, refocusing);
 	}
 	setFocusTextbox = (ev: FocusEvent) => {
 		const target = ev.currentTarget as HTMLInputElement;
@@ -2369,7 +2370,9 @@ class TeamEditorForm extends preact.Component<{
 		if (!target || ev.target !== target) return;
 		this.openFocusTextbox(target);
 	};
-	changeFocus(focus: TeamEditorState['innerFocus'], focusButton = false, polite = true) {
+	changeFocus(
+		focus: TeamEditorState['innerFocus'], focusButton = false, polite = true, preserveSearch = false
+	) {
 		const { editor } = this.props;
 		editor.innerFocus = focus;
 		this.pendingFocus = focus;
@@ -2381,7 +2384,7 @@ class TeamEditorForm extends preact.Component<{
 		}
 
 		const set = editor.sets[focus.setIndex];
-		if (focus.type !== 'details' && focus.type !== 'stats' && focus.type !== 'import') {
+		if (!preserveSearch && focus.type !== 'details' && focus.type !== 'stats' && focus.type !== 'import') {
 			let value = '';
 			if (focus.type === 'pokemon') value = set?.species || '';
 			else if (focus.type === 'item') value = set?.item || '';
@@ -3321,7 +3324,7 @@ class StatForm extends preact.Component<{
 		const autoSpreadValue = autoSpread && Object.values(autoSpread).join('/');
 		if (editor.isChampions) return null;
 		if (!hpIVdata) {
-			return <select name="ivspread" class="button" onChange={this.changeIVSpread}>
+			return <select name="ivspread" class="select" onChange={this.changeIVSpread}>
 				<option value="" selected>IV spreads</option>
 				{autoSpreadValue && <option value="auto">Auto ({autoSpreadValue})</option>}
 				<optgroup label="min Atk">
@@ -3341,7 +3344,7 @@ class StatForm extends preact.Component<{
 		const minStat = editor.gen >= 6 ? 0 : 2;
 		const hpIVs = hpIVdata.map(ivs => ivs.split('').map(iv => parseInt(iv)));
 
-		return <select name="ivspread" class="button" onChange={this.changeIVSpread}>
+		return <select name="ivspread" class="select" onChange={this.changeIVSpread}>
 			<option value="" selected>Hidden Power {hpType} IVs</option>
 			{autoSpreadValue && <option value="auto">Auto ({autoSpreadValue})</option>}
 			<optgroup label="min Atk">
@@ -3871,7 +3874,7 @@ class StatForm extends preact.Component<{
 					</tr>
 				</table>
 				{editor.gen >= 3 && <p>
-					Nature: <select name="nature" class="button" onChange={this.changeNature} value={set.nature || 'Serious'}>
+					Nature: <select name="nature" class="select" onChange={this.changeNature} value={set.nature || 'Serious'}>
 						{Object.entries(BattleNatures).map(([natureName, curNature]) => (
 							<option value={natureName}>
 								{natureName}
@@ -4113,7 +4116,7 @@ class DetailsForm extends preact.Component<{
 				)}
 				{((!editor.isLetsGo && editor.gen === 7) || editor.isNatDex || species.baseSpecies === 'Unown') && <p>
 					<label class="label">Hidden Power Type: <select
-						name="hptype" class="button" onChange={this.changeHPType} value={editor.getHPType(set)}
+						name="hptype" class="select" onChange={this.changeHPType} value={editor.getHPType(set)}
 					>
 						{Dex.types.all().map(type => (
 							type.HPivs && <option value={type.name}>

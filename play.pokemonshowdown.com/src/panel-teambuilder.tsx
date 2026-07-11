@@ -699,7 +699,7 @@ class TeambuilderPanel extends PSRoomPanel<TeambuilderRoom> {
 		}
 
 		return <>
-			<select class="button teambuilder-folder-select" value={room.curFolder} onChange={this.changeMobileFolder}>
+			<select class="select teambuilder-folder-select" value={room.curFolder} onChange={this.changeMobileFolder}>
 				<option value="">All teams</option>
 				{gens.map(gen => (
 					<optgroup label={`Gen ${gen}`}>
@@ -787,7 +787,7 @@ class TeambuilderPanel extends PSRoomPanel<TeambuilderRoom> {
 					</button>}
 				</p>
 				<PSTextarea
-					name="import" initialValue={(room.exportCode ??= PS.teams.packAll(filteredTeams.filter(Boolean) as Team[]))}
+					name="import" defaultValue={(room.exportCode ??= PS.teams.packAll(filteredTeams.filter(Boolean) as Team[]))}
 				/>
 			</div>;
 		}

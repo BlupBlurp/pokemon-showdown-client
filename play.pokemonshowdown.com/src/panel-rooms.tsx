@@ -239,7 +239,7 @@ class RoomsPanel extends PSRoomPanel {
 				<div dangerouslySetInnerHTML={{ __html: Config.includes.roomlistTopHTML }} />
 			)}
 			<div>
-				<select name="sections" class="button" onChange={this.changeSection}>
+				<select name="sections" class="select" onChange={this.changeSection}>
 					<option value="">(All rooms)</option>
 					{rooms.sectionTitles?.map(title => {
 						return <option value={title}> {title} </option>;

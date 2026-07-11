@@ -195,9 +195,8 @@ export class BattleTooltips {
 	static parentElem: HTMLElement | null = null;
 	static isLocked = false;
 	static isPressed = false;
-	static allowsTouchScroll(elem: EventTarget | null) {
-		if (!(elem instanceof HTMLElement)) return false;
-		return elem.dataset.tooltip?.startsWith('activepokemon|') || false;
+	static allowsTouchScroll(elem: HTMLElement | null) {
+		return elem && (elem.tagName === 'DIV' || elem.tagName === 'SPAN');
 	}
 
 	static hideTooltip() {
@@ -266,6 +265,10 @@ export class BattleTooltips {
 		});
 		$elem.on('touchleave.battleTooltips', '.has-tooltip', BattleTooltips.unshowTooltip);
 		$elem.on('touchcancel.battleTooltips', '.has-tooltip', BattleTooltips.unshowTooltip);
+		$elem.on('contextmenu.battleTooltips', '.has-tooltip', e => {
+			const pointerType = (e.originalEvent as PointerEvent | undefined)?.pointerType;
+			if (pointerType === 'touch' || pointerType === 'pen') e.preventDefault();
+		});
 	}
 
 	unlisten(elem: HTMLElement | JQuery) {

@@ -37,7 +37,7 @@ export class ChatRoom extends PSRoom {
 	/** not equal to onlineUsers.length because guests exist */
 	userCount = 0;
 	onlineUsers: [ID, string][] = [];
-	override readonly canConnect = true;
+	override connectMode: PSRoom['connectMode'] = 'normal';
 
 	// PM-only properties
 	pmTarget: string | null = null;
@@ -62,6 +62,7 @@ export class ChatRoom extends PSRoom {
 
 	constructor(options: RoomOptions) {
 		super(options);
+		if (options.connectMode !== undefined) this.connectMode = options.connectMode;
 		if (options.args?.pmTarget) this.pmTarget = options.args.pmTarget as string;
 		if (options.args?.challengeMenuOpen) this.challengeMenuOpen = true;
 		if (options.args?.initialSlash) this.initialSlash = true;
@@ -69,14 +70,16 @@ export class ChatRoom extends PSRoom {
 		this.connect();
 	}
 	override connect() {
-		if (!this.connected || this.connected === 'autoreconnect') {
+		if (!this.connected && (
+			this.connectMode === 'normal' || this.connectMode === 'pending-reconnect' ||
+			this.connectMode === 'pending-login'
+		)) {
 			if (this.pmTarget === null) {
 				PS.send(`/join ${this.id}`);
-				if (this.connected !== 'autoreconnect') this.connected = 'init';
+				this.connected = 'pending';
 			} else {
-				this.connected = 'client-only';
+				this.connectMode = null;
 			}
-			this.connectWhenLoggedIn = false;
 		}
 	}
 	override interruptClose(explicit?: boolean, elem?: HTMLElement | null): string | boolean {
@@ -135,7 +138,8 @@ export class ChatRoom extends PSRoom {
 			}
 			return;
 		case 'expire':
-			this.connected = 'expired';
+			this.connected = false;
+			this.connectMode = 'expired';
 			this.receiveLine(['', `This room has expired (you can't chat in it anymore)`]);
 			return;
 
@@ -182,8 +186,8 @@ export class ChatRoom extends PSRoom {
 		// then cut off roomintro from the end
 		let cutOffStart = 0;
 		let cutOffEnd = lines.length;
-		const cutOffTime = PS.connection?.lastMessageTimeBeforeReconnect || parseInt(PS.lastMessageTime);
-		const cutOffExactLine = this.lastMessage ? '|' + this.lastMessage?.join('|') : '';
+		const cutOffTime = PS.connection?.lastMessageTimeBeforeReconnect || 0;
+		const cutOffExactLine = this.lastMessage ? '|' + this.lastMessage?.join('|') : null;
 		let reconnectMessage = '|raw|<div class="infobox">You reconnected.</div>';
 		for (let i = 0; i < lines.length; i++) {
 			if (lines[i].startsWith('|users|')) {
@@ -394,20 +398,28 @@ export class ChatRoom extends PSRoom {
 			this.log?.reset();
 			this.update(null);
 		},
-		'scrollsnapdebug'(target) {
+		'debug'(target) {
 			const targetID = toID(target);
 			if (targetID === 'off') {
-				PSView.setSnapDebug(false);
-				this.add('||Scroll-snap debug: OFF');
+				PSView.setDebug(null);
+				this.add('||Debug menu: OFF');
+				this.handleSend('/hidedebug');
+				return;
+			} else if (targetID === 'snap') {
+				PSView.setDebug('snap');
+				this.add('||Debug menu: SCROLL-SNAP');
+				return;
+			} else if (targetID === 'panels') {
+				PSView.setDebug('panels');
+				this.add('||Debug menu: PANELS');
+				return;
+			} else if (targetID === 'battles') {
+				this.handleSend('/showdebug');
 				return;
 			}
-			if (!target || targetID === 'on') {
-				PSView.setSnapDebug(true);
-				this.add('||Scroll-snap debug: ON');
-				return;
-			}
-			this.add(`||Scroll-snap debug is currently ${PSView.snapDebug ? 'ON' : 'OFF'}.`);
-			this.add('||Usage: /scrollsnapdebug [on|off]');
+			this.add(`||Debug menu: ${PSView.debugMenu?.toUpperCase() || 'OFF'}.`);
+			this.add(`||Debug battle messages: ${PS.prefs.showdebug ? 'ON' : 'OFF'}`);
+			this.add('||Usage: /debug [off|snap|panels|battles]');
 		},
 		'togglemessages'(target) {
 			if (this.pmTarget ||
@@ -886,7 +898,7 @@ export class CopyableURLBox extends preact.Component<{ url: string }> {
 	override render() {
 		return <div>
 			<input
-				type="text" class="textbox" readOnly size={45} value={this.props.url}
+				name="url" type="text" class="textbox" readOnly size={45} value={this.props.url}
 				style="field-sizing:content"
 			/> {}
 			<button class="button" onClick={this.copy}>Copy</button> {}
@@ -931,8 +943,9 @@ export class ChatTextEntry extends preact.Component<{
 		this.subscription = PS.user.subscribe(() => {
 			this.forceUpdate();
 		});
-		const textbox = this.base!.querySelector<HTMLElement>('textarea[name=message], pre')!;
-		if (textbox.tagName === 'TEXTAREA') {
+		const textbox = this.base!.querySelector<HTMLElement>('textarea[name=message], pre, input[name=url]')!;
+		if (textbox.tagName === 'TEXTAREA' || textbox.tagName === 'INPUT') {
+			// hack to support replays with no textbox. hopefully doesn't crash
 			this.textbox = textbox as HTMLTextAreaElement;
 		} else {
 			this.miniedit = new MiniEdit(textbox, {
@@ -969,6 +982,7 @@ export class ChatTextEntry extends preact.Component<{
 		return true;
 	}
 	onKeyDown = (e: KeyboardEvent) => {
+		if (e.isComposing) return;
 		if (this.handleKey(e) || this.props.onKey(e)) {
 			e.preventDefault();
 			e.stopImmediatePropagation();
@@ -1264,14 +1278,14 @@ export class ChatTextEntry extends preact.Component<{
 	override render() {
 		const { room } = this.props;
 		const OLD_TEXTBOX = !PSView.useContentEditable && !this.miniedit;
-		if (room.connected === 'client-only' && room.id.startsWith('battle-')) {
+		if (room.connectMode === null && room.id.startsWith('battle-')) {
 			return <div
 				class="chat-log-add hasuserlist" onClick={this.focusIfNoSelection} style={{ left: this.props.left || 0 }}
 			><CopyableURLBox url={`https://psim.us/r/${room.id.slice(7)}`} /></div>;
 		}
 
 		const canTalk = PS.user.named || room.id === 'dm-';
-		const connected = room.connected === true || room.connected === 'client-only';
+		const connected = room.connected === true || room.connectMode === null;
 		return <div
 			class="chat-log-add" onClick={this.focusIfNoSelection} style={{ left: this.props.left || 0 }}
 		>
@@ -1585,26 +1599,45 @@ export class ChatLog extends preact.Component<{
 }
 
 export class PSTextarea extends preact.Component<{
-	initialValue?: string, name?: string, placeholder?: string, class?: string,
-	onKeyDown?: (e: KeyboardEvent) => void, minHeight?: string,
+	defaultValue?: string, name?: string, placeholder?: string, class?: string,
+	onInput?: (e: Event) => void, onKeyDown?: (e: KeyboardEvent) => void,
+	minHeight?: string, minWidth?: string,
+	/**
+	 * A single-line textarea that still wraps: strips linebreaks, submits its
+	 * containing form on Enter, and grows both horizontally and vertically.
+	 */
+	singleLine?: boolean,
+	/** looks like plain text until hovered, focused, or changed (see `.textbox.textbox-subtle`) */
+	subtle?: boolean,
 }> {
 	cssAutosize = !!window.CSS?.supports?.('field-sizing', 'content');
 	updateSize = () => {
+		const textbox = this.base!.querySelector('textarea')!;
+		textbox.setAttribute('data-changed', textbox.value === (this.props.defaultValue || '') ? '' : '1');
 		if (this.cssAutosize) return;
 
-		const textbox = this.base!.querySelector('textarea')!;
 		const textboxTest = this.base!.querySelector<HTMLTextAreaElement>('textarea.heighttester')!;
 		textboxTest.style.width = `${textbox.offsetWidth}px`;
 		textboxTest.value = textbox.value;
-		textbox.setAttribute('data-changed', textbox.value === this.props.initialValue ? '' : '1');
 		const newHeight = Math.max(textboxTest.scrollHeight + 40, 50);
 		textbox.style.height = `${newHeight}px`;
 	};
-	override componentDidMount(): void {
-		const textbox = this.base!.querySelector('textarea')!;
-		if (this.props.initialValue) {
-			textbox.value = this.props.initialValue;
+	handleInput = (e: Event) => {
+		if (this.props.singleLine) {
+			const textbox = e.currentTarget as HTMLTextAreaElement;
+			if (/[\r\n]/.test(textbox.value)) textbox.value = textbox.value.replace(/[\r\n]+/g, '');
 		}
+		this.updateSize();
+		this.props.onInput?.(e);
+	};
+	handleKeyDown = (e: KeyboardEvent) => {
+		if (this.props.singleLine && e.keyCode === 13 && !e.shiftKey) { // Enter
+			e.preventDefault();
+			(e.currentTarget as HTMLElement).closest('form')?.requestSubmit();
+		}
+		this.props.onKeyDown?.(e);
+	};
+	override componentDidMount(): void {
 		this.updateSize();
 		window.addEventListener('resize', this.updateSize);
 	}
@@ -1612,14 +1645,23 @@ export class PSTextarea extends preact.Component<{
 		window.removeEventListener('resize', this.updateSize);
 	}
 	override render() {
-		return <div style="position:relative">
+		const className = [
+			'textbox', this.props.subtle && 'textbox-subtle',
+			this.props.singleLine && 'textbox-singleline', this.props.class,
+		].filter(Boolean).join(' ');
+		let style = `min-height:${this.props.minHeight || (this.props.singleLine ? '1em' : '3em')}`;
+		const minWidth = this.props.minWidth || (this.props.singleLine ? '5em' : '');
+		if (minWidth) style += `;min-width:${minWidth}`;
+		const wrapperStyle = this.props.singleLine ?
+			'position:relative;display:inline-block;max-width:100%;vertical-align:middle;margin:-4px' : 'position:relative';
+		return <div style={wrapperStyle}>
 			<textarea
-				name={this.props.name} class={`textbox ${this.props.class || ''}`}
-				style={`min-height:${this.props.minHeight || '3em'}`} placeholder={this.props.placeholder}
-				onInput={this.updateSize} onKeyUp={this.updateSize} onKeyDown={this.props.onKeyDown}
+				name={this.props.name} class={className} style={style} placeholder={this.props.placeholder}
+				defaultValue={this.props.defaultValue}
+				onInput={this.handleInput} onKeyUp={this.updateSize} onKeyDown={this.handleKeyDown}
 			/>
 			{!this.cssAutosize && <div><textarea
-				class={`textbox heighttester ${this.props.class || ''}`}
+				class={`${className} heighttester`}
 				style="visibility:hidden;position:absolute;left:-200px"
 			/></div>}
 		</div>;

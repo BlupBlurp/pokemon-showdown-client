@@ -1111,6 +1111,22 @@ form.menugroup {
 .button.mainmenu6:hover { background: linear-gradient(to bottom,  hsl(270,40%,62%),  hsl(270,40%,42%)); }
 .button.mainmenu6:active { background: linear-gradient(to bottom,  hsl(270,40%,42%),  hsl(300,40%,58%)); }
 
+#ps-debug-menu {
+	display: none;
+	position: fixed;
+	left: 8px;
+	bottom: 8px;
+	z-index: 9999;
+	margin: 0;
+	padding: 6px 8px;
+	background: rgba(0,0,0,.75);
+	color: white;
+	font: 11px/1.35 monospace;
+	pointer-events: none;
+	white-space: pre-wrap;
+	border-radius: 4px;
+}
+
 /*********************************************************
  * Room list
  *********************************************************/
@@ -2020,6 +2036,11 @@ pre.textbox.textbox-empty[placeholder]:before {
 	background: #009AA4;
 }
 
+.has-tooltip {
+	-webkit-touch-callout: none;
+	user-select: none;
+	-webkit-user-select: none;
+}
 .movebutton {
 	float: left;
 	display: block;
@@ -2313,9 +2334,7 @@ pre.textbox.textbox-empty[placeholder]:before {
  *********************************************************/
 
 .select, .team {
-	width: 246px;
-	height: 32px;
-	padding: 0 5px;
+	padding: 4px 22px 4px 8px;
 	font-size: 9pt;
 	text-align: left;
 	font-family: Verdana, Helvetica, Arial, sans-serif;
@@ -2332,20 +2351,56 @@ pre.textbox.textbox-empty[placeholder]:before {
 
 	position: relative;
 }
+.dark .select, .dark .team {
+	border-color: #34373b;
+	box-shadow: none;
+	background: linear-gradient(to bottom, #626971, #444950);
+	box-shadow: 0.5px 1px 2px rgba(255, 255, 255, 0.45), inset 0.5px 1px 1px rgba(255, 255, 255, 0.5);
+	color: white;
+}
+.select:hover, .select:hover .team, a.team:hover, button.team:hover {
+	border-color: #555555;
+	background: #FFFFFF;
+	background: linear-gradient(to bottom,  #dce4ec,  #c6d3e0);
+}
+.select:active, .select:active .team, a.team:active, button.team:active {
+	border-color: #777777;
+	background: #DDDDDD;
+	box-shadow: none;
+	background: linear-gradient(to bottom,  #bbc4cd,  #e7edf2);
+}
+.dark .select:hover, .dark .select:hover .team, .dark a.team:hover, .dark button.team:hover {
+	border-color: #34373b;
+	background: #FFFFFF;
+	color: white;
+	background: linear-gradient(to bottom, #8f98a1, #4a5057);
+}
+.dark .select:active, .dark .select:active .team, .dark a.team:active, .dark button.team:active {
+	border-color: #34373b;
+	box-shadow: none;
+	background: linear-gradient(to bottom, #4a5057, #8f98a1);
+}
+
+select.select {
+	padding: 3px 4px;
+}
+.label .select {
+	margin-top: 2px;
+	display: block;
+}
+select.select.base-select {
+	padding: 4px 22px 4px 8px;
+}
+.formatselect, .teamselect, .team {
+	width: 246px;
+	min-height: 32px;
+	padding: 0 5px;
+	height: auto;
+}
 .team {
 	height: 49px;
 	overflow: hidden;
 	white-space: nowrap;
-}
-.select {
-	min-height: 32px;
-	height: auto;
-}
-.dark .select, .dark .team {
-	border-color: #000000;
-	box-shadow: none;
-	background: linear-gradient(to bottom, rgba(227, 239, 251, 0.85), rgba(118, 128, 140, 0.85));
-	color: black;
 }
 .team.pc-box {
 	min-height: 74px;
@@ -2384,12 +2439,6 @@ pre.textbox.textbox-empty[placeholder]:before {
 	font-style: normal;
 	font-weight: normal;
 }
-.teamselect:disabled strong {
-	color: #777777;
-}
-.dark .teamselect:disabled strong {
-	color: #505050;
-}
 .team small {
 	display: block;
 	text-align: center;
@@ -2400,32 +2449,12 @@ pre.textbox.textbox-empty[placeholder]:before {
 .team small span {
 	margin-right: -4px;
 }
-.select:hover, .select:hover .team, a.team:hover, button.team:hover {
-	border-color: #555555;
-	background: #FFFFFF;
-	background: linear-gradient(to bottom,  #dce4ec,  #c6d3e0);
-}
-.select:active, .select:active .team, a.team:active, button.team:active {
-	border-color: #777777;
-	background: #DDDDDD;
-	box-shadow: none;
-	background: linear-gradient(to bottom,  #bbc4cd,  #e7edf2);
-}
-.dark .select:hover, .dark .select:hover .team, .dark a.team:hover, .dark button.team:hover {
-	border-color: #000000;
-	background: #FFFFFF;
-	color: black;
-	background: linear-gradient(to bottom, rgba(255, 255, 255, 0.85), rgba(161, 175, 189, 0.85));
-}
-.dark .select:active, .dark .select:active .team, .dark a.team:active, .dark button.team:active {
-	border-color: #000000;
-	box-shadow: none;
-	background: linear-gradient(to bottom, rgba(141, 153, 165, 0.85), rgba(255, 255, 255, 0.85));
-}
+
 .select:before {
 	position: absolute;
-	top: 8px;
+	top: 50%;
 	right: 6px;
+	margin-top: -7px;
 	padding: 0;
 
 	font-size: 14px;
@@ -2434,11 +2463,11 @@ pre.textbox.textbox-empty[placeholder]:before {
 	-webkit-font-smoothing: antialiased;
 	color: #777777;
 }
-.dark .select:before {
-	color: #000000;
+select.select::picker-icon {
+	display: none;
 }
-.select.teamselect:before {
-	top: 16px;
+.dark .select:before {
+	color: #cccccc;
 }
 .select:disabled {
 	border-color: #999999;
@@ -2447,9 +2476,9 @@ pre.textbox.textbox-empty[placeholder]:before {
 	box-shadow: none;
 }
 .dark .select:disabled {
-	border-color: #888888;
-	background: linear-gradient(to bottom, rgba(227, 239, 251, 0.6), rgba(193, 199, 207, 0.6));
-	color: #444444;
+	border-color: #888;
+	background: rgba(90,90,90,.65);
+	color: #BBB;
 	box-shadow: none;
 }
 .select:disabled .team, .select:disabled:hover .team, .select:disabled:active .team {
@@ -2468,6 +2497,10 @@ pre.textbox.textbox-empty[placeholder]:before {
 .select.preselected,
 .select:disabled.preselected {
 	color: black;
+}
+.dark .select.preselected,
+.dark .select:disabled.preselected {
+	color: white;
 }
 
 .teamlist .team, .teamdropdown .team {
@@ -2553,7 +2586,7 @@ pre.textbox.textbox-empty[placeholder]:before {
 	box-shadow: none;
 	background: transparent;
 }
-.avatarlist button {
+.avatarlist button, .dark .avatarlist button {
 	width: 80px;
 	height: 80px;
 	background: transparent url(https://play.pokemonshowdown.com/sprites/trainers-sheet.png) no-repeat scroll 0px 0px;

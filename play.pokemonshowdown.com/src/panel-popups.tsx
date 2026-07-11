@@ -9,7 +9,7 @@ import {
 	type TimestampOptions, type BattleLayoutPreference,
 } from "./client-main";
 import { type BattleRoom } from "./panel-battle";
-import { ChatUserList, type ChatRoom } from "./panel-chat";
+import { ChatUserList, PSTextarea, type ChatRoom } from "./panel-chat";
 import { PSRoomPanel, PSPanelWrapper, PSView } from "./panels";
 import { PSHeader } from "./panel-topbar";
 
@@ -44,6 +44,108 @@ export class UserRoom extends PSRoom {
 		if (/[a-zA-Z0-9]/.test(this.name.charAt(0))) this.name = ' ' + this.name;
 		this.update(null);
 		if (this.userid) PS.send(`/cmd userdetails ${this.userid}`);
+	}
+}
+
+export class StatusEditor extends preact.Component {
+	declare state: { addingStatus?: boolean, statusChanged?: boolean };
+	override componentDidMount() {
+		this.fetchStatus();
+	}
+	fetchStatus() {
+		if (!PS.user.userid) return;
+		PS.mainmenu.makeQuery('userdetails', PS.user.userid).then(() => this.forceUpdate());
+	}
+	currentStatus() {
+		let status = PS.mainmenu.userdetailsCache[PS.user.userid]?.status || '';
+		if (status.startsWith('!')) status = status.slice(1);
+		return status.replace(/^\((?:Busy|Idle)\) ?/, '');
+	}
+	statusLabel() {
+		const status = PS.mainmenu.userdetailsCache[PS.user.userid]?.status || '';
+		return /^!?(\((?:Busy|Idle)\))/.exec(status)?.[1] || '';
+	}
+	statusInput() {
+		return this.base!.querySelector<HTMLTextAreaElement>('textarea[name=statustext]');
+	}
+	addStatus = (ev: Event) => {
+		ev.preventDefault();
+		ev.stopImmediatePropagation();
+		this.setState({ addingStatus: true }, () => this.focusStatus());
+	};
+	focusStatus = (ev?: Event) => {
+		ev?.preventDefault();
+		ev?.stopImmediatePropagation();
+		const input = this.statusInput();
+		input?.focus();
+		input?.select();
+	};
+	handleStatusInput = (ev: Event) => {
+		const changed = (ev.currentTarget as HTMLTextAreaElement).value !== this.currentStatus();
+		if (changed !== !!this.state.statusChanged) this.setState({ statusChanged: changed });
+	};
+	handleStatusKeyDown = (ev: KeyboardEvent) => {
+		if (ev.key === 'Escape') {
+			ev.preventDefault();
+			ev.stopImmediatePropagation();
+			this.revertStatus();
+		}
+	};
+	revertStatus = (ev?: Event) => {
+		ev?.preventDefault();
+		ev?.stopImmediatePropagation();
+		const input = this.statusInput();
+		if (input) {
+			input.value = input.defaultValue;
+			input.dispatchEvent(new Event('input'));
+		}
+		this.setState({ addingStatus: false, statusChanged: false });
+	};
+	submitStatus = (ev: Event) => {
+		ev.preventDefault();
+		ev.stopImmediatePropagation();
+		const status = (this.statusInput()?.value || '').trim();
+		PS.send(status ? `/noreply /status ${status}` : `/noreply /clearstatus`);
+		// optimistic update; the requery below will catch any server-side filtering
+		const details = PS.mainmenu.userdetailsCache[PS.user.userid];
+		if (details) {
+			const awayMarkers = /^!?(?:\((?:Busy|Idle)\) ?)?/.exec(details.status || '')![0];
+			details.status = awayMarkers + status;
+		}
+		this.setState({ addingStatus: false, statusChanged: false });
+		this.fetchStatus();
+	};
+	override render() {
+		const curStatus = this.currentStatus();
+		const label = this.statusLabel();
+		if (!curStatus && !this.state.addingStatus) {
+			return <div>
+				{label && <span class="userstatus" style="display:inline">{label}</span>} {}
+				<button class="button small" onClick={this.addStatus}>Add status</button>
+			</div>;
+		}
+		return <form onSubmit={this.submitStatus} class="statusform">
+			{label && <span class="userstatus" style="display:inline">{label}</span>} {}
+			<PSTextarea
+				class="userstatus"
+				key={curStatus} singleLine subtle name="statustext" defaultValue={curStatus}
+				onInput={this.handleStatusInput} onKeyDown={this.handleStatusKeyDown}
+			/> {}
+			{this.state.statusChanged || this.state.addingStatus ? (
+				<>
+					<button class="button" type="submit">
+						<strong>{curStatus ? 'Change' : 'Add'}</strong>
+					</button> {}
+					<button class="button" type="button" onClick={this.revertStatus}>
+						{curStatus ? 'Revert' : 'Cancel'}
+					</button>
+				</>
+			) : (
+				<button class="button small" type="button" onClick={this.focusStatus} aria-label="Edit">
+					<i class="fa fa-pencil" aria-hidden></i>
+				</button>
+			)}
+		</form>;
 	}
 }
 
@@ -184,7 +286,11 @@ class UserPanel extends PSRoomPanel<UserRoom> {
 			>
 				{user.name}
 			</a></strong><br />
-			{status && <div class="userstatus">{status}</div>}
+			{isSelf && !hideInteraction ? (
+				<StatusEditor />
+			) : status ? (
+				<div class="userstatus">{status}</div>
+			) : null}
 			{groupName && <div class="usergroup roomgroup">{groupName}</div>}
 			{globalGroupName && <div class="usergroup globalgroup">{globalGroupName}</div>}
 			{customGroup && <div class="usergroup globalgroup">{customGroup}</div>}
@@ -570,7 +676,6 @@ class OptionsPanel extends PSRoomPanel {
 	static readonly id = 'options';
 	static readonly routes = ['options'];
 	static readonly location = 'modal-popup';
-	declare state: { showStatusInput?: boolean, showStatusUpdated?: boolean };
 
 	override componentDidMount() {
 		super.componentDidMount();
@@ -604,12 +709,6 @@ class OptionsPanel extends PSRoomPanel {
 	setPMsTimestamp = (ev: Event) => {
 		const timestamp = (ev.currentTarget as HTMLSelectElement).value as TimestampOptions;
 		PS.prefs.set('timestamps', { ...PS.prefs.timestamps, pms: timestamp || undefined });
-	};
-
-	handleShowStatusInput = (ev: Event) => {
-		ev.preventDefault();
-		ev.stopImmediatePropagation();
-		this.setState({ showStatusInput: !this.state.showStatusInput });
 	};
 
 	handleOnChange = (ev: Event) => {
@@ -655,40 +754,22 @@ class OptionsPanel extends PSRoomPanel {
 		}
 	};
 
-	editStatus = (ev: Event) => {
-		const statusInput = this.base!.querySelector<HTMLInputElement>('input[name=statustext]');
-		PS.send(statusInput?.value?.length ? `/status ${statusInput.value}` : `/clearstatus`);
-		this.setState({ showStatusUpdated: true, showStatusInput: false });
-		ev.preventDefault();
-		ev.stopImmediatePropagation();
-	};
-
 	override render() {
 		const room = this.props.room;
 		const serverSettings = PS.prefs.serversettings;
 		return <PSPanelWrapper room={room} width={340}><div class="pad">
-			<p>
+			<p style="padding-left:50px">
 				<img
-					class="trainersprite yours" width="40" height="40" style={{ verticalAlign: 'middle' }}
+					class="trainersprite yours" width="40" height="40" style={{ float: 'left', marginLeft: '-50px' }}
 					src={Dex.resolveAvatar(`${PS.user.avatar}`)} data-href="avatars"
 				/> {}
 				<strong>{PS.user.name}</strong>
-			</p>
-			<p>
-				<button class="button" data-href="avatars"> Avatar...</button>
+				<StatusEditor />
 			</p>
 
-			{this.state.showStatusInput ? (
-				<p>
-					<input class="textbox" name="statustext" />
-					<button class="button" onClick={this.editStatus}><i class="fa fa-pencil" aria-hidden></i></button>
-				</p>
-			) : (
-				<p>
-					<button class="button" onClick={this.handleShowStatusInput} disabled={this.state.showStatusUpdated}>
-						{this.state.showStatusUpdated ? 'Status Updated' : 'Status...'}</button>
-				</p>
-			)}
+			<p style="clear:both">
+				<button class="button" data-href="avatars">Avatar...</button>
+			</p>
 
 			{PS.user.named && (PS.user.registered?.userid === PS.user.userid ?
 				<button className="button" data-href="changepassword">Password...</button> :
@@ -698,7 +779,7 @@ class OptionsPanel extends PSRoomPanel {
 			<h3>Graphics</h3>
 			<p>
 				<label class="optlabel">Theme: <select
-					name="theme" class="button" onChange={this.setTheme} value={PS.prefs.theme || 'light'}
+					name="theme" class="select" onChange={this.setTheme} value={PS.prefs.theme || 'light'}
 				>
 					<option value="light">Light</option>
 					<option value="dark">Dark</option>
@@ -707,7 +788,7 @@ class OptionsPanel extends PSRoomPanel {
 			</p>
 			<p>
 				<label class="optlabel">Layout: <select
-					name="layout" class="button" onChange={this.setLayout}
+					name="layout" class="select" onChange={this.setLayout}
 					value={PS.prefs.onepanel === true ? 'onepanel' : PS.prefs.onepanel || ''}
 				>
 					<option value="">
@@ -797,7 +878,7 @@ class OptionsPanel extends PSRoomPanel {
 			<p>
 				<label class="optlabel">
 					Language: {}
-					<select name="language" onChange={this.handleOnChange} class="button" value={serverSettings.language || 'english'}>
+					<select name="language" onChange={this.handleOnChange} class="select" value={serverSettings.language || 'english'}>
 						<option value="english">English</option>
 						<option value="german">Deutsch</option>
 						<option value="spanish">Español</option>
@@ -816,7 +897,7 @@ class OptionsPanel extends PSRoomPanel {
 			<p>
 				<label class="optlabel">
 					Tournaments: <select
-						name="tournaments" class="button" onChange={this.handleOnChange} value={PS.prefs.tournaments || 'notify'}
+						name="tournaments" class="select" onChange={this.handleOnChange} value={PS.prefs.tournaments || 'notify'}
 					>
 						<option value="notify">Always notify</option>
 						<option value="nonotify">Notify when joined</option>
@@ -826,7 +907,7 @@ class OptionsPanel extends PSRoomPanel {
 			</p>
 			<p>
 				<label class="optlabel">Timestamps: <select
-					name="layout" class="button" onChange={this.setChatroomTimestamp} value={PS.prefs.timestamps.chatrooms || ''}
+					name="layout" class="select" onChange={this.setChatroomTimestamp} value={PS.prefs.timestamps.chatrooms || ''}
 				>
 					<option value="">Off</option>
 					<option value="minutes">[HH:MM]</option>
@@ -835,7 +916,7 @@ class OptionsPanel extends PSRoomPanel {
 			</p>
 			<p>
 				<label class="optlabel">Timestamps in DMs: <select
-					name="layout" class="button" onChange={this.setPMsTimestamp} value={PS.prefs.timestamps.pms || ''}
+					name="layout" class="select" onChange={this.setPMsTimestamp} value={PS.prefs.timestamps.pms || ''}
 				>
 					<option value="">Off</option>
 					<option value="minutes">[HH:MM]</option>
@@ -1767,7 +1848,7 @@ class BattleOptionsPanel extends PSRoomPanel {
 			<p><strong>All battles</strong></p>
 			<p>
 				<label class="optlabel">Layout: <select
-					name="battlelayout" class="button" onChange={this.handleBattleLayout}
+					name="battlelayout" class="select" onChange={this.handleBattleLayout}
 					value={PS.prefs.battlelayout || ''}
 				>
 					<option value="">

@@ -334,12 +334,12 @@ class TeamPanel extends PSRoomPanel<TeamRoom> {
 					<i class="fa fa-laptop"></i> Local
 				</button>
 			)}
-			<div style="float:right"><button
+			<div style={room.width < 550 ? "margin-top:8px" : "float:right"}><button
 				name="format" value={team.format} data-selecttype="teambuilder"
-				class="button" data-href="/formatdropdown" onChange={this.handleChangeFormat}
+				class="select formatselect" data-href="/formatdropdown" onChange={this.handleChangeFormat}
 			>
 				<i class="fa fa-folder-o"></i> {BattleLog.formatName(team.format)} {}
-				{team.format.length <= 4 && <em>(uncategorized)</em>} <i class="fa fa-caret-down"></i>
+				{team.format.length <= 4 && <em>(uncategorized)</em>}
 			</button></div>
 			<label class="label teamname">
 				Team name:{}

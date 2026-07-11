@@ -266,7 +266,7 @@ export class PSRoomPanel<T extends PSRoom = PSRoom> extends preact.Component<{ r
 	chooseParentValue(value: string) {
 		const dropdownButton = this.props.room.parentElem as HTMLButtonElement;
 		dropdownButton.value = value;
-		if (dropdownButton.name === 'format' && dropdownButton.getAttribute('data-href') !== '/formatdropdown') {
+		if (dropdownButton.getAttribute('data-href') !== '/formatdropdown') {
 			// button was made by |html| rather than <FormatDropdown>
 			dropdownButton.innerText = value;
 		}
@@ -389,18 +389,18 @@ export class PSView extends preact.Component {
 	static snapVelocityX = 0;
 	static snapAnimating = false;
 	static snapRestingX = NARROW_MODE_HEADER_WIDTH;
-	static snapDebug = false;
+	static debugMenu: 'snap' | 'panels' | null = null;
 	commandPreviewTextbox: HTMLElement | null = null;
 	commandPreviewPlaceholder: string | null = null;
-	static setSnapDebug(enabled: boolean) {
-		this.snapDebug = enabled;
+	static setDebug(mode: 'snap' | 'panels' | null) {
+		this.debugMenu = mode;
 		PS.update();
-		if (!enabled) {
-			const elem = document.getElementById('ps-snap-debug');
+		if (mode === null) {
+			const elem = document.getElementById('ps-debug-menu');
 			if (elem) elem.style.display = 'none';
 			return;
 		}
-		setTimeout(() => this.updateSnapDebug(`command ${enabled ? 'on' : 'off'}`), 1);
+		setTimeout(() => this.updateSnapDebug(`command ${this.debugMenu || 'off'}`), 1);
 	}
 	override componentDidMount() {
 		PSView.scrollFrame = this.base!.children[0] as HTMLDivElement | null;
@@ -594,10 +594,10 @@ export class PSView extends preact.Component {
 		return naturalEndpoint < roomX / 2 ? 0 : roomX;
 	}
 	static updateSnapDebug(event = '') {
-		if (!this.snapDebug || this.cssScrollSnap || !this.narrowMode) {
+		if (this.debugMenu !== 'snap' || this.cssScrollSnap || !this.narrowMode) {
 			return;
 		}
-		const elem = document.getElementById('ps-snap-debug');
+		const elem = document.getElementById('ps-debug-menu');
 		if (!elem) return;
 
 		const x = this.getScrollX();
@@ -1406,6 +1406,13 @@ export class PSView extends preact.Component {
 		}
 	};
 	handleButtonClick(elem: HTMLButtonElement) {
+		if (elem.classList.contains('formatselect')) {
+			// this is an abomination but we gotta support it for backcompat
+			PS.join('formatdropdown' as RoomID, {
+				parentElem: elem,
+			});
+			return true;
+		}
 		switch (elem.name) {
 		case 'closeRoom': {
 			const roomid = elem.value as RoomID || PS.getRoom(elem)?.id || '' as RoomID;
@@ -1629,6 +1636,15 @@ export class PSView extends preact.Component {
 			<PSPanelErrorBoundary room={room} />
 		</div>;
 	}
+	renderDebugMenu() {
+		if (PSView.debugMenu === 'panels') {
+			return `room: ${JSON.stringify(PS.room?.id)}\n` +
+				`onepanel: ${JSON.stringify(PS.prefs.onepanel)}, leftPanelWidth: ${JSON.stringify(PS.leftPanelWidth)}\n` +
+				`panel: ${JSON.stringify(PS.panel?.id)}, left: ${JSON.stringify(PS.leftPanel?.id)}, right: ${JSON.stringify(PS.rightPanel?.id)}\n` +
+				`popups: ${JSON.stringify(PS.popups)}`;
+		}
+		return null;
+	}
 	render() {
 		let rooms = [] as preact.VNode[];
 		for (const roomid in PS.rooms) {
@@ -1645,12 +1661,9 @@ export class PSView extends preact.Component {
 					{rooms}
 				</div>
 			</div>
-			{PSView.snapDebug && <pre
-				id="ps-snap-debug" aria-hidden="true"
-				style={`display:none;position:fixed;left:8px;bottom:8px;z-index:9999;margin:0;padding:6px 8px;` +
-					`background:rgba(0,0,0,.75);color:white;font:11px/1.35 monospace;pointer-events:none;` +
-					`white-space:pre-wrap;border-radius:4px;`}
-			></pre>}
+			{PSView.debugMenu && <pre id="ps-debug-menu" aria-hidden="true" style={{ display: 'block' }}>
+				{this.renderDebugMenu()}
+			</pre>}
 			{PS.popups.map(roomid => this.renderPopup(PS.rooms[roomid]!))}
 		</div>;
 	}

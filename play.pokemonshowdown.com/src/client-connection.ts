@@ -210,15 +210,6 @@ export class PSConnection {
 		socket.onclose = () => {
 			console.log('\u274C (DISCONNECTED)');
 			this.handleDisconnect();
-			console.log('\u2705 (DISCONNECTED)');
-			this.connected = false;
-			PS.isOffline = true;
-			for (const roomid in PS.rooms) {
-				const room = PS.rooms[roomid]!;
-				if (room.connectedToServer()) room.connected = 'autoreconnect';
-			}
-			this.socket = null;
-			PS.update();
 		};
 
 		socket.onerror = (ev: Event) => {
@@ -245,7 +236,9 @@ export class PSConnection {
 		this.socket = null;
 		for (const roomid in PS.rooms) {
 			const room = PS.rooms[roomid]!;
-			if (room.connectedToServer()) room.connected = 'autoreconnect';
+			// other rooms also connect after reconnecting but this flag is for rooms that were already connected
+			if (room.connected === true) room.connectMode = 'pending-reconnect';
+			room.connected = false;
 		}
 		PS.update();
 	}

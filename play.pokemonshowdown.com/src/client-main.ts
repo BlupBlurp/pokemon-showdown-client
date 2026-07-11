@@ -347,21 +347,20 @@ class PSPrefs extends PSStreamModel<string | null> {
 			let rooms = autojoin[PS.server.id] || '';
 			for (let title of rooms.split(",")) {
 				const id = /[^a-z0-9-]/.test(title) ? toID(title) as any as RoomID : title as RoomID;
-				PS.addRoom({ id, title, connected: 'init', autofocus: false });
+				PS.addRoom({ id, title, connected: 'pending', autofocus: false });
 			}
 			const cmd = `/autojoin ${rooms}`;
-			if (PS.connection?.queue.includes(cmd)) {
-				// don't jam up the queue with autojoin requests
-				// sending autojoin again after a prior autojoin successfully resolves likely returns an error from the server
-				return;
-			}
-			// send even if `rooms` is empty, for server autojoins
+			// Don't jam up the queue with duplicate autojoin requests.
+			// Sending multiple autojoins is a server error.
+			if (PS.connection?.queue.includes(cmd)) return;
 			PS.send(cmd);
 		}
 
 		for (const roomid in PS.rooms) {
 			const room = PS.rooms[roomid]!;
-			if (room.type === 'battle' && room.connected === 'autoreconnect') {
+			if (room.type === 'battle' && room.connectMode === 'pending-reconnect') {
+				// The server autojoins ongoing battles.
+				// Fortunately, joining a joined room is a no-op.
 				room.connect();
 			}
 		}
@@ -693,7 +692,7 @@ class PSUser extends PSStreamModel<PSLoginState | null> {
 			}
 			for (const roomid in PS.rooms) {
 				const room = PS.rooms[roomid]!;
-				if (room.connectWhenLoggedIn) room.connect();
+				if (room.connectMode === 'pending-login') room.connect();
 			}
 		}
 		this.updateRegExp();
@@ -1008,7 +1007,8 @@ export interface RoomOptions {
 	parentRoomid?: RoomID | null;
 	/** Opens the popup to the right of its parent, instead of the default above/below (for userlists) */
 	rightPopup?: boolean;
-	connected?: 'autoreconnect' | 'client-only' | 'expired' | 'init' | boolean;
+	connected?: PSRoom['connected'];
+	connectMode?: PSRoom['connectMode'];
 	/** @see {PSRoomPanelSubclass#noURL} */
 	noURL?: boolean;
 	args?: Record<string, unknown> | null;
@@ -1057,6 +1057,7 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 	title = "";
 	type = '';
 	isPlaceholder = false;
+	/** unused??? */
 	readonly classType: string = '';
 	location: PSRoomLocation = 'left';
 	/**
@@ -1066,27 +1067,24 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 	 */
 	closable = true;
 	/**
-	 * Whether the room is connected to the server. This is _eager_,
-	 * we set it to `'init'` when we send `/join`, not when the server
-	 * tells us we're connected. That's because it tracks whether we
-	 * still need to send `/join` or `/leave`.
+	 * Whether the room is connected to the server.
 	 *
-	 * Set to 'init' during initialization, including while parsing
-	 * the lines after receiveing `'init'` from the server.
+	 * * `'pending'` after sending `/join`.
 	 *
-	 * Use `.connectedToServer()` to check for the states that count
-	 * as "connected for real".
-	 *
-	 * 'client-only' is used for DMs and for replay pages.
+	 * * `'init'` after getting a response from the server, while handling
+	 *   the lines after receiving `'init'` from the server.
 	 */
-	connected: 'autoreconnect' | 'client-only' | 'expired' | 'init' | boolean = false;
+	connected: boolean | 'pending' | 'init' = false;
 	/**
-	 * Can this room even be connected to at all?
-	 * `true` = pass messages from the server to subscribers
-	 * `false` = throw an error if we receive messages from the server
+	 * How this room connects to the server.
+	 * * `null` = client-only
+	 * * `'normal'` = can connect normally
+	 * * `'pending-reconnect'` = once connected, now not (flag to retry after reconnect)
+	 * * `'pending-login'` = failed to connect (flag to retry after login)
+	 * * `'expired'` = once connected, now expired
+	 * * `'not-found'` = got `noinit` from the server
 	 */
-	readonly canConnect: boolean = false;
-	connectWhenLoggedIn = false;
+	connectMode: null | 'normal' | 'expired' | 'not-found' | 'pending-reconnect' | 'pending-login' = null;
 	onRequestFocus: ((options?: PSRoomFocusOptions) => boolean | void) | null = null;
 	onParentKeyDown: ((e?: Event) => boolean | void) | null = null;
 
@@ -1125,6 +1123,7 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 		if (this.location !== 'popup' && this.location !== 'modal-popup') this.parentElem = null;
 		if (options.rightPopup) this.rightPopup = true;
 		if (options.connected) this.connected = options.connected;
+		if (options.connectMode !== undefined) this.connectMode = options.connectMode;
 		if (options.backlog) this.backlog = options.backlog;
 		this.noURL = options.noURL || false;
 		this.args = options.args || null;
@@ -1132,14 +1131,6 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 	getParent() {
 		if (this.parentRoomid) return PS.rooms[this.parentRoomid] || null;
 		return null;
-	}
-	/**
-	 * True if this.connected is `true | 'init' | 'autoreconnect'`.
-	 * Determines whether we should send `/leave` if the room is closed, and
-	 * whether we should try to rejoin if the socket disconnects.
-	 */
-	connectedToServer() {
-		return this.connected === true || this.connected === 'init' || this.connected === 'autoreconnect';
 	}
 	notify(options: { title: string, body?: string, noAutoDismiss?: boolean, id?: string }) {
 		let desktopNotification: Notification | null = null;
@@ -1246,11 +1237,7 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 			this.dismissNotification(id);
 			break;
 		} default: {
-			if (this.canConnect) {
-				this.update(args);
-			} else {
-				throw new Error(`This room is not designed to receive messages`);
-			}
+			this.update(args);
 		}
 		}
 	}
@@ -1334,7 +1321,8 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 			PS.user.logOut();
 		},
 		'reconnect,connect'() {
-			if (this.connected && this.connected !== 'autoreconnect') {
+			if (this.connected) {
+				if (this.connected !== true) return this.errorReply(`You are already connecting.`);
 				return this.errorReply(`You are already connected.`);
 			}
 
@@ -1830,11 +1818,16 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 		this.sendDirect(msg);
 	}
 	sendDirect(msg: string) {
-		if (this.connected === 'expired') return this.add(`This room has expired (you can't chat in it anymore)`);
+		if (this.connectMode === 'expired') {
+			return this.add(`This room has expired (you can't chat in it anymore)`);
+		}
+		if (this.connectMode === 'not-found') {
+			return this.add(`This room doesn't exist`);
+		}
 		PS.send(msg, this.id);
 	}
 	destroy() {
-		if (this.connectedToServer()) {
+		if (this.connected) {
 			this.sendDirect(`/noreply /leave ${this.id}`);
 			this.connected = false;
 		}
@@ -2113,7 +2106,7 @@ export const PS = new class extends PSModel {
 			let rooms = autojoin[this.server.id] || '';
 			for (let title of rooms.split(",")) {
 				const id = /[^a-z0-9-]/.test(title) ? toID(title) as any as RoomID : title as RoomID;
-				this.addRoom({ id, title, connected: true, autofocus: false });
+				this.addRoom({ id, title, connected: 'pending', autofocus: false });
 			}
 		}
 
@@ -2192,8 +2185,12 @@ export const PS = new class extends PSModel {
 	/** @returns changed */
 	updateLayout(): boolean {
 		const leftPanelWidth = this.calculateLeftPanelWidth();
-		const viewportWidth = window.innerWidth;
-		const viewportHeight = window.innerHeight;
+		// `window.inner*` subtracts on-screen keyboards, but `document.body.offset*` doesn't
+		// we don't want the layout to jump around wildly when we open an OSK, so...
+		// `document.body.offset*` is the scrollable area, though, we want
+		// `document.documentElement.client*` for the viewport dimensions before OSK
+		const viewportWidth = document.documentElement.clientWidth;
+		const viewportHeight = document.documentElement.clientHeight;
 		const roomHeight = viewportHeight - 56;
 		// Big Picture Mode: hide the chat (right) panel so the battle canvas
 		// gets the full viewport. Only applies when the focused panel is a
@@ -2306,12 +2303,16 @@ export const PS = new class extends PSModel {
 					}
 				} else {
 					room.type = type;
+					room.connected = 'init';
 					this.updateRoomTypes();
 				}
 				if (room) {
-					if (room.connected === 'autoreconnect') {
-						room.connected = true;
-						if (room.handleReconnect(msg)) return;
+					if (room.connectMode === 'pending-reconnect') {
+						room.connectMode = 'normal';
+						if (room.handleReconnect(msg)) {
+							room.connected = true;
+							return;
+						}
 					}
 					room.connected = true;
 				}
@@ -2320,12 +2321,12 @@ export const PS = new class extends PSModel {
 				continue;
 			} case 'deinit': {
 				room = PS.rooms[roomid2];
-				if (room && room.connected !== 'expired') {
+				if (room) {
 					room.connected = false;
-					this.removeRoom(room);
+					if (room.connectMode !== 'expired') this.removeRoom(room);
+					this.updateAutojoin();
+					this.update();
 				}
-				this.updateAutojoin();
-				this.update();
 				continue;
 			} case 'noinit': {
 				room = PS.rooms[roomid2];
@@ -2334,23 +2335,27 @@ export const PS = new class extends PSModel {
 					room = this.addRoom({
 						id: roomid2,
 						type: 'battle',
-						connected: false,
+						connectMode: null,
 					});
 					(room as BattleRoom).rejoining = false;
 				}
 				if (room) {
 					room.connected = false;
 					if (args[1] === 'namerequired') {
-						room.connectWhenLoggedIn = true;
+						room.connectMode = 'pending-login';
 						if (!PS.user.initializing) {
 							room.receiveLine(['error', args[2]]);
 						}
 					} else if (args[1] === 'nonexistent' || args[1] === 'joinfailed') {
 						// sometimes we assume a room is a chatroom when it's not
 						// when that happens, just ignore this error
-						if (room.type === 'chat' || room.type === 'battle') room.receiveLine(args);
+						if (room.type === 'chat' || room.type === 'battle') {
+							room.connectMode = 'not-found';
+							room.receiveLine(args);
+						}
 					} else if (args[1] === 'rename') {
 						room.connected = true;
+						room.connectMode = 'normal';
 						room.title = args[3] || room.title;
 						this.renameRoom(room, args[2] as RoomID);
 					}
@@ -2412,8 +2417,8 @@ export const PS = new class extends PSModel {
 	 */
 	calculateLeftPanelWidth() {
 		if (this.prefs.onepanel === 'vertical') return null;
-		if (!this.prefs.onepanel && window.innerWidth < 700) return null;
-		if (!this.prefs.onepanel && window.innerHeight < 430) return null;
+		if (!this.prefs.onepanel && document.documentElement.clientWidth < 700) return null;
+		if (!this.prefs.onepanel && document.documentElement.clientHeight < 430) return null;
 		// If we don't have both a left room and a right room, obviously
 		// just show one room
 		if (!this.leftPanel || !this.rightPanel || this.prefs.onepanel) {
@@ -2423,7 +2428,7 @@ export const PS = new class extends PSModel {
 		// The rest of this code can assume we have both a left room and a
 		// right room, and also want to show both if they fit
 
-		const available = window.innerWidth;
+		const available = document.documentElement.clientWidth;
 		const left = this.getWidthFor(this.leftPanel);
 		const right = this.getWidthFor(this.rightPanel);
 
@@ -2525,6 +2530,7 @@ export const PS = new class extends PSModel {
 			const options: RoomOptions = room;
 			if (RoomType.title) options.title = RoomType.title;
 			options.type = type;
+			options.connectMode = undefined;
 			const Model = RoomType.Model || PSRoom;
 			const newRoom = new Model(options);
 			this.rooms[roomid] = newRoom;
@@ -2931,14 +2937,18 @@ export const PS = new class extends PSModel {
 
 		if (this.popups.length && room.id === this.popups[this.popups.length - 1]) {
 			this.popups.pop();
-			if (this.popups.length) {
-				// focus topmost popup
-				PS.room = PS.rooms[this.popups[this.popups.length - 1]]!;
-			} else {
-				// if popup parent is a mini-window, focus popup parent
-				PS.room = PS.rooms[room.parentRoomid ?? PS.panel.id] || PS.panel;
-				// otherwise focus current panel
-				if (PS.room.location !== 'mini-window' || PS.panel !== PS.mainmenu) PS.room = PS.panel;
+			if (wasFocused) {
+				// the topmost popup must be focused while open, but if you focus
+				// while closing it, don't steal focus back.
+				if (this.popups.length) {
+					// focus topmost popup
+					PS.room = PS.rooms[this.popups[this.popups.length - 1]]!;
+				} else {
+					// if popup parent is a mini-window, focus popup parent
+					PS.room = PS.rooms[room.parentRoomid ?? PS.panel.id] || PS.panel;
+					// otherwise focus current panel
+					if (PS.room.location !== 'mini-window' || PS.panel !== PS.mainmenu) PS.room = PS.panel;
+				}
 			}
 		}
 
