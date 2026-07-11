@@ -1027,9 +1027,15 @@ class AvatarsPanel extends PSRoomPanel {
 			avatars.push([i, window.BattleAvatarNumbers?.[i] || `${i}`]);
 		}
 
-		const serverAvatars: string[] = (window.Config as any)?.serverAvatars || [];
+		const serverAvatars: string[] = window.Config?.serverAvatars || [];
 		const protocol = (Config.server.port === 443) ? 'https' : 'http';
 		const serverUrl = `${protocol}://${Config.server.host}:${Config.server.port}`;
+
+		// Expose the trainers sprite-sheet URL via a CSS custom property on the
+		// .avatarlist container, so the sprite sheet is loaded from the user's
+		// server (not the play.pokemonshowdown.com URL hardcoded in client2.css).
+		// spriteResourcePrefix() also honors the useupstreamsprites preference.
+		const trainersSpriteSheet = `${Dex.spriteResourcePrefix()}sprites/trainers-sheet.png`;
 
 		return <PSPanelWrapper room={room} width={1210}><div class="pad">
 			<label class="optlabel"><strong>Choose an avatar or </strong>
@@ -1049,14 +1055,16 @@ class AvatarsPanel extends PSRoomPanel {
 				</div>
 				<div style="clear:left"></div>
 			</>}
-			<div class="avatarlist">
-				{avatars.map(([i, avatar]) => (
-					<button
+			<div class="avatarlist" style={`--trainers-sheet: url(${trainersSpriteSheet})`}>
+				{avatars.map(([i, avatar]) => {
+					const col = (i - 1) % 16;
+					const row = Math.floor((i - 1) / 16);
+					return <button
 						data-cmd={`/closeand /avatar ${avatar}`} title={`/avatar ${avatar}`}
 						class={`option pixelated${avatar === PS.user.avatar ? ' cur' : ''}`}
-						style={`background-position: -${((i - 1) % 16) * 80 + 1}px -${Math.floor((i - 1) / 16) * 80 + 1}px`}
-					></button>
-				))}
+						style={`background-position: -${col * 80 + 1}px -${row * 80 + 1}px`}
+					></button>;
+				})}
 			</div>
 			<div style="clear:left"></div>
 			<p><button class="button" data-cmd="/close">Cancel</button></p>
