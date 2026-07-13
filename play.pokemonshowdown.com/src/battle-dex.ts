@@ -245,13 +245,30 @@ export const Dex = new class implements ModdedDex {
 	/**
 	 * Returns the base URL for sprites. Uses upstream (play.pokemonshowdown.com)
 	 * when useupstreamsprites preference is enabled, otherwise uses local resourcePrefix.
+	 * Custom Relumi forms always use the local prefix because their sprites do not
+	 * exist upstream.
 	 */
-	spriteResourcePrefix() {
+	spriteResourcePrefix(speciesid?: ID) {
 		if (Dex.prefs('useupstreamsprites')) {
+			if (speciesid && this.isCustomRelumiForm(speciesid)) {
+				return Dex.resourcePrefix;
+			}
 			const prefix = window.document?.location?.protocol !== 'http:' ? 'https:' : '';
 			return `${prefix}//play.pokemonshowdown.com/`;
 		}
 		return Dex.resourcePrefix;
+	}
+
+	/**
+	 * Check whether a species is a custom Relumi form whose sprites only exist
+	 * locally (not on the upstream play.pokemonshowdown.com server).
+	 */
+	isCustomRelumiForm(speciesid: ID) {
+		const overrideData = window.BattleTeambuilderTable?.gen8relumi?.overrideSpeciesData;
+		if (!overrideData) return false;
+		const data = overrideData[speciesid];
+		if (!data?.baseSpecies || !data?.forme) return false;
+		return toID(data.baseSpecies) !== speciesid;
 	}
 
 	loadedSpriteData = { xy: 1, bw: 0 };
@@ -297,15 +314,14 @@ export const Dex = new class implements ModdedDex {
 			return Dex.mod("gen8relumi" as ID);
 		}
 
-		const knownFormat = (window.BattleFormats &&
-			window.BattleFormats[fullFormatId]) as
+		const knownFormat = (window.BattleFormats?.[fullFormatId]) as
 			| {
-					mod?: string;
-			  }
+				mod?: string,
+			}
 			| undefined;
 		const modid = toID(knownFormat?.mod || "");
 		if (modid && window.BattleTeambuilderTable?.[modid]) {
-			return Dex.mod(modid as ID);
+			return Dex.mod(modid);
 		}
 
 		const formatid = fullFormatId.slice(4);
@@ -557,7 +573,7 @@ export const Dex = new class implements ModdedDex {
 				if (baseSpecies.exists) {
 					const cosmeticName = data.name || baseSpecies.name;
 					// Explicitly preserve forme from cosmetic data to ensure correct spriteid
-					const cosmeticForme = (data as any).forme || '';
+					const cosmeticForme = (data).forme || '';
 					const cosmeticSpecies = new Species(formid, cosmeticName, {
 						...baseSpecies,
 						...data,
@@ -703,7 +719,6 @@ export const Dex = new class implements ModdedDex {
 			pokemon = pokemon.getSpeciesForme() + (isGigantamax ? '-Gmax' : '');
 		}
 		const species = Dex.species.get(pokemon);
-		const requestedId = toID(pokemon) as ID;
 		// Gmax sprites are already extremely large, so we don't need to double.
 		if (species.name.endsWith('-Gmax')) isDynamax = false;
 		let spriteData = {
@@ -711,7 +726,7 @@ export const Dex = new class implements ModdedDex {
 			w: 96,
 			h: 96,
 			y: 0,
-			url: this.spriteResourcePrefix() + 'sprites/',
+			url: this.spriteResourcePrefix(species.id) + 'sprites/',
 			pixelated: true,
 			isFrontSprite: false,
 			cryurl: '',
@@ -820,16 +835,15 @@ export const Dex = new class implements ModdedDex {
 				spriteData.w = animationData[facing].w;
 				spriteData.h = animationData[facing].h;
 				if (animDir === '') {
-					if (Dex.prefs('useupstreamsprites')) {
-						// Restore original 1x dimensions when using upstream sprites,
-						// since relumi-overrides patches BattlePokemonSprites to 2x for local GIFs.
-						const origDims = (window as any).__originalBattlePokemonSpriteDims?.[speciesid]?.[facing];
-						if (origDims) {
-							spriteData.w = origDims.w;
-							spriteData.h = origDims.h;
-						}
+					// The dimension table stores the actual pixel size of the local 2x GIFs;
+					// the battle scene expects 1x CSS dimensions, so halve them for local sprites.
+					// Upstream sprites use their own native 1x dimensions.
+					const upstreamDims = Dex.prefs('useupstreamsprites') &&
+						(window as any).__upstreamBattlePokemonSprites?.[speciesid]?.[facing];
+					if (upstreamDims) {
+						spriteData.w = upstreamDims.w;
+						spriteData.h = upstreamDims.h;
 					} else {
-						// Custom sprites in sprites/ani/ are 2x resolution.
 						spriteData.w = Math.floor(spriteData.w / 2);
 						spriteData.h = Math.floor(spriteData.h / 2);
 					}
@@ -1051,7 +1065,7 @@ export const Dex = new class implements ModdedDex {
 		const data = this.getTeambuilderSpriteData(pokemon, dex);
 		const shiny = (data.shiny ? '-shiny' : '');
 		const resize = (data.h ? `background-size:${data.h}px` : '');
-		return `background-image:url(${this.spriteResourcePrefix()}${data.spriteDir}${shiny}/${data.spriteid}.png);background-position:${data.x + xOffset}px ${data.y + yOffset}px;background-repeat:no-repeat;${resize}`;
+		return `background-image:url(${this.spriteResourcePrefix(toID(pokemon.species || pokemon))}${data.spriteDir}${shiny}/${data.spriteid}.png);background-position:${data.x + xOffset}px ${data.y + yOffset}px;background-repeat:no-repeat;${resize}`;
 	}
 
 	getItemIcon(item: any) {
@@ -1099,9 +1113,7 @@ export const Dex = new class implements ModdedDex {
 			if (species.baseSpecies && species.forme && species.baseSpecies !== species.name) {
 			// Pre-computed form index map from export-relumi-client-overrides.js.
 			// Uses the server-side Dex (which has formeOrder) so it's always correct.
-				const precomputed = (window.BattleTeambuilderTable &&
-					window.BattleTeambuilderTable.gen8relumi &&
-					window.BattleTeambuilderTable.gen8relumi.relumiFormIndexMap) || {};
+				const precomputed = (window.BattleTeambuilderTable?.gen8relumi?.relumiFormIndexMap) || {};
 				if (species.id in precomputed) {
 					return `//${Config.routes.dex}/pokedex/${species.num}_${precomputed[species.id]}`;
 				}
