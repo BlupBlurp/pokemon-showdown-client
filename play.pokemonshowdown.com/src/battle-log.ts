@@ -1606,8 +1606,7 @@ export class BattleLog {
 				return {
 					tagName: 'button',
 					attribs: [
-						// TODO: stop using this one we drop oldclient
-						'type', 'selectformat',
+						'data-select', 'selectformat',
 						'class', "select formatselect",
 						'value', getAttrib('format') || getAttrib('value') || '',
 						'name', getAttrib('name') || '',
