@@ -1066,6 +1066,17 @@ export class TeamEditor extends preact.Component<{
 	static probablyMobile() {
 		return window.innerWidth < 500;
 	}
+	coverageOpen = false;
+	toggleCoverage = () => {
+		this.coverageOpen = !this.coverageOpen;
+		this.forceUpdate();
+	};
+	onCoverageClick = (ev: MouseEvent) => {
+		if ((ev.target as HTMLElement).closest('summary')) {
+			ev.preventDefault();
+			this.toggleCoverage();
+		}
+	};
 	renderDefensiveCoverage() {
 		const { editor } = this;
 		if (editor.team.isBox) return null;
@@ -1073,7 +1084,7 @@ export class TeamEditor extends preact.Component<{
 
 		const counters = Object.values(editor.teamDefensiveCoverage());
 		PSUtils.sortBy(counters, counter => [counter.resists, -counter.weaknesses]);
-		const good = [], medium = [], bad = [];
+		const good = [] as typeof counters[number][], medium = [] as typeof counters[number][], bad = [] as typeof counters[number][];
 		const renderTypeDefensive = (counter: typeof counters[number]) => (
 			<tr>
 				<th>{counter.type}</th>
@@ -1083,22 +1094,23 @@ export class TeamEditor extends preact.Component<{
 		);
 		for (const counter of counters) {
 			if (counter.resists > 0) {
-				good.push(renderTypeDefensive(counter));
+				good.push(counter);
 			} else if (counter.weaknesses <= 0) {
-				medium.push(renderTypeDefensive(counter));
+				medium.push(counter);
 			} else {
-				bad.push(renderTypeDefensive(counter));
+				bad.push(counter);
 			}
 		}
-		return <details class="details">
+		const previewRows = [...bad, ...medium, ...good].slice(0, 2);
+		return <details class="details coverage-col" open={this.coverageOpen} onClick={this.onCoverageClick}>
 			<summary>
 				<strong>Defensive coverage</strong>
 				<table class="details-preview table">
-					{bad}
+					{previewRows.map(renderTypeDefensive)}
 					<tr><td colSpan={3}><span class="details-preview ilink"><small>See all</small></span></td></tr>
 				</table>
 			</summary>
-			<table class="table">{bad}{medium}{good}</table>
+			<table class="table">{[...bad, ...medium, ...good].map(renderTypeDefensive)}</table>
 		</details>;
 	}
 	renderOffensiveCoverage() {
@@ -1108,7 +1120,7 @@ export class TeamEditor extends preact.Component<{
 
 		const counters = Object.values(editor.teamOffensiveCoverage());
 		PSUtils.sortBy(counters, counter => [counter.se, -counter.blanked]);
-		const good = [] as preact.ComponentChildren[], medium = [] as preact.ComponentChildren[], bad = [] as preact.ComponentChildren[];
+		const good = [] as typeof counters[number][], medium = [] as typeof counters[number][], bad = [] as typeof counters[number][];
 		const renderTypeOffensive = (counter: typeof counters[number]) => (
 			<tr>
 				<th>{counter.type}</th>
@@ -1123,22 +1135,23 @@ export class TeamEditor extends preact.Component<{
 		);
 		for (const counter of counters) {
 			if (counter.se > 0) {
-				good.push(renderTypeOffensive(counter));
+				good.push(counter);
 			} else if (counter.blanked <= 0) {
-				medium.push(renderTypeOffensive(counter));
+				medium.push(counter);
 			} else {
-				bad.push(renderTypeOffensive(counter));
+				bad.push(counter);
 			}
 		}
-		return <details class="details">
+		const previewRows = [...bad, ...medium, ...good].slice(0, 2);
+		return <details class="details coverage-col" open={this.coverageOpen} onClick={this.onCoverageClick}>
 			<summary>
 				<strong>Offensive coverage</strong>
 				<table class="details-preview table">
-					{bad}
+					{previewRows.map(renderTypeOffensive)}
 					<tr><td colSpan={4}><span class="details-preview ilink"><small>See all</small></span></td></tr>
 				</table>
 			</summary>
-			<table class="table">{bad}{medium}{good}</table>
+			<table class="table">{[...bad, ...medium, ...good].map(renderTypeOffensive)}</table>
 		</details>;
 	}
 	cancelClipboard = () => {
@@ -1183,8 +1196,10 @@ export class TeamEditor extends preact.Component<{
 				{this.props.children}
 				<div class="team-resources">
 					<br /><hr /><br />
-					{this.renderDefensiveCoverage()}
-					{this.renderOffensiveCoverage()}
+					<div class="team-coverage">
+						{this.renderDefensiveCoverage()}
+						{this.renderOffensiveCoverage()}
+					</div>
 					{this.props.resources}
 				</div>
 			</>}

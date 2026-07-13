@@ -338,6 +338,16 @@
 	margin: 3px 0 12px;
 }
 
+.team-coverage {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	align-items: flex-start;
+}
+.team-coverage > .details {
+	flex: 1 1 260px;
+}
+
 .teameditor {
 	max-width: 660px;
 }
