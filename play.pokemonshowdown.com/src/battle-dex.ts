@@ -1027,6 +1027,13 @@ export const Dex = new class implements ModdedDex {
 			spriteData.x = 8;
 			spriteData.y = 10;
 			spriteData.h = 96;
+			if (pokemon.gender === 'F' && !spriteid.endsWith('-gmax')) {
+				const miscData = window.BattlePokemonSprites?.[id] || window.BattlePokemonSpritesBW?.[id];
+				if (miscData?.frontf) {
+					spriteid += '-f';
+				}
+			}
+			spriteData.spriteid = spriteid;
 			return spriteData;
 		}
 		let xydexExists = (!species.isNonstandard || species.isNonstandard === 'Past' || species.isNonstandard === 'CAP') || [
