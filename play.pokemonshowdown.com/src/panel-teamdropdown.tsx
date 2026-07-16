@@ -145,7 +145,7 @@ export function TeamBox(props: {
 	let contents;
 	if (team) {
 		team.iconCache ||= team.packedTeam ? (
-			Teams.unpackSpeciesOnly(team.packedTeam).map(
+			Teams.unpackSpeciesAndGender(team.packedTeam).map(
 				// can't use <PSIcon>, weird interaction with iconCache
 				// don't try this at home; I'm a trained professional
 				pokemon => PSIcon({ pokemon })

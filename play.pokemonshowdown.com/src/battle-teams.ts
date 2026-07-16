@@ -304,9 +304,12 @@ export const Teams = new class {
 		return team;
 	}
 	unpackSpeciesOnly(buf: string): string[] {
+		return this.unpackSpeciesAndGender(buf).map(p => p.species);
+	}
+	unpackSpeciesAndGender(buf: string): Dex.PokemonSet[] {
 		if (!buf) return [];
 
-		const team = [];
+		const team: Dex.PokemonSet[] = [];
 		let i = 0;
 		let lastI = 0;
 
@@ -314,9 +317,21 @@ export const Teams = new class {
 			const name = buf.slice(i, buf.indexOf('|', i));
 			i = buf.indexOf('|', i) + 1;
 
-			team.push(buf.slice(i, buf.indexOf('|', i)) || name);
+			const species = buf.slice(i, buf.indexOf('|', i)) || name;
+			i = buf.indexOf('|', i) + 1;
 
-			for (let k = 0; k < 9; k++) {
+			// skip item, ability, moves, nature, evs
+			for (let k = 0; k < 5; k++) {
+				i = buf.indexOf('|', i) + 1;
+			}
+
+			const gender = buf.slice(i, buf.indexOf('|', i));
+			i = buf.indexOf('|', i) + 1;
+
+			team.push({ species, gender, moves: [] });
+
+			// skip ivs, shiny, level, happiness, and misc fields
+			for (let k = 0; k < 3; k++) {
 				i = buf.indexOf('|', i) + 1;
 			}
 
