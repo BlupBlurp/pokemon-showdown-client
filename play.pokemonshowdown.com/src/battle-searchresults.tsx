@@ -234,7 +234,6 @@ export class PSSearchResults extends preact.Component<{
 		return '' as ID;
 	}
 	private getMoveFlagsTooltip(move: Dex.Move): string {
-		if (!move?.flags) return '';
 		const parts: string[] = [];
 		if (move.flags.contact) parts.push('Contact');
 		if (move.flags.slicing) parts.push('Slicing');
@@ -247,6 +246,7 @@ export class PSSearchResults extends preact.Component<{
 		if (move.flags.wind) parts.push('Wind');
 		if (move.flags.dance) parts.push('Dance');
 		if (move.flags.bypasssub) parts.push('Bypasses Sub');
+		if (move.priority) parts.push(`Priority: ${move.priority > 0 ? '+' : ''}${move.priority}`);
 		return parts.join(', ');
 	}
 	private parseMethodCode(methodCode: string): string | null {

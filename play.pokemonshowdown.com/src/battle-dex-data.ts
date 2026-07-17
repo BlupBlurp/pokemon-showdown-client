@@ -1284,6 +1284,7 @@ export class Move implements Effect {
 	readonly pressureTarget: MoveTarget;
 	readonly flags: Readonly<MoveFlags>;
 	readonly critRatio: number;
+	readonly willCrit: boolean;
 	readonly damage?: number | 'level' | false | null;
 
 	readonly desc: string;
@@ -1299,6 +1300,7 @@ export class Move implements Effect {
 	readonly maxMove: { basePower: number };
 	readonly ohko: true | 'Ice' | null;
 	readonly recoil: number[] | null;
+	readonly drain: number[] | null;
 	readonly heal: number[] | null;
 	readonly multihit: number[] | number | null;
 	readonly hasCrashDamage: boolean;
@@ -1326,6 +1328,7 @@ export class Move implements Effect {
 		this.pressureTarget = data.pressureTarget || this.target;
 		this.flags = data.flags || {};
 		this.critRatio = data.critRatio === 0 ? 0 : (data.critRatio || 1);
+		this.willCrit = data.willCrit || false;
 		this.damage = data.damage;
 
 		// TODO: move to text.js
@@ -1336,6 +1339,7 @@ export class Move implements Effect {
 		this.zMove = data.zMove || {};
 		this.ohko = data.ohko || null;
 		this.recoil = data.recoil || null;
+		this.drain = data.drain || null;
 		this.heal = data.heal || null;
 		this.multihit = data.multihit || null;
 		this.hasCrashDamage = data.hasCrashDamage || false;

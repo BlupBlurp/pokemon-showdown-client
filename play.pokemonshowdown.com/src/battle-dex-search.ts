@@ -23,7 +23,25 @@ const MOVE_FLAG_NAMES: Record<string, string> = {
 	contact: 'Contact', slicing: 'Slicing', sound: 'Sound',
 	punch: 'Punch', bite: 'Bite', pulse: 'Pulse',
 	bullet: 'Bullet', powder: 'Powder', wind: 'Wind', dance: 'Dance',
+	multihit: 'Multihit', priority: 'Priority', critratio: 'High Crit',
+	recoil: 'Recoil', drain: 'Drain', heal: 'Heal',
 };
+
+/** IDs that are treated like flags in the teambuilder but are not real MoveFlags. */
+const PSEUDO_FLAG_IDS = ['multihit', 'priority', 'critratio', 'recoil', 'drain', 'heal'];
+
+/** Check whether a move (raw BattleMovedex entry or Dex.Move) has a pseudo-flag. */
+function moveHasPseudoFlag(move: any, flagId: string): boolean {
+	switch (flagId) {
+	case 'multihit': return !!move.multihit;
+	case 'priority': return (move.priority || 0) !== 0;
+	case 'critratio': return (move.critRatio || 0) > 1 || !!move.willCrit;
+	case 'recoil': return !!move.recoil;
+	case 'drain': return !!move.drain;
+	case 'heal': return !!move.heal;
+	default: return false;
+	}
+}
 
 export type SearchRow = (
 	[SearchType, ID, number?, number?] | ['sortpokemon' | 'sortmove', ''] | ['header' | 'html', string]
@@ -666,9 +684,12 @@ export class DexSearch {
 				let flagName = MOVE_FLAG_NAMES[fId] || fId;
 				buf.push(['header', `${flagName} moves`]);
 				for (let id in BattleMovedex) {
-					if (BattleMovedex[id].flags && (BattleMovedex[id].flags as any)[fId]) {
-						(illegal && id in illegal ? illegalBuf : buf).push(['move', id as ID]);
+					if (PSEUDO_FLAG_IDS.includes(fId)) {
+						if (!moveHasPseudoFlag(BattleMovedex[id], fId)) continue;
+					} else {
+						if (!BattleMovedex[id].flags || !(BattleMovedex[id].flags as any)[fId]) continue;
 					}
+					(illegal && id in illegal ? illegalBuf : buf).push(['move', id as ID]);
 				}
 				break;
 			}
@@ -2349,7 +2370,11 @@ class BattleMoveSearch extends BattleTypedSearch<'move'> {
 				if (move.category !== value) return false;
 				break;
 			case 'flag':
-				if (!move.flags || !(move.flags as any)[value]) return false;
+				if (PSEUDO_FLAG_IDS.includes(value)) {
+					if (!moveHasPseudoFlag(move, value)) return false;
+				} else {
+					if (!move.flags || !(move.flags as any)[value]) return false;
+				}
 				break;
 			case 'pokemon':
 				if (!this.canLearn(value as ID, move.id)) return false;
