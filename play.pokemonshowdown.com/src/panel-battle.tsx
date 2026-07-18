@@ -173,7 +173,7 @@ class BattlesPanel extends PSRoomPanel<BattlesRoom> {
 					></span>
 				</p>
 
-				<p class="buttonbar">
+				<p style="margin-top:1em">
 					<button class={`button${room.tab === 'battles' ? ' cur' : ''}`} onClick={() => this.setTab('battles')}>
 						Active Battles
 					</button> {}
