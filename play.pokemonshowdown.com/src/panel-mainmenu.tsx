@@ -455,6 +455,13 @@ export class MainMenuRoom extends PSRoom {
 				battlesRoom.update(null);
 			}
 			break;
+		case 'replaylist':
+			const replaysRoom = PS.rooms[`battles`] as BattlesRoom;
+			if (replaysRoom) {
+				replaysRoom.replays = response.replays || [];
+				replaysRoom.update(null);
+			}
+			break;
 		case 'laddertop':
 			for (const [roomid, ladderRoom] of Object.entries(PS.rooms)) {
 				if (roomid.startsWith('ladder-')) {

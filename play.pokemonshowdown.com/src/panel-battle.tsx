@@ -31,12 +31,21 @@ type BattleDesc = {
 	p3?: string,
 	p4?: string,
 };
+type ReplayDesc = {
+	id: string,
+	format: string,
+	players: string[],
+	rating: number | null,
+	uploadtime: number,
+};
 export class BattlesRoom extends PSRoom {
 	override readonly classType = 'battles';
 	/** null means still loading */
 	format = '';
 	filters = '';
 	battles: BattleDesc[] | null = null;
+	tab: 'battles' | 'replays' = 'battles';
+	replays: ReplayDesc[] | null = null;
 	constructor(options: RoomOptions) {
 		super(options);
 		this.refresh();
@@ -48,12 +57,26 @@ export class BattlesRoom extends PSRoom {
 	setFormat(format: string) {
 		if (format === this.format) return this.refresh();
 		this.battles = null;
+		this.replays = null;
 		this.format = format;
 		this.update(null);
 		this.refresh();
 	}
+	setTab(tab: 'battles' | 'replays') {
+		if (tab === this.tab) return;
+		this.tab = tab;
+		this.update(null);
+		this.refresh();
+	}
 	refresh() {
-		PS.send(`/cmd roomlist ${toID(this.format)}, ${this.filters}`);
+		if (this.tab === 'replays') {
+			this.refreshReplays();
+		} else {
+			PS.send(`/cmd roomlist ${toID(this.format)}, ${this.filters}`);
+		}
+	}
+	refreshReplays() {
+		PS.send(`/cmd replist ${toID(this.format)}, ${this.filters}`);
 	}
 }
 
@@ -87,6 +110,52 @@ class BattlesPanel extends PSRoomPanel<BattlesRoom> {
 			<em class="p1">{battle.p1}</em> <small class="vs">vs.</small> <em class="p2">{battle.p2}</em>
 		</a></div>;
 	}
+	setTab = (tab: 'battles' | 'replays') => {
+		this.props.room.setTab(tab);
+	};
+	renderReplayLink(replay: ReplayDesc) {
+		const ratingMessage = replay.rating ? `rated ${replay.rating}` : null;
+		const p1 = replay.players[0] || '?';
+		const p2 = replay.players[1] || '?';
+		return <div key={replay.id}><a href={`/battle-${replay.id}`} class="blocklink">
+			{ratingMessage && <small style="float:right">({ratingMessage})</small>}
+			<small>[{replay.format}]</small><br />
+			<em class="p1">{p1}</em> <small class="vs">vs.</small> <em class="p2">{p2}</em>
+		</a></div>;
+	}
+	renderList() {
+		const room = this.props.room;
+		if (room.tab === 'replays') {
+			return this.renderReplaysList();
+		}
+		return this.renderBattlesList();
+	}
+	renderBattlesList() {
+		const room = this.props.room;
+		return <div class="list">{!room.battles ? (
+			<p>Loading...</p>
+		) : !room.battles.length ? (
+			<p>No battles are going on</p>
+		) : (<>
+			<p>{room.battles.length === 100 ?
+				`100+` : room.battles.length} {room.battles.length > 1 ? `battles` : `battle`}</p>
+			{room.battles.map(battle => this.renderBattleLink(battle))}
+		</>
+		)}</div>;
+	}
+	renderReplaysList() {
+		const room = this.props.room;
+		return <div class="list">{!room.replays ? (
+			<p>Loading...</p>
+		) : !room.replays.length ? (
+			<p>No replays found</p>
+		) : (<>
+			<p>{room.replays.length > 50 ?
+				`50+` : room.replays.length} {room.replays.length > 1 ? `replays` : `replay`}</p>
+			{room.replays.map(replay => this.renderReplayLink(replay))}
+		</>
+		)}</div>;
+	}
 	override render() {
 		const room = this.props.room;
 		return <PSPanelWrapper room={room}><div class="pad">
@@ -99,9 +168,18 @@ class BattlesPanel extends PSRoomPanel<BattlesRoom> {
 						<i class="fa fa-refresh" aria-hidden></i> Refresh
 					</button> {}
 					<span
-						style={Dex.getPokemonIcon('meloetta-pirouette') + ';display:inline-block;vertical-align:middle'} class="picon"
+						style={Dex.getPokemonIcon('giratina-origin') + ';display:inline-block;vertical-align:middle'} class="picon"
 						title="Giratina is Relumi's mascot! It is a fierce and powerful Pokémon, and represents our battles."
 					></span>
+				</p>
+
+				<p class="buttonbar">
+					<button class={`button${room.tab === 'battles' ? ' cur' : ''}`} onClick={() => this.setTab('battles')}>
+						Active Battles
+					</button> {}
+					<button class={`button${room.tab === 'replays' ? ' cur' : ''}`} onClick={() => this.setTab('replays')}>
+						Replays
+					</button>
 				</p>
 
 				<p>
@@ -120,16 +198,7 @@ class BattlesPanel extends PSRoomPanel<BattlesRoom> {
 						<button type="submit" class="button">Search</button>
 					</p>
 				</form>
-				<div class="list">{!room.battles ? (
-					<p>Loading...</p>
-				) : !room.battles.length ? (
-					<p>No battles are going on</p>
-				) : (<>
-					<p>{room.battles.length === 100 ?
-						`100+` : room.battles.length} {room.battles.length > 1 ? `battles` : `battle`}</p>
-					{room.battles.map(battle => this.renderBattleLink(battle))}
-				</>
-				)}</div>
+				{this.renderList()}
 			</div>
 		</div></PSPanelWrapper>;
 	}
