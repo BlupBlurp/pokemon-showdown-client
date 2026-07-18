@@ -248,7 +248,7 @@ export class BattleRoom extends ChatRoom {
 
 	loadReplay() {
 		const replayid = this.id.slice(7);
-		Net(`https://replay.pokemonshowdown.com/${replayid}.json`).get().catch(() => '').then(data => {
+		Net(`https://${Config.routes.replays}/battle-${replayid}.json`).get().catch(() => '').then(data => {
 			try {
 				const replay = JSON.parse(data);
 				this.title = `[${replay.format}] ${replay.players.join(' vs. ')}`;
