@@ -455,7 +455,7 @@ export class MainMenuRoom extends PSRoom {
 				battlesRoom.update(null);
 			}
 			break;
-		case 'replaylist':
+		case 'replist':
 			const replaysRoom = PS.rooms[`battles`] as BattlesRoom;
 			if (replaysRoom) {
 				replaysRoom.replays = response.replays || [];
