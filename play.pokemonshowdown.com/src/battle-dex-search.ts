@@ -941,9 +941,13 @@ abstract class BattleTypedSearch<T extends SearchType> {
 					if (!(id in legalityFilter)) {
 						// Cosmetic formes are selectable via sprite picker - don't mark as illegal.
 						// Exception: Alcremie-Salted-Cream (see runtime loop above).
-						const species = this.dex.species.get(id);
-						if (!species.exists) continue;
-						if (species.isCosmeticForme && id !== 'alcremiesaltedcream') continue;
+						// This check only applies to Pokemon search; moves/abilities/items
+						// have no concept of cosmetic formes.
+						if (this.searchType === 'pokemon') {
+							const species = this.dex.species.get(id);
+							if (!species.exists) continue;
+							if (species.isCosmeticForme && id !== 'alcremiesaltedcream') continue;
+						}
 						this.baseIllegalResults.push([this.searchType, id as ID]);
 						this.illegalReasons[id] = 'Illegal';
 					}
