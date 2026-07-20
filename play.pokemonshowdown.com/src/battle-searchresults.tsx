@@ -249,33 +249,163 @@ export class PSSearchResults extends preact.Component<{
 		if (move.priority) parts.push(`Priority: ${move.priority > 0 ? '+' : ''}${move.priority}`);
 		return parts.join(', ');
 	}
-	private parseMethodCode(methodCode: string): string | null {
+	/**
+	 * Walk the full learnset chain for a species→move pair and return the
+	 * combined learnset method badge text (e.g. "Lv25 / TM"), or null if
+	 * the setting is disabled or no data is available. Results are cached
+	 * per render cycle via the RelumiDiffHelper cache.
+	 */
+	getLearnsetMethodForMove(speciesId: ID, moveId: ID): string | null {
+		if (Dex.prefs('relumiShowLearnsetMethods') === false) return null;
+		if (!speciesId || !moveId) return null;
+
+		const cacheKey = `lsetMethod|${speciesId}|${moveId}`;
+		if (this._relumi.cacheHas(cacheKey)) {
+			return this._relumi.cacheGet<string | null>(cacheKey);
+		}
+
+		const search = this.props.search;
+		const isRelumi = search.dex.modid === 'gen8relumi' ||
+			(search.typedSearch?.format || '').includes('relumi');
+		const result = PSSearchResults.computeLearnsetMethodForMove(
+			speciesId, moveId, search.dex, isRelumi
+		);
+		this._relumi.cacheSet(cacheKey, result);
+		return result;
+	}
+
+	/**
+	 * Standalone helper to compute the learnset method for a species→move pair.
+	 * Usable from outside PSSearchResults (e.g. the team editor).
+	 *
+	 * @returns Combined badge text like "Lv25 / TM" or null.
+	 */
+	static computeLearnsetMethodForMove(
+		speciesId: ID, moveId: ID, dex: any, isRelumi: boolean
+	): string | null {
+		if (Dex.prefs('relumiShowLearnsetMethods') === false) return null;
+		if (!speciesId || !moveId) return null;
+
+		const table = isRelumi
+			? (window as any).BattleTeambuilderTable?.gen8relumi
+			: (window as any).BattleTeambuilderTable;
+		const rawLearnsets = table?.learnsets;
+		if (!rawLearnsets) return null;
+
+		// Walk the learnset chain. The first species that has the move
+		// contributes all its method codes; subsequent species (pre-evolutions)
+		// only contribute egg moves.
+		const allCodes: string[] = [];
+		let foundFirst = false;
+		let cur: ID = PSSearchResults.staticGetFirstLearnsetId(speciesId, rawLearnsets, dex);
+		const visited: Record<string, true> = Object.create(null);
+		while (cur) {
+			if (visited[cur]) break;
+			visited[cur] = true;
+			const learnEntry = rawLearnsets[cur]?.[moveId];
+			if (learnEntry) {
+				if (!foundFirst) {
+					allCodes.push(learnEntry);
+					foundFirst = true;
+				} else {
+					// Only collect egg moves from pre-evolutions
+					const eggOnly = PSSearchResults.filterEggOnlyCode(learnEntry);
+					if (eggOnly) allCodes.push(eggOnly);
+				}
+			}
+			cur = PSSearchResults.staticGetNextLearnsetId(cur, speciesId, rawLearnsets, dex);
+		}
+
+		return PSSearchResults.parseAllMethodCodes(allCodes);
+	}
+
+	/**
+	 * Given a raw learnset method code string (e.g. "9L25,9M,9E"), return
+	 * only the egg-move parts (e.g. "9E"), or null if there are none.
+	 */
+	private static filterEggOnlyCode(methodCode: string): string | null {
 		if (!methodCode) return null;
-		// Handle pipe-delimited vanilla format: "genavail|L25,M"
-		// Handle Relumi format: "9l25,9m,9e" (lowercase, prefixed with '9')
 		let methods: string[];
 		if (methodCode.includes('|')) {
 			methods = methodCode.split('|')[1].split(',');
-		} else if (/^\d/.test(methodCode)) {
-			// Relumi format: "9l25,9m" → strip gen prefix, uppercase
-			methods = methodCode.split(',').map(m => m.replace(/^\d+/, '').toUpperCase());
 		} else {
 			methods = methodCode.split(',');
 		}
-		const parts: string[] = [];
+		const eggParts: string[] = [];
 		for (const m of methods) {
-			const levelMatch = m.match(/^L(\d+)$/);
-			if (levelMatch) {
-				const lvl = parseInt(levelMatch[1]);
-				parts.push(lvl === 0 ? 'Lv1' : `Lv${levelMatch[1]}`);
-			} else if (m === 'M') {
-				parts.push('TM');
-			} else if (m === 'T') {
-				parts.push('Tutor');
-			} else if (m === 'E') {
-				parts.push('Egg');
-			} else if (m === 'V') {
-				parts.push('Event');
+			const upperM = m.trim().toUpperCase();
+			if (upperM === 'E' || upperM.match(/^\d+E$/)) {
+				eggParts.push(m);
+			}
+		}
+		if (!eggParts.length) return null;
+		// Preserve pipe prefix if present
+		if (methodCode.includes('|')) {
+			return methodCode.split('|')[0] + '|' + eggParts.join(',');
+		}
+		return eggParts.join(',');
+	}
+
+	private static staticGetFirstLearnsetId(speciesId: ID, learnsets: any, dex: any): ID {
+		if (speciesId in learnsets) return speciesId;
+		const species = dex.species.get(speciesId);
+		if (!species?.exists) return '' as ID;
+		let baseLearnsetid: ID = toID(species.baseSpecies);
+		if (typeof species.battleOnly === 'string' && species.battleOnly !== species.baseSpecies) {
+			baseLearnsetid = toID(species.battleOnly);
+		}
+		if (baseLearnsetid in learnsets) return baseLearnsetid;
+		return '' as ID;
+	}
+
+	private static staticGetNextLearnsetId(learnsetid: ID, speciesId: ID, learnsets: any, dex: any): ID {
+		const lsetSpecies = dex.species.get(learnsetid);
+		if (!lsetSpecies?.exists) return '' as ID;
+		if (learnsetid === 'lycanrocdusk' || (speciesId === 'rockruff' && learnsetid === 'rockruff')) {
+			return 'rockruffdusk' as ID;
+		}
+		if (lsetSpecies.id === 'gastrodoneast') return 'gastrodon' as ID;
+		if (lsetSpecies.id === 'pumpkaboosuper') return 'pumpkaboo' as ID;
+		if (lsetSpecies.id === 'sinisteaantique') return 'sinistea' as ID;
+		if (lsetSpecies.id === 'tatsugiristretchy') return 'tatsugiri' as ID;
+		const next = lsetSpecies.battleOnly || lsetSpecies.changesFrom || lsetSpecies.prevo;
+		if (next) return toID(next);
+		return '' as ID;
+	}
+
+	/** Parse one or more method code strings (from the learnset chain), deduplicate, and join. */
+	private static parseAllMethodCodes(methodCodes: string[]): string | null {
+		const seen = new Set<string>();
+		const parts: string[] = [];
+		for (const methodCode of methodCodes) {
+			if (!methodCode) continue;
+			let methods: string[];
+			if (methodCode.includes('|')) {
+				methods = methodCode.split('|')[1].split(',');
+			} else if (/^\d/.test(methodCode)) {
+				methods = methodCode.split(',').map(m => m.replace(/^\d+/, '').toUpperCase());
+			} else {
+				methods = methodCode.split(',');
+			}
+			for (const m of methods) {
+				let label: string | null = null;
+				const levelMatch = m.match(/^L(\d+)$/);
+				if (levelMatch) {
+					const lvl = parseInt(levelMatch[1]);
+					label = lvl === 0 ? 'Lv1' : `Lv${levelMatch[1]}`;
+				} else if (m === 'M') {
+					label = 'TM';
+				} else if (m === 'T') {
+					label = 'Tutor';
+				} else if (m === 'E') {
+					label = 'Egg';
+				} else if (m === 'V') {
+					label = 'Event';
+				}
+				if (label && !seen.has(label)) {
+					seen.add(label);
+					parts.push(label);
+				}
 			}
 		}
 		return parts.length ? parts.join(' / ') : null;
@@ -338,6 +468,18 @@ export class PSSearchResults extends preact.Component<{
 		const pokemon = search.dex.species.get(id);
 		if (!pokemon) return `<li class="result" value="${index}">Unrecognized pokemon</li>`;
 
+		// Determine learnset method badge when filtering by a move
+		let moveMethodBadge = '';
+		if (search.filters) {
+			const moveFilter = search.filters.find(f => f[0] === 'move');
+			if (moveFilter) {
+				const method = this.getLearnsetMethodForMove(id, moveFilter[1] as ID);
+				if (method) {
+					moveMethodBadge = ` <span class="move-method-badge">${method}</span>`;
+				}
+			}
+		}
+
 		const tagStart = (pokemon.forme ? pokemon.name.length - pokemon.forme.length - 1 : 0);
 		const stats = pokemon.baseStats;
 		const hpClass = this._relumi.getStatClass(id, 'hp', stats.hp);
@@ -376,7 +518,7 @@ export class PSSearchResults extends preact.Component<{
 			`data-entry="pokemon|${escapeHTML(pokemon.name)}">` +
 			`<span class="col numcol">${escapeHTML(search.getTier(pokemon))}</span>` +
 			`<span class="col iconcol"><span class="pixelated" style="${escapeHTML(Dex.getPokemonIcon(pokemon.id))}"></span></span>` +
-			`<span class="col pokemonnamecol">${this.renderNameHTML(pokemon.name, matchStart, matchEnd, tagStart)}</span>`;
+			`<span class="col pokemonnamecol">${this.renderNameHTML(pokemon.name, matchStart, matchEnd, tagStart)}${moveMethodBadge}</span>`;
 		if (errorMessage) return `${buf}${errorMessage}</a></li>`;
 
 		buf += `<span class="col typecol">${pokemon.types.map(type =>
@@ -497,33 +639,7 @@ export class PSSearchResults extends preact.Component<{
 		const flagsTooltip = this.getMoveFlagsTooltip(move);
 		const typedSearch = this.props.search.typedSearch;
 		const speciesId = typedSearch?.species || '' as ID;
-		let methodCode = '';
-		const showLearnsetMethods = Dex.prefs('relumiShowLearnsetMethods') !== false;
-		if (speciesId && showLearnsetMethods) {
-			const isRelumi = this.props.search.dex.modid === 'gen8relumi' ||
-				(this.props.search.typedSearch?.format || '').includes('relumi');
-			const table = isRelumi
-				? (window as any).BattleTeambuilderTable?.gen8relumi
-				: (window as any).BattleTeambuilderTable;
-			const rawLearnsets = table?.learnsets;
-			if (rawLearnsets) {
-				// Walk the learnset chain so egg moves show for evolved Pokémon,
-				// not just the base form.
-				let cur: ID = this.getFirstLearnsetId(speciesId, rawLearnsets);
-				const visited: Record<string, true> = Object.create(null);
-				while (cur) {
-					if (visited[cur]) break;
-					visited[cur] = true;
-					const learnEntry = rawLearnsets[cur]?.[id];
-					if (learnEntry) {
-						methodCode = learnEntry;
-						break;
-					}
-					cur = this.getNextLearnsetId(cur, speciesId, rawLearnsets);
-				}
-			}
-		}
-		const method = this.parseMethodCode(methodCode);
+		const method = this.getLearnsetMethodForMove(speciesId, id);
 		const fmtValue = (v: number | true) => v === true ? 'always' : String(v);
 		type MoveDiff = { vanilla: number | true, delta: number };
 		const fmtMoveTitle = (label: string, diff: MoveDiff | null, current: number | true) => {
@@ -593,6 +709,14 @@ export class PSSearchResults extends preact.Component<{
 		return `<li class="result" value="${index}"><a href="#" data-target="push" data-entry="flag|${id}">` +
 			`<span class="col namecol">${this.renderNameHTML(name, matchStart, matchEnd)}</span>` +
 			`<span class="col movedesccol">(flag)</span>` +
+			`</a></li>`;
+	}
+
+	renderLearnsetRowHTML(index: number, id: ID, matchStart: number, matchEnd: number) {
+		const name = id.charAt(0).toUpperCase() + id.slice(1);
+		return `<li class="result" value="${index}"><a href="#" data-target="push" data-entry="learnset|${id}">` +
+			`<span class="col namecol">${this.renderNameHTML(name, matchStart, matchEnd)}</span>` +
+			`<span class="col movedesccol">(learn method)</span>` +
 			`</a></li>`;
 	}
 
@@ -699,6 +823,8 @@ export class PSSearchResults extends preact.Component<{
 			return this.renderArticleRowHTML(index, id, matchStart, matchEnd, errorMessage);
 		case 'flag':
 			return this.renderFlagRowHTML(index, id, matchStart, matchEnd);
+		case 'learnset':
+			return this.renderLearnsetRowHTML(index, id, matchStart, matchEnd);
 		}
 		return `<li>Error: not found</li>`;
 	}

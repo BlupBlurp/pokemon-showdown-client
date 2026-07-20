@@ -15,7 +15,7 @@ import { Dex, type ModdedDex, toID, type ID } from "./battle-dex";
 import type { PSSearchResults } from "./battle-searchresults";
 
 export type SearchType = (
-	'pokemon' | 'type' | 'tier' | 'move' | 'item' | 'ability' | 'egggroup' | 'category' | 'article' | 'flag'
+	'pokemon' | 'type' | 'tier' | 'move' | 'item' | 'ability' | 'egggroup' | 'category' | 'article' | 'flag' | 'learnset'
 );
 
 /** Display names for move flag filters (query text = flag key) */
@@ -25,6 +25,11 @@ const MOVE_FLAG_NAMES: Record<string, string> = {
 	bullet: 'Bullet', powder: 'Powder', wind: 'Wind', dance: 'Dance',
 	multihit: 'Multihit', priority: 'Priority', critratio: 'High Crit',
 	recoil: 'Recoil', drain: 'Drain', heal: 'Heal',
+};
+
+/** Display names for learnset method filters (query text = method key) */
+const LEARNSET_METHOD_NAMES: Record<string, string> = {
+	level: 'Level', tutor: 'Tutor', egg: 'Egg', tm: 'TM',
 };
 
 /** IDs that are treated like flags in the teambuilder but are not real MoveFlags. */
@@ -88,6 +93,7 @@ export class DexSearch {
 		category: 8,
 		article: 9,
 		flag: 10,
+		learnset: 11,
 	};
 	static typeName = {
 		pokemon: 'Pok\u00e9mon',
@@ -100,6 +106,7 @@ export class DexSearch {
 		category: 'Category',
 		article: 'Article',
 		flag: 'Flag',
+		learnset: 'Learnset Method',
 	};
 	static unselectableResultTypes = ['header', 'html', 'sortpokemon', 'sortmove'];
 	firstPokemonColumn: 'Tier' | 'Number' = 'Number';
@@ -231,7 +238,7 @@ export class DexSearch {
 		let [type] = entry;
 		if (this.typedSearch.searchType === 'pokemon') {
 			if (type === this.sortCol) this.sortCol = null;
-			if (!['type', 'move', 'ability', 'egggroup', 'tier'].includes(type)) return false;
+			if (!['type', 'move', 'ability', 'egggroup', 'tier', 'learnset'].includes(type)) return false;
 			if (type === 'type') entry[1] = this.capitalizeFirst(entry[1]);
 			if (type === 'move') entry[1] = toID(entry[1]);
 			if (type === 'ability') entry[1] = this.dex.abilities.get(entry[1]).name;
@@ -256,7 +263,7 @@ export class DexSearch {
 			return true;
 		} else if (this.typedSearch.searchType === 'move') {
 			if (type === this.sortCol) this.sortCol = null;
-			if (!['type', 'category', 'pokemon', 'flag'].includes(type)) return false;
+			if (!['type', 'category', 'pokemon', 'flag', 'learnset'].includes(type)) return false;
 			if (type === 'type') entry[1] = this.capitalizeFirst(entry[1]);
 			if (type === 'category') entry[1] = this.capitalizeFirst(entry[1]);
 			if (type === 'pokemon') entry[1] = toID(entry[1]);
@@ -415,7 +422,7 @@ export class DexSearch {
 
 		// Notes:
 		// - if we have a searchType, that searchType's buffer will be on top
-		let bufs: SearchRow[][] = [[], [], [], [], [], [], [], [], [], [], []];
+		let bufs: SearchRow[][] = [[], [], [], [], [], [], [], [], [], [], [], []];
 		let seenInBuf: Record<string, boolean>[] = bufs.map(() => Object.create(null));
 		let topbufIndex = -1;
 
@@ -623,6 +630,22 @@ export class DexSearch {
 			}
 		}
 
+		// Detect learnset method filter queries (partial prefix match)
+		if ((searchType === 'move' || searchType === 'pokemon') && queryForFlags.length >= 2) {
+			for (const methodKey in LEARNSET_METHOD_NAMES) {
+				if (methodKey.startsWith(queryForFlags)) {
+					const learnsetTypeIndex = 11;
+					if (!bufs[learnsetTypeIndex].length) {
+						bufs[learnsetTypeIndex] = [['header', 'Learnset Method']];
+					}
+					bufs[learnsetTypeIndex].push(['learnset', methodKey as ID, 0, queryForFlags.length]);
+					if (!instafilter) {
+						instafilter = ['learnset', methodKey as ID, learnsetTypeIndex];
+					}
+				}
+			}
+		}
+
 		if (instafilter && count < 20) {
 			// Result count is less than 20, so we can instafilter
 			bufs.push(this.instafilter(searchType, instafilter[0], instafilter[1]));
@@ -659,6 +682,9 @@ export class DexSearch {
 					}
 				}
 				break;
+			case 'learnset':
+				buf.push(['header', `${LEARNSET_METHOD_NAMES[fId] || fId} method (add a move filter)`]);
+				break;
 			}
 		} else if (searchType === 'move') {
 			switch (fType) {
@@ -691,6 +717,10 @@ export class DexSearch {
 					}
 					(illegal && id in illegal ? illegalBuf : buf).push(['move', id as ID]);
 				}
+				break;
+			case 'learnset':
+				let methodName = LEARNSET_METHOD_NAMES[fId] || fId;
+				buf.push(['header', `${methodName} method moves`]);
 				break;
 			}
 		}
@@ -1104,6 +1134,64 @@ abstract class BattleTypedSearch<T extends SearchType> {
 	protected getRelumiTable(table: any): any {
 		if (this.format.includes('relumi') && table?.gen8relumi) return table.gen8relumi;
 		return table;
+	}
+	protected canLearnByMethod(speciesid: ID, moveid: ID, methodId: string): boolean {
+		const table = this.getLearnsetTable();
+		const gen = this.format.includes('relumi') ? Math.max(this.dex.gen, 9) : this.dex.gen;
+		let genChar = `${gen}`;
+		if (
+			this.format.startsWith('vgc') ||
+			this.format.startsWith('bss') ||
+			this.format.startsWith('battlespot') ||
+			this.format.startsWith('battlestadium') ||
+			this.format.startsWith('battlefestival') ||
+			(this.dex.gen === 9 && !this.formatType?.includes('natdex'))
+		) {
+			if (gen === 9) {
+				genChar = 'a';
+			} else if (gen === 8) {
+				genChar = 'g';
+			} else if (gen === 7) {
+				genChar = 'q';
+			} else if (gen === 6) {
+				genChar = 'p';
+			}
+		}
+		let learnsetid = this.firstLearnsetid(speciesid);
+		while (learnsetid) {
+			let t = this.getRelumiTable(BattleTeambuilderTable);
+			if (this.formatType?.startsWith('bdsp')) t = t['gen8bdsp'];
+			if (this.formatType === 'letsgo') t = t['gen7letsgo'];
+			if (this.formatType === 'bw1') t = t['gen5bw1'];
+			if (this.formatType === 'rs') t = t['gen3rs'];
+			if (this.formatType === 'frlg') t = t['gen3frlg'];
+			if (this.formatType === 'champions') t = t['champions'];
+			if (this.formatType === 'natdexchampions') t = t['natdexchampions'];
+			let learnset = t.learnsets[learnsetid];
+			if (learnset && (moveid in learnset)) {
+				const learnMethods = learnset[moveid];
+				// learnMethods is a comma-separated string like "7E,8M" or "9l25,9m"
+				const methodStr = (Array.isArray(learnMethods) ? (learnMethods as string[]).join(',') : learnMethods) as string;
+				const parts = methodStr.split(',');
+				for (const part of parts) {
+					let code = part.toUpperCase();
+					// Handle pipe-delimited format: "genavail|L25" -> "L25"
+					if (code.includes('|')) {
+						code = code.split('|')[1];
+					}
+					// Handle Relumi format: strip gen prefix like "9L25" -> "L25"
+					if (/^\d/.test(code)) {
+						code = code.replace(/^\d+/, '');
+					}
+					if (methodId === 'level' && /^L\d+$/.test(code)) return true;
+					if (methodId === 'tm' && code === 'M') return true;
+					if (methodId === 'tutor' && code === 'T') return true;
+					if (methodId === 'egg' && code === 'E') return true;
+				}
+			}
+			learnsetid = this.nextLearnsetid(learnsetid, speciesid, true);
+		}
+		return false;
 	}
 	private getLearnsetTable() {
 		let table = this.getRelumiTable(BattleTeambuilderTable);
@@ -1653,6 +1741,14 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 				break;
 			case 'move':
 				if (!this.canLearn(species.id, value as ID)) return false;
+				break;
+			case 'learnset':
+				// Only works alongside a move filter
+				const moveFilter = filters.find(f => f[0] === 'move');
+				if (moveFilter) {
+					if (!this.canLearnByMethod(species.id, moveFilter[1] as ID, value)) return false;
+				}
+				break;
 			}
 		}
 		return true;
@@ -2382,6 +2478,9 @@ class BattleMoveSearch extends BattleTypedSearch<'move'> {
 				break;
 			case 'pokemon':
 				if (!this.canLearn(value as ID, move.id)) return false;
+				break;
+			case 'learnset':
+				if (this.species && !this.canLearnByMethod(this.species, move.id, value)) return false;
 				break;
 			}
 		}
