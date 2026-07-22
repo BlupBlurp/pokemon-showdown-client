@@ -451,11 +451,11 @@ li::marker {
 	padding-top: 3px;
 	padding-bottom: 5px;
 }
-.tabbar li:first-child .button, .tabbar li.home-li .button, .tabbar li.home-li + li .button {
+.tabbar li:first-child .button, .tabbar li.home-li .button, .tabbar li.home-li + li .button, .tabbar .button-first {
 	border-top-left-radius: 5px;
 	margin-left: 6px;
 }
-.tabbar li:last-child .button, .tabbar li.home-li .button {
+.tabbar li:last-child .button, .tabbar li.home-li .button, .tabbar .button-last {
 	border-top-right-radius: 5px;
 }
 .tabbar a.closable {
@@ -977,9 +977,12 @@ p.or:after {
 	background: #052f68;
 	color: #b3d2fc;
 }
-.challenge.outgoing fieldset {
-	border: 1px solid #217bf5;
+.fieldset {
+	border: 1px solid #888;
 	border-radius: 5px;
+}
+.challenge.outgoing .fieldset {
+	border-color: #217bf5;
 }
 .challenge p {
 	margin: 4px 0;
@@ -1021,7 +1024,7 @@ p.or:after {
 form.menugroup {
 	max-width: 270px;
 }
-.menugroup .label {
+.menugroup .label, .tournament-tools .label {
 	text-align: left;
 	width: 246px;
 	margin: 0 auto;
@@ -1126,6 +1129,10 @@ form.menugroup {
 	white-space: pre-wrap;
 	border-radius: 4px;
 }
+
+/*********************************************************
+ * User menu
+ *********************************************************/
 
 /*********************************************************
  * Room list
@@ -1236,11 +1243,11 @@ form.menugroup {
 	overflow-x: hidden;
 	-webkit-overflow-scrolling: touch;
 }
-.chat-log, .readable-bg {
+.chat-log, .readable-bg, .battle-log {
 	background: rgba(242,247,250,.5);
 	color: black;
 }
-.dark .chat-log, .dark .readable-bg {
+.dark .chat-log, .dark .readable-bg, .dark .battle-log {
 	background: rgba(0,0,0,.5);
 	color: #DDD;
 	backdrop-filter: blur(4px);
@@ -1369,7 +1376,7 @@ pre.textbox.textbox-empty[placeholder]:before {
 	padding: 0;
 	background: transparent;
 	width: 100%;
-	text-align: left;
+	text-align: center;
 	overflow: hidden;
 	white-space: nowrap;
 }
@@ -1392,7 +1399,7 @@ pre.textbox.textbox-empty[placeholder]:before {
 	margin-right: 5px;
 	line-height: 30px;
 	font-weight: normal;
-	display: inline-block;
+	float: left;
 	font-size: 11px;
 }
 
@@ -1802,9 +1809,6 @@ pre.textbox.textbox-empty[placeholder]:before {
 	left: 0;
 	width: 640px;
 }
-.battle-chat-toggle {
-	display: none;
-}
 .battle-log .battle-controls {
 	top: 0;
 	position: static;
@@ -1877,32 +1881,16 @@ pre.textbox.textbox-empty[placeholder]:before {
 	margin: 2px 0 8px 0;
 	padding: 0 8px;
 }
-.small-layout .battle-userlist,
-.small-layout .battle-log,
-.small-layout .battle-log-add {
-	display: none;
-}
-.small-layout .battle-chat-toggle {
-	display: block;
+.battle-chat-toggle {
 	position: absolute;
 	top: 4px;
-	left: 151px;
+	left: 168px;
 	font-size: 14px;
 	padding: 3px 6px;
 }
-.small-layout .battle-chat-toggle[name=showChat] {
+.battle-chat-toggle[name=showChat] {
 	left: auto;
 	right: 6px;
-}
-.small-layout.showing-chat .battle,
-.small-layout.showing-chat .battle-controls {
-	display: none;
-}
-.small-layout.showing-chat .battle-userlist,
-.small-layout.showing-chat .battle-log,
-.small-layout.showing-chat .battle-log-add {
-	left: 0;
-	display: block;
 }
 
 /*********************************************************
@@ -2333,77 +2321,10 @@ pre.textbox.textbox-empty[placeholder]:before {
  * Team Selector
  *********************************************************/
 
-.select, .team {
-	padding: 4px 22px 4px 8px;
-	font-size: 9pt;
-	text-align: left;
-	font-family: Verdana, Helvetica, Arial, sans-serif;
-	text-decoration: none;
-	cursor: pointer;
-
-	border-radius: 4px;
-	border: 1px solid #888888;
-	background: #EEEEEE;
-	box-shadow: inset 0 1px 0 #FFFFFF;
-	background: linear-gradient(to bottom,  #edf2f8,  #d7e3ec);
-	color: black;
-	box-sizing: border-box;
-
-	position: relative;
-}
-.dark .select, .dark .team {
-	border-color: #34373b;
-	box-shadow: none;
-	background: linear-gradient(to bottom, #626971, #444950);
-	box-shadow: 0.5px 1px 2px rgba(255, 255, 255, 0.45), inset 0.5px 1px 1px rgba(255, 255, 255, 0.5);
-	color: white;
-}
-.select:hover, .select:hover .team, a.team:hover, button.team:hover {
-	border-color: #555555;
-	background: #FFFFFF;
-	background: linear-gradient(to bottom,  #dce4ec,  #c6d3e0);
-}
-.select:active, .select:active .team, a.team:active, button.team:active {
-	border-color: #777777;
-	background: #DDDDDD;
-	box-shadow: none;
-	background: linear-gradient(to bottom,  #bbc4cd,  #e7edf2);
-}
-.dark .select:hover, .dark .select:hover .team, .dark a.team:hover, .dark button.team:hover {
-	border-color: #34373b;
-	background: #FFFFFF;
-	color: white;
-	background: linear-gradient(to bottom, #8f98a1, #4a5057);
-}
-.dark .select:active, .dark .select:active .team, .dark a.team:active, .dark button.team:active {
-	border-color: #34373b;
-	box-shadow: none;
-	background: linear-gradient(to bottom, #4a5057, #8f98a1);
-}
-
-select.select {
-	padding: 3px 4px;
-}
-.label .select {
-	margin-top: 2px;
-	display: block;
-}
-select.select.base-select {
-	padding: 4px 22px 4px 8px;
-}
-.formatselect, .teamselect, .team {
+.formatselect, .teamselect {
 	width: 246px;
 	min-height: 32px;
 	padding: 0 5px;
-	height: auto;
-}
-.team {
-	height: 49px;
-	overflow: hidden;
-	white-space: nowrap;
-}
-.team.pc-box {
-	min-height: 74px;
 	height: auto;
 }
 .team:focus {
@@ -2425,97 +2346,12 @@ select.select.base-select {
 	background: transparent;
 	box-shadow: none;
 }
-.team strong {
-	display: block;
-	font-size: 8pt;
-	padding-top: 2px;
-	text-align: center;
+.dark .preselected .team small {
+	filter: none;
 }
-.team em {
-	display: block;
-	padding-top: 16px;
-}
-.team strong span {
-	font-style: normal;
-	font-weight: normal;
-}
-.team small {
-	display: block;
-	text-align: center;
-	/* individual pokemon in a team have margin-right -4px so this compensates */
-	margin: 0 -1px 0 -5px;
-	white-space: normal;
-}
-.team small span {
-	margin-right: -4px;
-}
-
-.select:before {
-	position: absolute;
-	top: 50%;
-	right: 6px;
-	margin-top: -7px;
-	padding: 0;
-
-	font-size: 14px;
-	content: "\f0d7";
-	font-family: FontAwesome;
-	-webkit-font-smoothing: antialiased;
-	color: #777777;
-}
-select.select::picker-icon {
-	display: none;
-}
-.dark .select:before {
-	color: #cccccc;
-}
-.select:disabled {
-	border-color: #999999;
-	background: rgba(220,220,220,.65);
-	color: #555555;
-	box-shadow: none;
-}
-.dark .select:disabled {
-	border-color: #888;
-	background: rgba(90,90,90,.65);
-	color: #BBB;
-	box-shadow: none;
-}
-.select:disabled .team, .select:disabled:hover .team, .select:disabled:active .team {
-	border-color: #999999;
-	cursor: default;
-}
-.dark .select:disabled .team, .dark .select:disabled:hover .team, .dark .select:disabled:active .team {
-	border-color: #888888;
-}
-.select:disabled:before {
-	color: #AAAAAA;
-}
-.dark .select:disabled:before {
-	color: #888888;
-}
-.select.preselected,
-.select:disabled.preselected {
-	color: black;
-}
-.dark .select.preselected,
-.dark .select:disabled.preselected {
-	color: white;
-}
-
 .teamlist .team, .teamdropdown .team {
 	display: inline-block;
-	width: 300px;
 	vertical-align: middle;
-}
-.teamlist .dragging button {
-	visibility: hidden;
-}
-.teamlist .dragging .team {
-	opacity: 0.4;
-}
-.teamlist .team small {
-	display: block;
 }
 
 /*********************************************************
@@ -2568,6 +2404,20 @@ select.select::picker-icon {
 }
 .buttonbar {
 	clear: both;
+}
+.buttonmenu p {
+	margin: 3px 0;
+}
+.buttonmenu legend {
+	font-size: 9pt;
+	color: #555;
+}
+.dark .buttonmenu legend {
+	color: #AAA;
+}
+.buttonmenu .fieldset {
+	padding: 1px 8px 5px;
+	margin: 8px 0;
 }
 
 .bglist {

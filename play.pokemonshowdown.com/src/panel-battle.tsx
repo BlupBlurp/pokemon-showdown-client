@@ -22,6 +22,7 @@ import {
 import type { Args } from "./battle-text-parser";
 import { ModifiableValue } from "./battle-tooltips";
 import { Net } from "./client-connection";
+import { BattleLog } from "./battle-log";
 
 type BattleDesc = {
 	id: RoomID,
@@ -225,13 +226,14 @@ export class BattleRoom extends ChatRoom {
 	overlayActive: 'move' | 'switch' | null = null;
 
 	override interruptClose(explicit?: boolean, elem?: HTMLElement | null) {
-		const battle = this.battle;
-		const activeBattle = battle && !battle.ended && this.request && this.connectMode !== 'expired';
-		if (activeBattle || this.requireForfeit) {
+		if (this.isPlaying() || this.requireForfeit) {
 			PS.join('forfeitbattle' as RoomID, { parentElem: elem, parentRoomid: this.id });
 			return `You are still in ${this.title}`;
 		}
 		return super.interruptClose(explicit, elem);
+	}
+	isPlaying() {
+		return this.battle && !this.battle.ended && this.request && this.connectMode !== 'deleted';
 	}
 
 	override handleReconnect(): boolean | void {
@@ -257,12 +259,18 @@ export class BattleRoom extends ChatRoom {
 				this.battle.pause();
 				this.battle.seekTurn(0);
 				this.connectMode = null;
+				this.connectError = null;
 				this.update(null);
 			} catch {
-				this.receiveLine(['bigerror', `Battle "${replayid}" not found`]);
-				this.receiveLine(['html',
-					`<div class="broadcast-red pad"><p class="buttonbar"><button class="button" data-cmd="/close"><strong>Close</strong></button></p></div>`,
-				]);
+				this.connectError = `Battle "${replayid}" not found`;
+				if (!this.battle.stepQueue.length) {
+					this.battle.scene.message(
+						`<div class="broadcast-red pad"><strong>${BattleLog.escapeHTML(this.connectError)}</strong></div><br />` +
+						`The battle you're looking for has expired. Battles expire after 15 minutes of inactivity unless they're saved.<br /><br />` +
+						`In the future, remember to click "Save replay" to save a replay permanently.`
+					);
+				}
+				this.update(null);
 			}
 		});
 	}
@@ -396,6 +404,15 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 	}
 	/** last displayed team. will not show the most recent request until the last one is gone. */
 	team: ServerPokemon[] | null = null;
+	mobileChatShown = false;
+	showMobileChat = () => {
+		this.mobileChatShown = true;
+		this.forceUpdate();
+	};
+	showMobileBattle = () => {
+		this.mobileChatShown = false;
+		this.forceUpdate();
+	};
 	send = (text: string, elem?: HTMLElement) => {
 		this.props.room.send(text, elem);
 	};
@@ -619,6 +636,16 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 			break;
 		}
 	}
+	renderConnectError() {
+		const room = this.props.room;
+		if (room.connectMode !== 'deleted' && room.connectMode !== 'not-found') {
+			return null;
+		}
+		return <div class="pad"><div class="broadcast-red pad">
+			<h3>{room.connectError || "Error"}</h3>
+			<p class="buttonbar"><button class="button" data-cmd="/close"><strong>Close</strong></button></p>
+		</div></div>;
+	}
 	renderControls(overlayVersion = false, hidePlayerControls = false) {
 		const room = this.props.room;
 		if (!room.battle) return null;
@@ -631,6 +658,8 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 			if (hidePlayerControls) return null;
 			return this.renderPlayerControls(room.request);
 		}
+		if (room.battle.stepQueue.length === 0) return null;
+
 		const atStart = !room.battle.started;
 		const atEnd = room.battle.atQueueEnd;
 		return <div class="inline-controls">
@@ -1262,9 +1291,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 			return <div class="inline-controls">
 				<div class="whatdo">
 					{this.renderOldChoices(request, choices)}
-				</div>
-				<div class="pad">
-					{choices.noCancel || room.battle.hardcoreMode ?
+					<em>Waiting for opponent...</em> {choices.noCancel || room.battle.hardcoreMode ?
 						null : <button data-cmd="/cancel" class="button">Cancel</button>}
 				</div>
 				{this.renderTeamList()}
@@ -1406,6 +1433,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 						role="complementary" aria-label="Battle Controls"
 					>
 						{this.renderControls(false, overlayVersion)}
+						{this.renderConnectError()}
 					</div>
 				</ChatLog>
 				{(room.battle && !room.battle.ended && room.request && room.battle.mySide.id === PS.user.userid) &&
@@ -1435,6 +1463,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 						role="complementary" aria-label="Battle Controls"
 					>
 						{this.renderControls(false, overlayVersion)}
+						{this.renderConnectError()}
 					</div>
 				</ChatLog>
 				<ChatTextEntry room={room} onMessage={this.send} onKey={this.onKey} left={0} tinyLayout={room.width < 400} />
@@ -1442,6 +1471,49 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 				{(room.battle && !room.battle.ended && room.request && room.battle.mySide.id === PS.user.userid) &&
 					<TimerButton room={room} top={battleHeight + 7} />}
 				<div class="battle-controls-container"></div>
+			</PSPanelWrapper>;
+		}
+
+		if (room.width < 500) {
+			// oldclient phone layout
+			const showingChat = this.mobileChatShown;
+			return <PSPanelWrapper room={room} focusClick noScroll="hidden">
+				{hardcoreStyle}
+				<div class="scrollable-battle-container" style={`width:${battleWidth}px;${showingChat ? 'display:none;' : ''}`}>
+					<BattleDiv room={room} />
+					{overlayVersion && <div
+						class="overlay-controls"
+						style={`position:absolute;left:0;top:${battleHeight}px;width:${battleWidth}px;height:0`}
+					>
+						{this.renderControls(true)}
+					</div>}
+					<div class="battle-controls-container">
+						<div
+							class={`battle-controls${battleWidth >= 639 ? ' wide-controls' : ''}`}
+							role="complementary" aria-label="Battle Controls"
+							style={`top:${battleHeight + 10}px;width:${battleWidth}px;`}
+						>
+							{(room.battle && !room.battle.ended && room.request &&
+								room.battle.mySide.id === PS.user.userid) && <TimerButton room={room} top={0} />}
+							{this.renderControls(false, overlayVersion)}
+							{this.renderConnectError()}
+						</div>
+					</div>
+				</div>
+				<div style={!showingChat ? 'display:none;' : ''}>
+					<ChatLog class="battle-log hasuserlist" room={room} noSubscription hasPreempt />
+					<ChatTextEntry room={room} onMessage={this.send} onKey={this.onKey} tinyLayout />
+					<ChatUserList room={room} minimized />
+				</div>
+				{showingChat ? (
+					<button class="battle-chat-toggle button" name="hideChat" onClick={this.showMobileBattle}>
+						Battle <i class="fa fa-caret-right" aria-hidden></i>
+					</button>
+				) : (
+					<button class="battle-chat-toggle button" name="showChat" onClick={this.showMobileChat}>
+						<i class="fa fa-caret-left" aria-hidden></i> Chat
+					</button>
+				)}
 			</PSPanelWrapper>;
 		}
 
@@ -1466,6 +1538,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 						{(room.battle && !room.battle.ended && room.request && room.battle.mySide.id === PS.user.userid) &&
 							<TimerButton room={room} top={0} />}
 						{this.renderControls(false, overlayVersion)}
+						{this.renderConnectError()}
 					</div>
 				</div>
 			</div>
