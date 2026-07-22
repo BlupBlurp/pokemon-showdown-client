@@ -74,6 +74,7 @@ export type RoomID = Lowercase<string> & { __isRoomID: true };
 export type TimestampOptions = 'minutes' | 'seconds' | undefined;
 /**
  * * `side-by-side`: desktop layout, with battle on left and chat on right, controls below battle
+ *   on phones, a toggle to switch between battle/controls and chat
  * * `top-and-bottom`: vertical phone layout, with battle on top and chat/controls on bottom
  * * `scrolling`: horizontal phone layout, fully scrollable
  */
@@ -148,6 +149,11 @@ class PSPrefs extends PSStreamModel<string | null> {
 	disallowspectators: boolean | null = null;
 	starredformats: { [formatid: string]: true | undefined } | null = null;
 
+	/* Teambuilder preferences */
+	teameditorspacious: boolean | null = null;
+	teameditorzoomoutforms: boolean | null = null;
+	teameditorzoomoutsearch: boolean | null = null;
+
 	/**
 	 * Show "User joined" and "User left" messages. serverid:roomid
 	 * table. Uses 1 and 0 instead of true/false for JSON packing
@@ -180,7 +186,7 @@ class PSPrefs extends PSStreamModel<string | null> {
 	effectvolume = 50;
 	musicvolume = 50;
 	notifvolume = 50;
-	uploadprivacy = false;
+	uploadprivacy = true;
 
 	afd: boolean | 'sprites' = undefined!;
 
@@ -1081,10 +1087,10 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 	 * * `'normal'` = can connect normally
 	 * * `'pending-reconnect'` = once connected, now not (flag to retry after reconnect)
 	 * * `'pending-login'` = failed to connect (flag to retry after login)
-	 * * `'expired'` = once connected, now expired
+	 * * `'deleted'` = deleted server-side, but should remain visible client-side
 	 * * `'not-found'` = got `noinit` from the server
 	 */
-	connectMode: null | 'normal' | 'expired' | 'not-found' | 'pending-reconnect' | 'pending-login' = null;
+	connectMode: null | 'normal' | 'deleted' | 'not-found' | 'pending-reconnect' | 'pending-login' = null;
 	onRequestFocus: ((options?: PSRoomFocusOptions) => boolean | void) | null = null;
 	onParentKeyDown: ((e?: Event) => boolean | void) | null = null;
 
@@ -1403,9 +1409,8 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 			}
 		},
 		'avatar'(target) {
-			target = target.toLowerCase();
-			// Allow dots for custom server-side avatars (e.g., politoed-pokemon.png)
-			if (/[^a-z0-9-.]/.test(target)) target = toID(target);
+			const parts = target.split(',');
+			target = parts[0].toLowerCase().replace(/[^a-z0-9-.]+/g, '');
 			const avatar = window.BattleAvatarNumbers?.[target] || target;
 			PS.user.avatar = avatar;
 			PS.prefs.set('avatar', avatar || null);
@@ -1414,6 +1419,7 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 			} else {
 				this.sendDirect(`/avatar ${avatar}`);
 			}
+			if (PS.user.userid) PS.send(`/cmd userdetails ${PS.user.userid}`);
 		},
 		'open,user'(target) {
 			let roomid = `user-${toID(target)}` as RoomID;
@@ -1818,11 +1824,11 @@ export class PSRoom extends PSStreamModel<Args | null> implements RoomOptions {
 		this.sendDirect(msg);
 	}
 	sendDirect(msg: string) {
-		if (this.connectMode === 'expired') {
-			return this.add(`This room has expired (you can't chat in it anymore)`);
+		if (this.connectMode === 'deleted') {
+			return this.errorReply(`This room has been deleted (you can't chat in it anymore)`);
 		}
 		if (this.connectMode === 'not-found') {
-			return this.add(`This room doesn't exist`);
+			return this.errorReply(`This room doesn't exist`);
 		}
 		PS.send(msg, this.id);
 	}
@@ -2014,6 +2020,10 @@ export const PS = new class extends PSModel {
 			return true;
 		}
 		if (room.type === 'battle') {
+			if ((oldWidth < 500) !==
+				(newWidth < 500)) {
+				return true;
+			}
 			const oldLayoutState = this.chooseBattleLayout(oldWidth, oldHeight, this.prefs.battlelayout);
 			const newLayoutState = this.chooseBattleLayout(newWidth, newHeight, this.prefs.battlelayout);
 			if (oldLayoutState.layout !== newLayoutState.layout ||
@@ -2032,10 +2042,10 @@ export const PS = new class extends PSModel {
 			height < uncappedBattleHeight + 150 ? 'scrolling' : 'top-and-bottom';
 
 		const preferredLayout = preference?.replace(/-overlay$/, '') as BattlePanelLayout;
-		if (preferredLayout && (width >= 500 || preferredLayout !== 'side-by-side')) {
+		if (preferredLayout) {
 			layout = preferredLayout;
 		}
-		if (layout === 'side-by-side') {
+		if (layout === 'side-by-side' && width >= 500) {
 			scale = Math.min(scale, Math.max(0, width - 180) / 640);
 		} else if (layout === 'top-and-bottom') {
 			scale = Math.min(scale, Math.max(0, height - 180) / 360);
@@ -2158,6 +2168,7 @@ export const PS = new class extends PSModel {
 				maxWidth: 640,
 			};
 		case 'team':
+		case 'teambuilder':
 			return {
 				minWidth: 660,
 				width: 660,
@@ -2230,6 +2241,11 @@ export const PS = new class extends PSModel {
 			this.leftPanelWidth = effectiveLeftPanelWidth;
 		}
 		this.layoutViewportWidth = viewportWidth;
+		(this.panel as ChatRoom).log?.updateScroll();
+		if (this.leftPanelWidth) {
+			(this.leftPanel as ChatRoom).log?.updateScroll();
+			(this.rightPanel as ChatRoom).log?.updateScroll();
+		}
 		return needsUpdate;
 	}
 	getRoom(elem: HTMLElement | EventTarget | null | undefined, skipClickable?: boolean): PSRoom | null {
@@ -2323,13 +2339,14 @@ export const PS = new class extends PSModel {
 				room = PS.rooms[roomid2];
 				if (room) {
 					room.connected = false;
-					if (room.connectMode !== 'expired') this.removeRoom(room);
+					if (room.connectMode !== 'deleted') this.removeRoom(room);
 					this.updateAutojoin();
 					this.update();
 				}
 				continue;
 			} case 'noinit': {
 				room = PS.rooms[roomid2];
+				const roomPreviouslyConnected = room?.connected === true || room?.connectMode === 'pending-reconnect';
 				if (!room && roomid2.startsWith('battle-') && args[1] === 'nonexistent') {
 					// possible replay; init a battle room for it
 					room = this.addRoom({
@@ -2350,7 +2367,7 @@ export const PS = new class extends PSModel {
 						// sometimes we assume a room is a chatroom when it's not
 						// when that happens, just ignore this error
 						if (room.type === 'chat' || room.type === 'battle') {
-							room.connectMode = 'not-found';
+							room.connectMode = roomPreviouslyConnected ? 'deleted' : 'not-found';
 							room.receiveLine(args);
 						}
 					} else if (args[1] === 'rename') {
@@ -2673,7 +2690,7 @@ export const PS = new class extends PSModel {
 		otherButtons?: preact.ComponentChildren, parentElem?: HTMLElement,
 	} = {}) {
 		opts.cancelButton ??= 'Cancel';
-		return new Promise(resolve => {
+		return new Promise<boolean>(resolve => {
 			this.join(`popup-${this.popups.length}` as RoomID, {
 				args: { message, okValue: true, cancelValue: false, callback: resolve, ...opts, parentElem: null },
 				parentElem: opts.parentElem,
@@ -2682,14 +2699,14 @@ export const PS = new class extends PSModel {
 	}
 	prompt(message: string, opts: {
 		defaultValue?: string, okButton?: string, cancelButton?: string, type?: 'text' | 'password' | 'number' | 'numeric',
-		otherButtons?: preact.ComponentChildren, parentElem?: HTMLElement | null,
+		label?: string, otherButtons?: preact.ComponentChildren, parentElem?: HTMLElement | null,
 	} = {}): Promise<string | null> {
 		opts.cancelButton ??= 'Cancel';
 		return new Promise(resolve => {
 			this.join(`popup-${this.popups.length}` as RoomID, {
 				args: {
 					message, value: opts.defaultValue || '',
-					okValue: true, cancelValue: false, callback: resolve, ...opts, parentElem: null,
+					okValue: true, cancelValue: null, callback: resolve, ...opts, parentElem: null,
 				},
 				parentElem: opts.parentElem,
 			});

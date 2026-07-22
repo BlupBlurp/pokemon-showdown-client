@@ -457,30 +457,31 @@
 			this.update();
 		},
 		events: {
-			"change input[name=noanim]": "setNoanim",
-			"change input[name=nogif]": "setNogif",
-			"change input[name=bwgfx]": "setBwgfx",
-			"change input[name=nopastgens]": "setNopastgens",
-			"change input[name=useupstreamsprites]": "setUseUpstreamSprites",
-			"change input[name=relumiHighlightBalanceChangesTB]": "setRelumiHighlightBalanceChanges",
-			"change input[name=relumiHighlightBalanceChangesBT]": "setRelumiHighlightBattleChanges",
-			"change select[name=tournaments]": "setTournaments",
-			"change select[name=language]": "setLanguage",
-			"change input[name=blockchallenges]": "setBlockchallenges",
-			"change input[name=blockpms]": "setBlockpms",
-			"change input[name=inchatpm]": "setInchatpm",
-			"change input[name=leavePopupRoom]": "setLeavePopupRoom",
-			"change input[name=temporarynotifications]": "setTemporaryNotifications",
-			"change input[name=refreshprompt]": "setRefreshprompt",
-			"change select[name=bg]": "setBg",
-			"change select[name=timestamps-lobby]": "setTimestampsLobby",
-			"change select[name=timestamps-pms]": "setTimestampsPMs",
-			"change select[name=onepanel]": "setOnePanel",
-			"change select[name=theme]": "setTheme",
-			"change input[name=logchat]": "setLogChat",
-			"change input[name=selfhighlight]": "setSelfHighlight",
-			"click img": "avatars",
-			"keydown input[name=statustext]": "editstatus",
+			'change input[name=noanim]': 'setNoanim',
+			'change input[name=nogif]': 'setNogif',
+			'change input[name=bwgfx]': 'setBwgfx',
+			'change input[name=nopastgens]': 'setNopastgens',
+			'change input[name=useupstreamsprites]': 'setUseUpstreamSprites',
+			'change input[name=relumiHighlightBalanceChangesTB]': 'setRelumiHighlightBalanceChanges',
+			'change input[name=relumiHighlightBalanceChangesBT]': 'setRelumiHighlightBattleChanges',
+			'change select[name=tournaments]': 'setTournaments',
+			'change select[name=language]': 'setLanguage',
+			'change input[name=blockchallenges]': 'setBlockchallenges',
+			'change input[name=blockpms]': 'setBlockpms',
+			'change input[name=inchatpm]': 'setInchatpm',
+			'change input[name=leavePopupRoom]': 'setLeavePopupRoom',
+			'change input[name=temporarynotifications]': 'setTemporaryNotifications',
+			'change input[name=refreshprompt]': 'setRefreshprompt',
+			'change select[name=bg]': 'setBg',
+			'change select[name=timestamps-lobby]': 'setTimestampsLobby',
+			'change select[name=timestamps-pms]': 'setTimestampsPMs',
+			'change input[name=syncteams]': 'setSyncTeams',
+			'change select[name=onepanel]': 'setOnePanel',
+			'change select[name=theme]': 'setTheme',
+			'change input[name=logchat]': 'setLogChat',
+			'change input[name=selfhighlight]': 'setSelfHighlight',
+			'click img': 'avatars',
+			'keydown input[name=statustext]': 'editstatus'
 		},
 		update: function () {
 			var name = app.user.get('name');
@@ -570,7 +571,8 @@
 			buf += '<p><label class="optlabel">Timestamps in chat rooms: <select name="timestamps-lobby" class="button"><option value="off">Off</option><option value="minutes"' + (timestamps.lobby === 'minutes' ? ' selected="selected"' : '') + '>[HH:MM]</option><option value="seconds"' + (timestamps.lobby === 'seconds' ? ' selected="selected"' : '') + '>[HH:MM:SS]</option></select></label></p>';
 			buf += '<p><label class="optlabel">Timestamps in PMs: <select name="timestamps-pms" class="button"><option value="off">Off</option><option value="minutes"' + (timestamps.pms === 'minutes' ? ' selected="selected"' : '') + '>[HH:MM]</option><option value="seconds"' + (timestamps.pms === 'seconds' ? ' selected="selected"' : '') + '>[HH:MM:SS]</option></select></label></p>';
 			buf += '<p><label class="optlabel">Chat preferences: <button name="formatting" class="button">Text formatting</button></label></p>';
-
+			var syncTeams = !Storage.prefs('nosyncteams');
+			buf += '<p><label class="optlabel">Download teams from server: <input type="checkbox" name="syncteams" ' + (syncTeams ? 'checked ' : '') + '></input></p>';
 			if (window.nodewebkit) {
 				buf += '<hr />';
 				buf += '<p><strong>Desktop app</strong></p>';
@@ -690,6 +692,17 @@
 		setTimestampsPMs: function (e) {
 			this.timestamps.pms = e.currentTarget.value;
 			Storage.prefs('timestamps', this.timestamps);
+		},
+		setSyncTeams: function () {
+			Storage.prefs('nosyncteams', !Storage.prefs('nosyncteams'));
+			if (!Storage.prefs('nosyncteams')) {
+				Storage.loadRemoteTeams(function () {
+					if (app.rooms.teambuilder) {
+						// if they have it open, be sure to update so it doesn't show 'no teams'
+						app.rooms.teambuilder.update();
+					}
+				});
+			}
 		},
 		avatars: function () {
 			app.addPopup(AvatarsPopup);

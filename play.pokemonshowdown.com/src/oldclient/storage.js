@@ -654,6 +654,7 @@ Storage.compareTeams = function (serverTeam, localTeam) {
 };
 
 Storage.loadRemoteTeams = function (after) {
+	if (Storage.prefs('nosyncteams')) return;
 	$.get(app.user.getActionPHP(), { act: 'getteams' }, Storage.safeJSON(function (data) {
 		if (data.actionerror) {
 			return app.addPopupMessage('Error loading uploaded teams: ' + data.actionerror);
@@ -1221,7 +1222,7 @@ Storage.packedTeamIcons = function (buf) {
 	if (!buf) return '<em>(empty team)</em>';
 
 	return this.packedTeamNames(buf).map(function (species) {
-		return '<span class="picon" style="' + Dex.getPokemonIcon(species) + ';float:left;overflow:visible"><span style="font-size:0px">' + toID(species) + '</span></span>';
+		return '<span class="picon" style="' + Dex.getPokemonIcon(species) + '"><span style="font-size:0px">' + toID(species) + '</span></span>';
 	}).join('');
 };
 
