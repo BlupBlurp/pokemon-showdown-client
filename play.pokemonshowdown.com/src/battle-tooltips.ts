@@ -1817,7 +1817,7 @@ export class BattleTooltips {
 
 		let minNatureMult = 0.9;
 		let maxNatureMult = 1.1;
-		if (tier.includes('Random Battle')) {
+		if (tier.includes('Random')) {
 			minNatureMult = 1;
 			maxNatureMult = 1;
 		}
