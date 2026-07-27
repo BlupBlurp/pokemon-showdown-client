@@ -11,7 +11,7 @@
 
 import preact from "../js/lib/preact";
 import type { Pokemon, ServerPokemon } from "./battle";
-import { Dex, toID } from "./battle-dex";
+import { Dex, PSUtils, toID } from "./battle-dex";
 import type { Args } from "./battle-text-parser";
 import { BattleTooltips } from "./battle-tooltips";
 import { Net } from "./client-connection";
@@ -254,7 +254,7 @@ export class PSRoomPanel<T extends PSRoom = PSRoom> extends preact.Component<{ r
 		PS.leave(this.props.room.id);
 	}
 	componentDidCatch(err: Error) {
-		this.props.room.caughtError = err.stack || err.message;
+		this.props.room.caughtError = PSUtils.normalizeError(err);
 		this.setState({});
 	}
 	receiveLine(args: Args) {}
@@ -344,7 +344,7 @@ export function PSPanelWrapper(props: {
 
 export class PSPanelErrorBoundary extends preact.Component<{ room: PSRoom }> {
 	componentDidCatch(err: Error) {
-		this.props.room.caughtError = err.stack || err.message;
+		this.props.room.caughtError = PSUtils.normalizeError(err);
 		this.setState({});
 	}
 	override render() {
@@ -1147,13 +1147,6 @@ export class PSView extends preact.Component {
 			const altShiftKey = !ev.ctrlKey && ev.altKey && !ev.metaKey && ev.shiftKey;
 			const shiftKey = !ev.ctrlKey && !ev.altKey && !ev.metaKey && ev.shiftKey;
 			const kc = ev.keyCode;
-			if (altShiftKey && (kc === 37 || kc === 38)) { // alt + shift + left or up
-				PS.arrowKeysUsed = true;
-				PS.focusUnreadRoom('left');
-			} else if (altShiftKey && (kc === 39 || kc === 40)) { // alt + shift + right or down
-				PS.arrowKeysUsed = true;
-				PS.focusUnreadRoom('right');
-			}
 			if (altKey && kc === 38) { // alt + up
 				PS.arrowKeysUsed = true;
 				PS.focusUpRoom();
@@ -1182,7 +1175,13 @@ export class PSView extends preact.Component {
 
 			if (isNonEmptyTextInput) return;
 
-			if (altKey && kc === 37) { // alt + left
+			if (altShiftKey && (kc === 37 || kc === 38)) { // alt + shift + left or up
+				PS.arrowKeysUsed = true;
+				PS.focusUnreadRoom('left');
+			} else if (altShiftKey && (kc === 39 || kc === 40)) { // alt + shift + right or down
+				PS.arrowKeysUsed = true;
+				PS.focusUnreadRoom('right');
+			} else if (altKey && kc === 37) { // alt + left
 				PS.arrowKeysUsed = true;
 				PS.focusLeftRoom();
 			} else if (altKey && kc === 39) { // alt + right
@@ -1486,7 +1485,7 @@ export class PSView extends preact.Component {
 		return false;
 	}
 	componentDidCatch(err: Error) {
-		PS.mainmenu.caughtError = err.stack || err.message;
+		PS.mainmenu.caughtError = PSUtils.normalizeError(err);
 		this.setState({});
 	}
 	static containingRoomid(elem: HTMLElement) {
