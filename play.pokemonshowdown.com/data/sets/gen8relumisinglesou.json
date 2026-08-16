@@ -9448,37 +9448,37 @@
         "species": "Decidueye-Hisui",
         "moves": [
           "Grass Pledge",
-          "Close Combat",
-          "Seed Bomb",
+          "Triple Arrows",
+          "Leaf Storm",
           "Confuse Ray"
         ],
         "ability": "Overgrow",
-        "nature": "Careful",
+        "nature": "Calm",
         "evs": {
-          "hp": 2,
-          "atk": 252,
+          "hp": 0,
+          "atk": 4,
           "def": 0,
-          "spa": 0,
+          "spa": 252,
           "spd": 252,
-          "spe": 4
+          "spe": 2
         }
       },
-      "Scrappy (Bulky Support) - ID 835": {
+      "Scrappy (Bulky Attacker) - ID 835": {
         "species": "Decidueye-Hisui",
         "moves": [
           "Triple Arrows",
-          "Leaf Blade",
+          "Leaf Storm",
           "Tailwind",
-          "Knock Off"
+          "Astonish"
         ],
         "ability": "Scrappy",
         "item": "Razor Claw",
-        "nature": "Adamant",
+        "nature": "Modest",
         "evs": {
           "hp": 6,
-          "atk": 252,
+          "atk": 0,
           "def": 0,
-          "spa": 0,
+          "spa": 252,
           "spd": 0,
           "spe": 252
         }
@@ -15732,7 +15732,7 @@
       "Sand Stream (Bulky Support) - ID 168": {
         "species": "Gigalith",
         "moves": [
-          "Explosion",
+          "Misty Explosion",
           "Stealth Rock",
           "Sandstorm",
           "Stone Edge"
@@ -15741,31 +15741,51 @@
         "nature": "Hardy",
         "evs": {
           "hp": 252,
-          "atk": 252,
+          "atk": 0,
           "def": 0,
-          "spa": 0,
+          "spa": 252,
           "spd": 6,
           "spe": 0
         }
       },
-      "Sand Stream (Bulky Attacker) - ID 958": {
+      "Sand Stream (Bulky Attacker) - ID 1958": {
         "species": "Gigalith",
         "moves": [
-          "Stone Edge",
-          "Rock Slide",
+          "Power Gem",
+          "Ancient Power",
           "Body Press",
-          "Explosion"
+          "Misty Explosion"
         ],
         "ability": "Sand Stream",
         "item": "Smooth Rock",
         "nature": "Adamant",
         "evs": {
           "hp": 252,
-          "atk": 252,
+          "atk": 4,
           "def": 0,
-          "spa": 2,
+          "spa": 252,
           "spd": 0,
-          "spe": 4
+          "spe": 2
+        }
+      },
+      "Sand Stream (Bulky Attacker) - ID 958": {
+        "species": "Gigalith",
+        "moves": [
+          "Power Gem",
+          "Ancient Power",
+          "Body Press",
+          "Misty Explosion"
+        ],
+        "ability": "Sand Stream",
+        "item": "Smooth Rock",
+        "nature": "Modest",
+        "evs": {
+          "hp": 252,
+          "atk": 4,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 2
         }
       }
     },
@@ -35792,21 +35812,21 @@
       }
     },
     "Sandaconda": {
-      "Sand Spit (Bulky Support) - ID 443": {
+      "Sand Spit (Bulky Attacker) - ID 443": {
         "species": "Sandaconda",
         "moves": [
-          "Earthquake",
-          "Stone Edge",
-          "Coil",
+          "Earth Power",
+          "Sand Tomb",
+          "Wrap",
           "Glare"
         ],
         "ability": "Sand Spit",
-        "nature": "Adamant",
+        "nature": "Modest",
         "evs": {
           "hp": 244,
-          "atk": 250,
+          "atk": 0,
           "def": 0,
-          "spa": 0,
+          "spa": 250,
           "spd": 12,
           "spe": 4
         }
