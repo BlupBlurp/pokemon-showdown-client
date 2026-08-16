@@ -28,6 +28,9 @@ function escapeCSSString(text: string) {
 	return text.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\a ').replace(/\r/g, '\\d ');
 }
 
+type EggMoveRoute = { steps: string[], method: string, level?: number };
+type EggMoveChain = { key: string, routes: EggMoveRoute[] } | null;
+
 export class PSSearchResults extends preact.Component<{
 	search: DexSearch, class?: string, style?: string | null,
 	prepend?: preact.ComponentChildren, children?: preact.ComponentChildren,
@@ -44,6 +47,11 @@ export class PSSearchResults extends preact.Component<{
 	renderedStart = -1;
 	renderedEnd = -1;
 	renderedLength = -1;
+
+	// Egg-move breeding-route hover popover state.
+	private eggChainPopover: HTMLElement | null = null;
+	private eggChainKey: string | null = null;
+	private eggChainHideTimer: number | null = null;
 
 	// Per-search memos for Relumi diff/lookup helpers. Cleared at the start of
 	// each render cycle so the same species/move/move-field lookups don't repeat.
@@ -275,6 +283,135 @@ export class PSSearchResults extends preact.Component<{
 	}
 
 	/**
+	 * Look up the precomputed egg-move breeding chains for a species→move pair.
+	 * Returns { key, routes }; routes is empty when the egg move has no known
+	 * breeding route (unobtainable), or null when unavailable (non-Relumi, no
+	 * generated data, or not an egg move).
+	 */
+	getEggMoveChainForMove(speciesId: ID, moveId: ID): EggMoveChain {
+		if (Dex.prefs('relumiShowLearnsetMethods') === false) return null;
+		if (!speciesId || !moveId) return null;
+
+		const search = this.props.search;
+		const isRelumi = search.dex.modid === 'gen8relumi' ||
+			(search.typedSearch?.format || '').includes('relumi');
+		if (!isRelumi) return null;
+
+		const chains = (window as any).BattleEggMoveChains;
+		if (!chains) return null;
+		const table = (window as any).BattleTeambuilderTable?.gen8relumi;
+		const firstId = PSSearchResults.staticGetFirstLearnsetId(speciesId, table?.learnsets, search.dex);
+		if (!firstId) return null;
+		const key = `${firstId}|${moveId}`;
+		const entry = chains[key];
+		if (entry === 'unobtainable') return { key, routes: [] }; // no breeding route
+		if (!Array.isArray(entry) || !entry.length) return null;
+		return {
+			key,
+			routes: entry.map((route: any) => ({
+				steps: route.s || [],
+				method: route.m || 'level',
+				level: route.l,
+			})),
+		};
+	}
+
+	/** Render the learn-method badge, with a breeding-route popover for egg moves. */
+	buildMoveMethodBadge(method: string | null, eggChain: EggMoveChain): string {
+		if (!method) return '';
+		// An empty route list marks an egg move with no known breeding route,
+		// so strike through the "Egg" label.
+		const unobtainable = eggChain?.routes.length === 0;
+		const cls = eggChain?.routes.length ? 'move-method-badge has-egg-chain' : 'move-method-badge';
+		const attrs = eggChain?.routes.length ? ` data-eggchain="${eggChain.key}"` : '';
+		const label = unobtainable ? method.replace('Egg', '<s>Egg</s>') : method;
+		return ` <span class="${cls}"${attrs}>${label}</span>`;
+	}
+
+	/** Format a single egg-move breeding route as a one-line description. */
+	formatEggMoveChainLine(route: EggMoveRoute): string {
+		const dex = this.props.search.dex;
+		const speciesName = (id: string) => {
+			const species = dex.species.get(id);
+			return species.exists ? species.name : id;
+		};
+		const phrase = this.eggMoveMethodPhrase(route.method, route.level);
+		if (route.steps.length === 1) {
+			return `Breed with ${speciesName(route.steps[0])} (learns it ${phrase})`;
+		}
+		const source = route.steps[route.steps.length - 1];
+		const chainNames = [...route.steps].reverse().map(speciesName).join(' \u2192 ');
+		return `Breed chain: ${chainNames} (${speciesName(source)} learns it ${phrase})`;
+	}
+
+	/** Human-readable learn phrase for a chain's natural source. */
+	eggMoveMethodPhrase(method: string, level?: number): string {
+		if (method === 'level') return `at Lv. ${level || 1}`;
+		if (method === 'tm') return 'via TM';
+		if (method === 'tutor') return 'via Tutor';
+		if (method === 'sketch') return 'via Sketch';
+		return 'naturally';
+	}
+
+	/** Build the egg-chain popover content: every route in one scrollable list. */
+	renderEggChainPopoverHTML(routes: EggMoveRoute[]): string {
+		return routes.map(route =>
+			`<div class="eggchain-route">${escapeHTML(this.formatEggMoveChainLine(route))}</div>`).join('');
+	}
+
+	getEggChainPopover(): HTMLElement {
+		if (this.eggChainPopover) return this.eggChainPopover;
+		const el = document.createElement('div');
+		el.className = 'eggchain-popover';
+		// Keep the popover open while the cursor is inside it so the list stays scrollable.
+		el.addEventListener('mouseenter', () => {
+			if (this.eggChainHideTimer) {
+				clearTimeout(this.eggChainHideTimer);
+				this.eggChainHideTimer = null;
+			}
+		});
+		el.addEventListener('mouseleave', () => this.hideEggChainPopover());
+		document.body.appendChild(el);
+		this.eggChainPopover = el;
+		return el;
+	}
+
+	showEggChainPopover(key: string, anchor: HTMLElement) {
+		const entry = (window as any).BattleEggMoveChains?.[key];
+		if (!Array.isArray(entry) || !entry.length) return;
+		const popover = this.getEggChainPopover();
+		if (this.eggChainKey !== key) {
+			const routes: EggMoveRoute[] = entry.map((route: any) => ({
+				steps: route.s || [], method: route.m || 'level', level: route.l,
+			}));
+			popover.innerHTML = this.renderEggChainPopoverHTML(routes);
+			this.eggChainKey = key;
+		}
+		// Position below the badge, clamped to the viewport width.
+		const rect = anchor.getBoundingClientRect();
+		popover.style.left = `${Math.max(4, Math.min(rect.left, window.innerWidth - 488))}px`;
+		popover.style.top = `${rect.bottom + 4}px`;
+		popover.classList.add('visible');
+		if (this.eggChainHideTimer) {
+			clearTimeout(this.eggChainHideTimer);
+			this.eggChainHideTimer = null;
+		}
+	}
+
+	hideEggChainPopover() {
+		if (this.eggChainHideTimer) {
+			clearTimeout(this.eggChainHideTimer);
+			this.eggChainHideTimer = null;
+		}
+		this.eggChainPopover?.classList.remove('visible');
+	}
+
+	scheduleEggChainHide() {
+		if (this.eggChainHideTimer) clearTimeout(this.eggChainHideTimer);
+		this.eggChainHideTimer = window.setTimeout(() => this.hideEggChainPopover(), 150);
+	}
+
+	/**
 	 * Standalone helper to compute the learnset method for a species→move pair.
 	 * Usable from outside PSSearchResults (e.g. the team editor).
 	 *
@@ -473,10 +610,11 @@ export class PSSearchResults extends preact.Component<{
 		if (search.filters) {
 			const moveFilter = search.filters.find(f => f[0] === 'move');
 			if (moveFilter) {
-				const method = this.getLearnsetMethodForMove(id, moveFilter[1] as ID);
-				if (method) {
-					moveMethodBadge = ` <span class="move-method-badge">${method}</span>`;
-				}
+				const moveId = moveFilter[1] as ID;
+				const method = this.getLearnsetMethodForMove(id, moveId);
+				const eggChain = method?.includes('Egg') ?
+					this.getEggMoveChainForMove(id, moveId) : null;
+				moveMethodBadge = this.buildMoveMethodBadge(method, eggChain);
 			}
 		}
 
@@ -640,6 +778,8 @@ export class PSSearchResults extends preact.Component<{
 		const typedSearch = this.props.search.typedSearch;
 		const speciesId = typedSearch?.species || '' as ID;
 		const method = this.getLearnsetMethodForMove(speciesId, id);
+		const eggChain = method?.includes('Egg') ?
+			this.getEggMoveChainForMove(speciesId, id) : null;
 		const fmtValue = (v: number | true) => v === true ? 'always' : String(v);
 		type MoveDiff = { vanilla: number | true, delta: number };
 		const fmtMoveTitle = (label: string, diff: MoveDiff | null, current: number | true) => {
@@ -653,7 +793,7 @@ export class PSSearchResults extends preact.Component<{
 
 		let buf = `<li class="result" value="${index}"><a href="${Dex.getLuminescentUrl('move', id)}" ` +
 			`class="${this.moveIds.includes(id) ? 'cur' : ''}" data-target="push" data-entry="${escapeHTML(entry)}">` +
-			`<span class="col movenamecol">${nameWithTitle}${method ? ` <span class="move-method-badge">${method}</span>` : ''}</span>`;
+			`<span class="col movenamecol">${nameWithTitle}${this.buildMoveMethodBadge(method, eggChain)}</span>`;
 
 		if (errorMessage) return `${buf}${errorMessage}</a></li>`;
 
@@ -933,6 +1073,24 @@ export class PSSearchResults extends preact.Component<{
 		}
 	};
 
+	handleMouseOver = (ev: MouseEvent) => {
+		let target = ev.target as HTMLElement | null;
+		while (target && target !== ev.currentTarget) {
+			const key = target.getAttribute?.('data-eggchain');
+			if (key) {
+				this.showEggChainPopover(key, target);
+				return;
+			}
+			target = target.parentElement;
+		}
+	};
+
+	handleMouseOut = (ev: MouseEvent) => {
+		const related = ev.relatedTarget as HTMLElement | null;
+		if (related && this.eggChainPopover?.contains(related)) return;
+		this.scheduleEggChainHide();
+	};
+
 	handleScroll = () => {
 		if (this.base?.scrollTop && document.documentElement.clientWidth === document.documentElement.scrollWidth) {
 			(this.base as any).scrollIntoViewIfNeeded?.();
@@ -1094,13 +1252,22 @@ export class PSSearchResults extends preact.Component<{
 		this.base?.removeEventListener('scroll', this.handleScroll);
 		this.props.search.resultsComponent = null;
 		if (this.scrollFrame) cancelAnimationFrame(this.scrollFrame);
+		if (this.eggChainHideTimer) clearTimeout(this.eggChainHideTimer);
+		this.eggChainPopover?.remove();
+		this.eggChainPopover = null;
 	}
 
 	override render() {
 		// the <ul> contents are uncontrolled
 		return <div class={this.props.class} style={this.props.style}>
 			{this.props.prepend}
-			<ul class="dexlist" onMouseDown={this.handleMouseDown} onClick={this.handleClick}></ul>
+			<ul
+				class="dexlist"
+				onMouseDown={this.handleMouseDown}
+				onClick={this.handleClick}
+				onMouseOver={this.handleMouseOver}
+				onMouseOut={this.handleMouseOut}
+			></ul>
 			{this.props.children}
 		</div>;
 	}
