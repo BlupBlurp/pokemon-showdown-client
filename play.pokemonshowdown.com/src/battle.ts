@@ -3489,6 +3489,9 @@ export class Battle {
 			if (this.tier.includes(`Champions`)) {
 				this.dex = Dex.mod('champions' as ID);
 			}
+			if (toID(this.tier).includes('relumi') && window.BattleTeambuilderTable?.gen8relumi) {
+				this.dex = Dex.mod('gen8relumi' as ID);
+			}
 			this.log(args);
 			break;
 		}
