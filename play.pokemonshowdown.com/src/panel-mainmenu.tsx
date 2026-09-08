@@ -778,7 +778,7 @@ class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
 						<p><a class={"mainmenu3 mainmenu" + onlineButton} href="ladder">{TL`Ladder`}</a></p>
 						<p><a class="mainmenu4 mainmenu button" href="battlestats">{TL`Stats`}</a></p>
 						<p><a class="mainmenu5 mainmenu button" href="damagecalc">{TL`Damage Calc`}</a></p>
-						<p><a class={"mainmenu6 mainmenu" + onlineButton} href="view-tournaments-all">{TL`Tournaments`}</a></p>
+						{/* <p><a class={"mainmenu6 mainmenu" + onlineButton} href="view-tournaments-all">{TL`Tournaments`}</a></p> */}
 					</div>
 
 					<div class="menugroup">
