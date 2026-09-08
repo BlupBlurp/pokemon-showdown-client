@@ -3763,6 +3763,7 @@
 
 			if (this.curTeam.format.includes('1v1') || this.curTeam.format.includes('categoryswap') ||
 				this.curTeam.format.includes('partnersincrime') || this.curTeam.format.includes('typesplit') ||
+				this.curTeam.format.includes('noholdsbarred') ||
 				this.curTeam.format.includes('champions')) return;
 			if (this.curTeam.format === 'gen7hiddentype') return;
 

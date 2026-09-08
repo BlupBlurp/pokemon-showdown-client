@@ -428,6 +428,7 @@ function toId() {
 					this.addRoom('lobby', null, true);
 				}
 				Storage.whenPrefsLoaded(function () {
+					Dex.loadTextData();
 					if (!Config.server.registered) {
 						app.send('/autojoin');
 						// Match the .html check used in the registered branch below so
