@@ -93,13 +93,14 @@ export class ChatRoom extends PSRoom {
 		}
 		return false;
 	}
-	override receiveLine(args: Args) {
+	override handleLine(args: Args): boolean {
+		if (super.handleLine(args)) return true;
 		switch (args[0]) {
 		case 'users':
 			const usernames = args[1].split(',');
 			const count = parseInt(usernames.shift()!, 10);
 			this.setUsers(count, usernames);
-			return;
+			return true;
 
 		case 'join': case 'j': case 'J':
 			this.addUser(args[1]);
@@ -120,7 +121,7 @@ export class ChatRoom extends PSRoom {
 		case 'tournament': case 'tournaments':
 			this.tour ||= new ChatTournament(this);
 			this.tour.receiveLine(args);
-			return;
+			return true;
 
 		case 'noinit':
 			if (this.connectMode === 'deleted') {
@@ -134,18 +135,18 @@ export class ChatRoom extends PSRoom {
 				this.connectError = args[2] || `Chatroom "${this.title}" not found`;
 			}
 			this.update(null);
-			return;
+			return true;
 		case 'expire':
 			this.connected = false;
 			this.connectMode = 'deleted';
 			this.connectError = args[1] || "This room has expired (you can't chat in it anymore)";
 			this.update(null);
-			return;
+			return true;
 
 		case 'chat': case 'c':
 			if (`${args[2]} `.startsWith('/challenge ')) {
 				this.updateChallenge(args[1], args[2].slice(11));
-				return;
+				return true;
 			} else if (args[2].startsWith('/warn ')) {
 				const reason = args[2].replace('/warn ', '');
 				PS.join(`rules-warn` as RoomID, {
@@ -155,7 +156,7 @@ export class ChatRoom extends PSRoom {
 					},
 					parentElem: null,
 				});
-				return;
+				return true;
 			}
 			// falls through
 		case 'c:':
@@ -176,7 +177,7 @@ export class ChatRoom extends PSRoom {
 		// 	this.joinLeave = null;
 		// 	break;
 		}
-		super.receiveLine(args);
+		return false;
 	}
 	override handleReconnect(msg: string): boolean | void {
 		let lines = msg.split('\n');
@@ -212,9 +213,11 @@ export class ChatRoom extends PSRoom {
 
 		if (lines.length) {
 			const timestamp = BattleLog.renderTimestamp(cutOffTime, PS.prefs.timestamps?.chatrooms);
-			this.receiveLine([`raw`, `<div class="infobox">${timestamp}You disconnected.</div>`]);
-			for (const line of lines) this.receiveLine(BattleTextParser.parseLine(line));
-			this.receiveLine(BattleTextParser.parseLine(reconnectMessage));
+			this.receiveBatch([
+				[`raw`, `<div class="infobox">${timestamp}You disconnected.</div>`],
+				...lines.map(line => BattleTextParser.parseLine(line)),
+				BattleTextParser.parseLine(reconnectMessage),
+			]);
 		}
 		this.update(null);
 		return true;
@@ -597,7 +600,7 @@ export class ChatRoom extends PSRoom {
 		'ffto,fastfowardto'(target, cmd, parentElem) {
 			if (!this.battle) return this.errorReply(TL`You are not in a battle`);
 			if (!target) {
-				PS.prompt("Turn number?", {
+				PS.prompt(TL`Turn number?`, {
 					defaultValue: `${this.battle.turn}`,
 					type: 'numeric',
 					okButton: TL`[Go]`,
