@@ -1503,7 +1503,23 @@ export class ModdedDex {
 		languages: () => Dex.text.languages(),
 		findLanguage: lang => Dex.text.findLanguage(lang),
 		get: (effect: TranslatableEffect, lang = Dex.text.getLanguage()) => {
-			return getTextEntry(effect, this.modid, this.gen, lang);
+			const entry = getTextEntry(effect, this.modid, this.gen, lang);
+			// Mods can override move/ability descriptions (e.g. Relumi's custom
+			// balance-change text). Prefer the modded effect's own descs over the
+			// vanilla BattleText entries when the mod table carries an override.
+			const table = window.BattleTeambuilderTable?.[this.modid];
+			if (table && (effect.effectType === 'Move' || effect.effectType === 'Ability')) {
+				const overrideData = effect.effectType === 'Move' ?
+					table.overrideMoveData?.[effect.id] :
+					table.overrideAbilityData?.[effect.id];
+				if (overrideData && (overrideData.shortDesc || overrideData.desc || overrideData.name)) {
+					const modded = effect as unknown as { name?: string, desc?: string, shortDesc?: string };
+					if (overrideData.name && typeof modded.name === 'string') entry.name = modded.name;
+					if (overrideData.shortDesc && typeof modded.shortDesc === 'string') entry.shortDesc = modded.shortDesc;
+					if (overrideData.desc && typeof modded.desc === 'string') entry.desc = modded.desc;
+				}
+			}
+			return entry;
 		},
 	};
 	moves = {
