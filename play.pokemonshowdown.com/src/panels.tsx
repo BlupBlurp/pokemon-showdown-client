@@ -198,7 +198,6 @@ export class PSRoomPanel<T extends PSRoom = PSRoom> extends preact.Component<{ r
 		return subscription;
 	}
 	override componentDidMount() {
-		this.props.room.onRequestFocus = options => this.focus(options);
 		this.subscriptions.push(this.props.room.subscribe(args => {
 			if (!args) this.forceUpdate();
 			else this.receiveLine(args);
@@ -237,14 +236,13 @@ export class PSRoomPanel<T extends PSRoom = PSRoom> extends preact.Component<{ r
 		const currentlyHidden = !room.width && room.parentElem && ['popup', 'modal-popup'].includes(room.location);
 		this.updateDimensions();
 		if (currentlyHidden) return;
-		if (room.focusNextUpdate) {
-			const focusOptions = room.focusNextUpdate === true ? undefined : room.focusNextUpdate;
-			room.focusNextUpdate = false;
-			this.focus(focusOptions);
+		if (PS.pendingFocus?.room === room) {
+			const { options } = PS.pendingFocus;
+			PS.pendingFocus = null;
+			this.focus(options);
 		}
 	}
 	override componentWillUnmount() {
-		this.props.room.onRequestFocus = null;
 		for (const subscription of this.subscriptions) {
 			subscription.unsubscribe();
 		}
@@ -275,11 +273,20 @@ export class PSRoomPanel<T extends PSRoom = PSRoom> extends preact.Component<{ r
 		PS.closePopup();
 	}
 	focus(options?: PSRoomFocusOptions) {
-		if (!options?.preventScroll && !PS.isPopup(this.props.room)) PSView.scrollToRoom();
+		const room = this.props.room;
+		if (!options?.preventScroll && !PS.isPopup(room)) {
+			PSView.scrollToRoom();
+			if (room.location === 'mini-window') {
+				this.base?.closest<HTMLElement>('.mini-window')?.scrollIntoView({
+					block: 'nearest',
+					inline: 'nearest',
+				});
+			}
+		}
 		if (PSView.hasTapped) return;
 
 		const autofocus = this.base?.querySelector<HTMLElement>('.autofocus');
-		PSView.politeFocus(autofocus);
+		PSView.politeFocus(autofocus || (PS.isPopup(room) ? this.base! : null));
 		(autofocus as HTMLInputElement)?.select?.();
 	}
 	override render() {
@@ -326,7 +333,10 @@ export function PSPanelWrapper(props: {
 	}
 	if (PS.isPopup(room)) {
 		const style = PSView.getPopupStyle(room, props.width, props.fullSize);
-		return <div class="ps-popup" id={`room-${room.id}`} style={style} onDragEnter={props.onDragEnter}>
+		// tabIndex -1 makes it focusable but not tabbable, for use as a default focus
+		return <div
+			class="ps-popup" id={`room-${room.id}`} style={style} tabIndex={-1} onDragEnter={props.onDragEnter}
+		>
 			{contents}
 		</div>;
 	}
@@ -1347,8 +1357,12 @@ export class PSView extends preact.Component {
 				}
 			}
 			PS.alert(
-				`Sorry, we don't know what to do with that file.\n\nSupported file types:\n` +
-				`- images (to set your background)\n- downloaded replay files\n- team files`
+				TL`Sorry, we don't know what to do with that file.
+
+Supported file types:
+- images (to set your background)
+- downloaded replay files
+- team files`
 			);
 			PS.dragging = null;
 		});
@@ -1412,7 +1426,8 @@ export class PSView extends preact.Component {
 
 		if (window.getSelection?.()?.type === 'Range') return;
 		room.autoDismissNotifications();
-		PS.setFocus(room);
+		PS.queueFocus(room);
+		room.update(null);
 	};
 	handleClickOverlay = (ev: MouseEvent) => {
 		// iOS Safari bug, no global click events when tapping
@@ -1561,7 +1576,6 @@ export class PSView extends preact.Component {
 			return { maxWidth: maxWidth || 480 };
 		}
 		if (!room.width || !room.height) {
-			room.focusNextUpdate = true;
 			// dimensions unknown; render hidden at top-left so width/height can be grabbed
 			// next render will be able to calculate position
 			return {
@@ -1727,33 +1741,33 @@ export function PSIcon(
 		}
 		const sanitizedType = typeName.replace(/\?/g, '%3f');
 		return <img
-			src={`${Dex.resourcePrefix}sprites/types/${sanitizedType}.png`} alt={Dex.text.typeName(typeName)}
+			src={`${Dex.resourcePrefix}sprites/types/${sanitizedType}.png`} alt={TL.type[typeName] || typeName}
 			height="14" width="32" class={`pixelated${props.b ? ' b' : ''}`} style="vertical-align:middle"
 		/>;
 	}
 	if ('category' in props) {
 		const categoryID = toID(props.category);
-		let sanitizedCategory = '';
+		let categoryName = '';
 		switch (categoryID) {
 		case 'physical':
 		case 'special':
 		case 'status':
-			sanitizedCategory = categoryID.charAt(0).toUpperCase() + categoryID.slice(1);
+			categoryName = categoryID.charAt(0).toUpperCase() + categoryID.slice(1);
 			break;
 		default:
-			sanitizedCategory = 'undefined';
+			categoryName = 'undefined';
 			break;
 		}
 		return <img
-			src={`${Dex.resourcePrefix}sprites/categories/${sanitizedCategory}.png`}
-			alt={Dex.text.categoryName(sanitizedCategory)}
+			src={`${Dex.resourcePrefix}sprites/categories/${categoryName}.png`}
+			alt={TL.tag[categoryID] || categoryName}
 			height="14" width="32" class="pixelated" style="vertical-align:middle"
 		/>;
 	}
 	if ('gender' in props) {
 		return <img
 			src={`${Dex.resourcePrefix}sprites/misc/gender-${props.gender.toLowerCase()}.png`}
-			width={18} height={18} alt={Dex.text.genderName(props.gender)} style="margin-top: -1px; filter: grayscale(30%)"
+			width={18} height={18} alt={TL.gender[props.gender] || props.gender} style="margin-top: -1px; filter: grayscale(30%)"
 		/>;
 	}
 	return null!;

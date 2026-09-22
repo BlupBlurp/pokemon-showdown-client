@@ -398,7 +398,7 @@ export class BattleLog {
 			break;
 
 		case 'tier':
-			this.addDiv('', `<small>${TL.label(TL.term.format || 'Format')}</small><br /><strong>` + BattleLog.escapeHTML(args[1]) + '</strong>');
+			this.addDiv('', `<small>${TL.label(TL`Format`)}</small><br /><strong>` + BattleLog.escapeHTML(args[1]) + '</strong>');
 			break;
 
 		case 'turn':
@@ -958,7 +958,7 @@ export class BattleLog {
 	static parseLogMessage(message: string): [string, string] {
 		const messages = message.split('\n').map(line => {
 			line = BattleLog.escapeHTML(line);
-			line = line.replace(/\*\*(.*)\*\*/, '<strong>$1</strong>');
+			line = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 			line = line.replace(/\|\|([^|]*)\|\|([^|]*)\|\|/, '<abbr title="$1">$2</abbr>');
 			if (line.startsWith('  ')) line = '<small>' + line.trim() + '</small>';
 			return line;
