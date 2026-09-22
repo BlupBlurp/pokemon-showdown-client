@@ -2,7 +2,7 @@
   "component": {
     "type": 17,
     "spoiler": false,
-    "accent_color": 13369344,
+    "accent_color": 15777864,
     "components": [
       {
         "type": 9,
@@ -20,7 +20,7 @@
       {
         "type": 12,
         "items": [
-          { "media": { "url": "https://play.relumishowdown.dpdns.org/pokemonshowdownbeta.png" } }
+          { "media": { "url": "https://play.relumishowdown.dpdns.org/pokemonshowdownbeta@2x.png" } }
         ]
       },
       {
