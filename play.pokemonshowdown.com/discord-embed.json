@@ -1,0 +1,49 @@
+{
+  "component": {
+    "type": 17,
+    "spoiler": false,
+    "accent_color": 13369344,
+    "components": [
+      {
+        "type": 9,
+        "components": [
+          {
+            "type": 10,
+            "content": "# **[Relumi Showdown](https://play.relumishowdown.dpdns.org/)**\nA custom Pokémon battle simulator based on *Re:Illuminated Platinum* (Relumi), a BDSP romhack. Features in-game accurate balance changes, Random Battle sets curated from in-game teams, and many unique additions."
+          }
+        ],
+        "accessory": {
+          "type": 11,
+          "media": { "url": "https://play.relumishowdown.dpdns.org/pokemonshowdownbeta.png" }
+        }
+      },
+      {
+        "type": 14,
+        "spacing": 1
+      },
+      {
+        "type": 1,
+        "components": [
+          {
+            "type": 2,
+            "style": 5,
+            "url": "https://play.relumishowdown.dpdns.org/",
+            "label": "Play Now"
+          },
+          {
+            "type": 2,
+            "style": 5,
+            "url": "https://calc.relumishowdown.dpdns.org",
+            "label": "Damage Calc"
+          },
+          {
+            "type": 2,
+            "style": 5,
+            "url": "https://www.nexusmods.com/pokemonbdsp/mods/1",
+            "label": "Download Re:Illuminated Platinum"
+          }
+        ]
+      }
+    ]
+  }
+}
