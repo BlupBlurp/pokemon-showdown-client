@@ -9,13 +9,19 @@
         "components": [
           {
             "type": 10,
-            "content": "# **[Relumi Showdown](https://play.relumishowdown.dpdns.org/)**\nA custom Pokémon battle simulator based on *Re:Illuminated Platinum* (Relumi), a BDSP romhack. Features in-game accurate balance changes, Random Battle sets curated from in-game teams, and many unique additions."
+            "content": "# **[Relumi Showdown](https://play.relumishowdown.dpdns.org/)**\nA custom Pokémon battle simulator based on *Re:Illuminated Platinum* (Relumi), a BDSP romhack.\n\nFeatures in-game accurate balance changes, Random Battle sets curated from in-game teams, and many unique additions."
           }
         ],
         "accessory": {
           "type": 11,
-          "media": { "url": "https://play.relumishowdown.dpdns.org/pokemonshowdownbeta.png" }
+          "media": { "url": "https://play.relumishowdown.dpdns.org/sprites/ani/giratina-origin.gif" }
         }
+      },
+      {
+        "type": 12,
+        "items": [
+          { "media": { "url": "https://play.relumishowdown.dpdns.org/pokemonshowdownbeta.png" } }
+        ]
       },
       {
         "type": 14,
