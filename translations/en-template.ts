@@ -288,7 +288,7 @@ export const translations: TranslationCatalog = {
 	"Wait for this countdown to finish first...": null,
 	"You're already searching for a {FORMAT} battle...": null,
 	"You need to go into the Teambuilder and build a team for this format.": null,
-	"Stats": null,
+	// "Stats": null, // Not needed since already included in data/text/ui-template.ts
 	"Damage Calc": null,
 	"Discord": null,
 

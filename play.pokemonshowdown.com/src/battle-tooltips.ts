@@ -1808,6 +1808,7 @@ export class BattleTooltips {
 			return `${bullet} ${TL(move)} <small>(0/${maxpp})</small>`;
 		}
 		if (ppUsed || moveName.startsWith('*')) {
+			if (typeof ppUsed === 'number') {
 				return `${bullet} ${TL(move)} <small>(${maxpp - ppUsed}/${maxpp})</small>`;
 			} else {
 				const low = `${maxpp - ppUsed[0]}/${maxpp}`;
