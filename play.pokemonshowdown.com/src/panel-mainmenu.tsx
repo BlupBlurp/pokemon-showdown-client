@@ -146,7 +146,10 @@ export class MainMenuRoom extends PSRoom {
 			}
 			void Dex.loadTextData().then(() => PS.updateTranslatedText());
 			PS.user.setName(fullName, named, avatar);
-			PS.teams.loadRemoteTeams();
+			// Only load remote teams when logged in (named), otherwise
+			// the server returns 'Not logged in' for guest users.
+			// This prevents an annoying error from appearing.
+			if (named) PS.teams.loadRemoteTeams();
 			return true;
 		} case 'updatechallenges': {
 			const [, challengesBuf] = args;
