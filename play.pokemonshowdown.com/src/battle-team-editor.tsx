@@ -61,20 +61,11 @@ export class TeamEditorState extends PSModel {
 		index: number,
 	} | null = null;
 	search = new DexSearch();
-	format: ID = `gen${this.gen}` as ID;
+	format = Dex.formats.get(`gen${this.gen}`);
 	originalSpecies: string | null = null;
 	narrow = false;
 	narrowStats = false;
 	innerFocus: InnerFocusState | null = null;
-	isLetsGo = false;
-	isNatDex = false;
-	isBDSP = false;
-	isRelumi = false;
-	isRelumiTesting = false;
-	isChampions = false;
-	formeLegality: 'normal' | 'hackmons' | 'custom' = 'normal';
-	abilityLegality: 'normal' | 'hackmons' = 'normal';
-	defaultLevel = 100;
 	readonly = false;
 	fetching = false;
 	handleParentKeyDown?: (ev: KeyboardEvent) => boolean | void;
@@ -94,50 +85,15 @@ export class TeamEditorState extends PSModel {
 		this.readonly = readonly;
 	}
 	setFormat(format: string) {
-		const team = this.team;
-		const formatid = toID(format);
-		this.format = formatid;
-		team.format = formatid;
-		this.dex = Dex.forFormat(formatid);
-		if (formatid.includes('relumi')) {
-			this.dex = Dex.mod('gen8relumi' as ID);
-		}
+		this.format = Dex.formats.get(format);
+		this.team.format = this.format.id;
+		// Dex.forFormat instead of Dex.mod(this.format.mod) so Relumi formats
+		// reliably resolve to the gen8relumi mod even if this Format was cached
+		// before the Relumi teambuilder table loaded.
+		this.dex = Dex.forFormat(this.format.id);
 		this.gen = this.dex.gen;
-
-		format = toID(format).slice(4);
-		this.isLetsGo = formatid.includes('letsgo');
-		this.isNatDex = formatid.includes('nationaldex') || formatid.includes('natdex');
-		this.isBDSP = formatid.includes('bdsp');
-		this.isRelumi = formatid.includes('relumi');
-		this.isRelumiTesting = this.isRelumi && formatid.includes('testing');
-		this.isChampions = formatid.includes('champions');
-		if (formatid.includes('almostanyability') || formatid.includes('aaa')) {
-			this.abilityLegality = 'hackmons';
-		} else {
-			this.abilityLegality = 'normal';
-		}
-		if (formatid.includes('hackmons') || formatid.includes('bh')) {
-			this.formeLegality = 'hackmons';
-			this.abilityLegality = 'hackmons';
-		} else if (formatid.includes('metronome') || formatid.includes('customgame')) {
-			this.formeLegality = 'custom';
-			this.abilityLegality = 'hackmons';
-		} else {
-			this.formeLegality = 'normal';
-		}
-
-		this.defaultLevel = 100;
-		if (
-			formatid.includes('vgc') || formatid.includes('bss') || formatid.includes('ultrasinnohclassic') ||
-			formatid.includes('battlespot') || formatid.includes('battlestadium') || formatid.includes('battlefestival') ||
-			formatid.includes('letsgo') || formatid.includes('champions')
-		) {
-			this.defaultLevel = 50;
-		}
-		if (formatid.includes('lc')) {
-			this.defaultLevel = 5;
-		}
 	}
+
 	stringifyFocus(focus: FocusState | null): string {
 		if (!focus) return '';
 		return `set-${focus.setIndex}-${focus.type}${focus.typeIndex >= 0 ? `-${focus.typeIndex}` : ''}`;
@@ -201,7 +157,7 @@ export class TeamEditorState extends PSModel {
 	}
 	setSearchType(type: SearchType, i: number, value?: string, typeIndex = -1) {
 		const set = this.sets[i];
-		this.search.setType(type, this.format, set);
+		this.search.setType(type, this.format.id, set);
 		this.originalSpecies = null;
 		this.search.prependResults = null;
 		if (type === 'move') {
@@ -476,10 +432,10 @@ export class TeamEditorState extends PSModel {
 		return this.sets.length < 6 || this.team.isBox;
 	}
 	showItem(set: Dex.PokemonSet) {
-		return !!(this.gen > 1 && !this.isLetsGo || set.item);
+		return !!(this.gen > 1 && !this.format.isLetsGo || set.item);
 	}
 	showAbility(set: Dex.PokemonSet) {
-		return !!(this.gen > 2 && !this.isLetsGo || set.ability);
+		return !!(this.gen > 2 && !this.format.isLetsGo || set.ability);
 	}
 	getHPType(set: Dex.PokemonSet): Dex.TypeName {
 		if (set.hpType) return set.hpType as Dex.TypeName;
@@ -546,7 +502,7 @@ export class TeamEditorState extends PSModel {
 	defaultIVs(set: Dex.PokemonSet, noGuess = !!set.ivs): Record<Dex.StatName, number> {
 		const useIVs = this.gen > 2;
 		const defaultIVs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
-		if (this.isChampions) return defaultIVs;
+		if (this.format.isChampions) return defaultIVs;
 		if (!useIVs) {
 			for (const stat of Dex.statNames) defaultIVs[stat] = 15;
 		}
@@ -604,11 +560,11 @@ export class TeamEditorState extends PSModel {
 		if (set.species.startsWith('Terapagos')) minSpe = false;
 
 		const preferMaxAtkFormats = ['1v1', 'categoryswap', 'noholdsbarred', 'partnersincrime', 'typesplit'];
-		if (preferMaxAtkFormats.some(f => this.format.includes(f))) {
+		if (preferMaxAtkFormats.some(f => this.format.id.includes(f))) {
 			minAtk = false;
 			return { minAtk, minSpe };
 		}
-		if (this.format === 'gen7hiddentype') return { minAtk, minSpe };
+		if (this.format.id === 'gen7hiddentype') return { minAtk, minSpe };
 
 		// only available through an event with 31 Atk IVs
 		if (set.ability === 'Battle Bond' || ['Koraidon', 'Miraidon', 'Gimmighoul-Roaming'].includes(set.species)) {
@@ -642,10 +598,10 @@ export class TeamEditorState extends PSModel {
 		return set.name || this.dex.species.get(set.species).baseSpecies || '';
 	}
 	canHyperTrain(set: Dex.PokemonSet) {
-		let format: string = this.format;
+		let format: string = this.format.id;
 		if (this.gen < 7 || format === 'gen7hiddentype') return false;
-		if ((set.level || this.defaultLevel) === 100) return true;
-		if ((set.level || this.defaultLevel) >= 50 && this.defaultLevel === 50) return true;
+		if ((set.level || this.format.defaultLevel) === 100) return true;
+		if ((set.level || this.format.defaultLevel) >= 50 && this.format.defaultLevel === 50) return true;
 		return false;
 	}
 	getHPIVs(hpType: Dex.TypeName | null) {
@@ -692,23 +648,23 @@ export class TeamEditorState extends PSModel {
 		const species = this.dex.species.get(set.species);
 		if (!species.exists) return 0;
 
-		const level = set.level || this.defaultLevel;
+		const level = set.level || this.format.defaultLevel;
 
 		let baseStat = species.baseStats[stat];
-		if (set.customBaseStats?.[stat] !== undefined && this.isRelumiTesting) {
+		if (set.customBaseStats?.[stat] !== undefined && this.format.isRelumiTesting) {
 			baseStat = set.customBaseStats[stat]!;
 		}
 		const iv = ivOverride;
 		let ev = evOverride ?? set.evs?.[stat] ?? (this.gen > 2 ? 0 : 252);
-		if (this.isChampions) ev *= 8;
+		if (this.format.isChampions) ev *= 8;
 
 		if (stat === 'hp') {
 			if (baseStat === 1) return 1;
-			if (this.isLetsGo) return Math.trunc(Math.trunc(2 * baseStat + iv + 100) * level / 100 + 10) + ev;
+			if (this.format.isLetsGo) return Math.trunc(Math.trunc(2 * baseStat + iv + 100) * level / 100 + 10) + ev;
 			return Math.trunc(Math.trunc(2 * baseStat + iv + Math.trunc(ev / 4) + 100) * level / 100 + 10);
 		}
 		let val = Math.trunc(Math.trunc(2 * baseStat + iv + Math.trunc(ev / 4)) * level / 100 + 5);
-		if (this.isLetsGo) {
+		if (this.format.isLetsGo) {
 			val = Math.trunc(Math.trunc(2 * baseStat + iv) * level / 100 + 5);
 		}
 		if (natureOverride) {
@@ -718,7 +674,7 @@ export class TeamEditorState extends PSModel {
 		} else if (BattleNatures[set.nature!]?.minus === stat) {
 			val *= 0.9;
 		}
-		if (this.isLetsGo) {
+		if (this.format.isLetsGo) {
 			const friendshipValue = Math.trunc((70 / 255 / 10 + 1) * 100);
 			val = Math.trunc(val) * friendshipValue / 100 + ev;
 		}
@@ -734,8 +690,8 @@ export class TeamEditorState extends PSModel {
 		this.save();
 	}
 	/** Returns the types the set currently uses, accounting for RelumiTesting custom types. */
-	getDisplayTypes(set: Dex.PokemonSet, species: Species): readonly Dex.TypeName[] {
-		if (this.isRelumiTesting && set.customTypes?.length) return set.customTypes;
+	getDisplayTypes(set: Dex.PokemonSet, species: Dex.Species): readonly Dex.TypeName[] {
+		if (this.format.isRelumiTesting && set.customTypes?.length) return set.customTypes;
 		return species.types;
 	}
 	getTypeWeakness(type: Dex.TypeName, attackType: Dex.TypeName): 0 | 0.5 | 1 | 2 {
@@ -868,13 +824,13 @@ export class TeamEditorState extends PSModel {
 		return counters;
 	}
 	getDefaultAbility(set: Dex.PokemonSet) {
-		if (this.gen < 3 || this.isLetsGo || this.formeLegality === 'custom') return set.ability;
+		if (this.gen < 3 || this.format.isLetsGo || this.format.formeLegality === 'custom') return set.ability;
 		const species = this.dex.species.get(set.species);
-		if (this.formeLegality === 'hackmons') {
+		if (this.format.formeLegality === 'hackmons') {
 			// TODO: support gen 9 hackmons forme legality more completely than this
 			if (this.gen < 9 || species.baseSpecies !== 'Xerneas') return set.ability;
 			// falls through to final return statement
-		} else if (this.abilityLegality === 'hackmons') {
+		} else if (this.format.abilityLegality === 'hackmons') {
 			if (!species.battleOnly) return set.ability;
 			if (species.requiredItems.length || species.baseSpecies === 'Meloetta') return set.ability;
 			// battle only species only ever have one ability
@@ -890,13 +846,13 @@ export class TeamEditorState extends PSModel {
 	getDefaultItem(speciesName: string) {
 		const species = this.dex.species.get(speciesName);
 		let items = species.requiredItems;
-		if (this.gen !== 7 && !this.isNatDex) {
+		if (this.gen !== 7 && !this.format.isNatDex) {
 			// Require plates on Arceus when Z crystals don't exist
 			items = items.filter(i => !i.endsWith('ium Z'));
 		}
 		if (items.length === 1) {
-			if (this.formeLegality === 'normal' ||
-				this.formeLegality === 'hackmons' && this.gen === 9 && species.battleOnly &&
+			if (this.format.formeLegality === 'normal' ||
+				this.format.formeLegality === 'hackmons' && this.gen === 9 && species.battleOnly &&
 				!species.isMega && !species.isPrimal && species.name !== 'Necrozma-Ultra') {
 				return items[0];
 			}
@@ -941,9 +897,9 @@ export class TeamEditorState extends PSModel {
 	}
 	/** returns null if sample sets aren't done loading */
 	getSampleSets(set: Dex.PokemonSet): string[] | null {
-		const d = TeamEditorState.sampleSets[this.format];
+		const d = TeamEditorState.sampleSets[this.format.id];
 		if (d === undefined) {
-			this.fetchSampleSets(this.format);
+			this.fetchSampleSets(this.format.id);
 			return null;
 		}
 		if (!d?.dex) return [];
@@ -958,11 +914,11 @@ export class TeamEditorState extends PSModel {
 	}
 	/** returns null if no boxes exist, empty array if no sets for this species */
 	getUserSets(set: Dex.PokemonSet): { [setName: string]: Dex.PokemonSet } | null {
-		if (!this.userSetsCache[this.format]) {
+		if (!this.userSetsCache[this.format.id]) {
 			const userSets: { [species: string]: { [setName: string]: Dex.PokemonSet } } = {};
 
 			for (const team of window.PS?.teams.list || []) {
-				if (team.format !== this.format || !team.isBox) continue;
+				if (team.format !== this.format.id || !team.isBox) continue;
 
 				const setList = Teams.unpack(team.packedTeam);
 				const duplicateNameIndices: Record<string, number> = {};
@@ -979,10 +935,10 @@ export class TeamEditorState extends PSModel {
 				}
 			}
 
-			this.userSetsCache[this.format] = userSets;
+			this.userSetsCache[this.format.id] = userSets;
 		}
 
-		const cachedSets = this.userSetsCache[this.format];
+		const cachedSets = this.userSetsCache[this.format.id];
 		if (Object.keys(cachedSets).length === 0) return null;
 		return cachedSets[set.species] || {};
 	}
@@ -991,7 +947,7 @@ export class TeamEditorState extends PSModel {
 		const set = this.sets[setIndex];
 		if (!set?.species) return false;
 
-		const data = TeamEditorState.sampleSets?.[this.format];
+		const data = TeamEditorState.sampleSets?.[this.format.id];
 		const sid = toID(set.species);
 		const setTemplate = data?.dex?.[set.species]?.[setName] ?? data?.dex?.[sid]?.[setName] ??
 			data?.stats?.[set.species]?.[setName] ?? data?.stats?.[sid]?.[setName];
@@ -1261,7 +1217,7 @@ export class TeamEditor extends preact.Component<{
 		const narrow = this.props.narrow ?? window.innerWidth < 500;
 		editor.narrow = !useZoomedOutForms && narrow;
 		editor.narrowStats = useZoomedOutForms || narrow;
-		if (this.props.team.format !== editor.format) {
+		if (this.props.team.format !== editor.format.id) {
 			editor.setFormat(this.props.team.format);
 		}
 		const useSpaciousCSS = spacious && !mobileOptions || useZoomedOutForms;
@@ -1956,12 +1912,12 @@ class TeamTextbox extends preact.Component<{
 
 		return <button class="textbox setdetails" name="details" value={i} onClick={this.clickDetails}>
 			<span class="detailcell">
-				<label>{TL`Level`}</label>{set.level || editor.defaultLevel}
+				<label>{TL`Level`}</label>{set.level || editor.format.defaultLevel}
 			</span>
 			<span class="detailcell">
 				<label>{TL`Shiny`}</label>{set.shiny ? 'Yes' : '\u2014'}
 			</span>
-			{editor.gen === 9 && !editor.isChampions ? (
+			{editor.gen === 9 && !editor.format.isChampions ? (
 				<span class="detailcell">
 					<label>{TL`Tera`}</label><PSIcon
 						type={set.teraType || species.requiredTeraType || editor.getDisplayTypes(set, species)[0]}
@@ -2046,14 +2002,14 @@ class TeamTextbox extends preact.Component<{
 						if (!num) return null;
 
 						if (editor.narrow) {
-							const displayTypes = (editor.isRelumiTesting && set.customTypes?.length ? set.customTypes : species.types);
+							const displayTypes = (editor.format.isRelumiTesting && set.customTypes?.length ? set.customTypes : species.types);
 							return <div style={`top:${prevOffset + 1}px;left:5px;position:absolute;text-align:center;pointer-events:none`}>
 								<div><PSIcon pokemon={species.id} /></div>
 								{displayTypes.map(type => <div><PSIcon type={type} /></div>)}
 								<div><PSIcon item={set.item || null} /></div>
 							</div>;
 						}
-						const displayTypes = (editor.isRelumiTesting && set.customTypes?.length ? set.customTypes : species.types);
+						const displayTypes = (editor.format.isRelumiTesting && set.customTypes?.length ? set.customTypes : species.types);
 						const spriteData = Dex.getTeambuilderSpriteData(set, editor.dex);
 						return [<div
 							class={spriteData.pixelated ? 'pixelated' : ''}
@@ -2927,7 +2883,7 @@ class TeamEditorForm extends preact.Component<{
 	}
 	getOuterSetButton(focus: NonNullable<TeamEditorState['innerFocus']>) {
 		if (focus.setIndex >= this.props.editor.sets.length) return null;
-		return this.base!.querySelectorAll<HTMLElement>('.teameditor > .set-form')[focus.setIndex] || null;
+		return this.base!.querySelector<HTMLElement>(`.set-form[data-set-index="${focus.setIndex}"]`);
 	}
 	removeDuplicateMove(name: string) {
 		const { editor } = this.props;
@@ -3012,7 +2968,7 @@ class TeamEditorForm extends preact.Component<{
 			) || this.base!.querySelector<HTMLButtonElement>(
 				`.team-focus-editor .tabbar button[name=addpokemon]`
 			) || this.base!.querySelector<HTMLButtonElement>(
-				`.teameditor > .set-form button[name=delete][value="${focus.setIndex}"]`
+				`.set-list > .set-form button[name=delete][value="${focus.setIndex}"]`
 			) || this.base!.querySelector<HTMLButtonElement>(
 				`.teameditor button[name=addpokemon]`
 			);
@@ -3152,7 +3108,7 @@ class TeamEditorForm extends preact.Component<{
 							>
 								<span class="detailcell">
 									<label>{TL`Level`}</label> {}
-									{set.level || editor.defaultLevel}
+									{set.level || editor.format.defaultLevel}
 								</span>
 								{!!(set.shiny || editor.gen >= 2) && <span class="detailcell">
 									<label>{TL`Shiny`}</label> {}
@@ -3160,7 +3116,7 @@ class TeamEditorForm extends preact.Component<{
 										src={`${Dex.resourcePrefix}sprites/misc/shiny.png`} width={18} height={18} alt="Yes" style="margin-top: -2px"
 									/> : '\u2014'}
 								</span>}
-								{editor.gen === 9 && !editor.isChampions && <span class="detailcell">
+								{editor.gen === 9 && !editor.format.isChampions && <span class="detailcell">
 									<label>{TL`Tera`}</label> {}
 									<PSIcon type={set.teraType || species.requiredTeraType || editor.getDisplayTypes(set, species)[0]} new={!editor.narrow} tera />
 								</span>}
@@ -3428,8 +3384,8 @@ class StatForm extends preact.Component<{
 			const stat = editor.getStat(statID, set, ivs[statID]);
 			let ev: number | string = set.evs ? (set.evs[statID] || 0) : defaultEV;
 			const maxStat = statID === 'hp' ?
-				Math.floor(176 * editor.defaultLevel / 25) + 10 :
-				Math.floor(247 * editor.defaultLevel / 50) + 5;
+				Math.floor(176 * editor.format.defaultLevel / 25) + 10 :
+				Math.floor(247 * editor.format.defaultLevel / 50) + 5;
 			const width = Math.min(stat * 75 / maxStat, 75);
 			const hue = Math.min(Math.floor(stat * 180 / maxStat), 360);
 			const statName = editor.gen === 1 && statID === 'spa' ? TL.statShort.spc : TL.statShort[statID];
@@ -3457,7 +3413,7 @@ class StatForm extends preact.Component<{
 		const hpIVdata = hpType && !editor.canHyperTrain(set) && editor.getHPIVs(hpType) || null;
 		const autoSpread = set.ivs && editor.defaultIVs(set, false);
 		const autoSpreadValue = autoSpread && Object.values(autoSpread).join('/');
-		if (editor.isChampions) return null;
+		if (editor.format.isChampions) return null;
 		if (!hpIVdata) {
 			return <select name="ivspread" class="select" onChange={this.changeIVSpread}>
 				<option value="" selected>{TL`IV spreads`}</option>
@@ -3511,7 +3467,7 @@ class StatForm extends preact.Component<{
 	smogdexLink(s: string) {
 		const { editor } = this.props;
 		const species = editor.dex.species.get(s);
-		let format: string = editor.format;
+		let format: string = editor.format.id;
 		let smogdexid: string = toID(species.baseSpecies);
 
 		if (species.id === 'meowstic') {
@@ -3639,7 +3595,7 @@ class StatForm extends preact.Component<{
 		</p>;
 	}
 	renderStatOptimizer() {
-		const optimized = BattleStatOptimizer(this.props.set, this.props.editor.format);
+		const optimized = BattleStatOptimizer(this.props.set, this.props.editor.format.id);
 		if (!optimized) return null;
 
 		return <p>
@@ -3692,13 +3648,29 @@ class StatForm extends preact.Component<{
 	override componentDidUpdate(): void {
 		this.update();
 	}
+	override componentWillUnmount(): void {
+		this.endEVSliderDrag();
+	}
+	draggingEVSlider: HTMLInputElement | null = null;
+	startEVSliderDrag = (ev: PointerEvent) => {
+		this.draggingEVSlider = ev.currentTarget as HTMLInputElement;
+		window.addEventListener('pointerup', this.endEVSliderDrag);
+		window.addEventListener('pointercancel', this.endEVSliderDrag);
+		window.addEventListener('blur', this.endEVSliderDrag);
+	};
+	endEVSliderDrag = () => {
+		this.draggingEVSlider = null;
+		window.removeEventListener('pointerup', this.endEVSliderDrag);
+		window.removeEventListener('pointercancel', this.endEVSliderDrag);
+		window.removeEventListener('blur', this.endEVSliderDrag);
+	};
 	plus: Dex.StatNameExceptHP | null = null;
 	minus: Dex.StatNameExceptHP | null = null;
 	renderStatbar(stat: number, statID: StatName) {
 		const { editor } = this.props;
 		const maxStat = statID === 'hp' ?
-			Math.floor(176 * editor.defaultLevel / 25) + 10 :
-			Math.floor(247 * editor.defaultLevel / 50) + 5;
+			Math.floor(176 * editor.format.defaultLevel / 25) + 10 :
+			Math.floor(247 * editor.format.defaultLevel / 50) + 5;
 		const width = Math.min(stat * 180 / maxStat, 180);
 		const hue = Math.min(Math.floor(stat * 180 / maxStat), 360);
 		return <span
@@ -3707,14 +3679,15 @@ class StatForm extends preact.Component<{
 	}
 	changeEV = (ev: Event) => {
 		const target = ev.currentTarget as HTMLInputElement;
-		const { set } = this.props;
+		const { editor, set } = this.props;
 		const statID = target.name.split('-')[1] as Dex.StatName;
+		const previousValue = set.evs?.[statID] ?? (editor.gen <= 2 && !set.evs ? 252 : 0);
 		let value = Math.abs(parseInt(target.value));
 
 		if (isNaN(value)) {
 			if (set.evs) delete set.evs[statID];
 		} else {
-			if (this.maxEVs() < 6 * 252 || this.props.editor.isLetsGo) {
+			if (this.maxEVs() < 6 * 252 || this.props.editor.format.isLetsGo) {
 				set.evs ||= {};
 			} else {
 				set.evs ||= { hp: 252, atk: 252, def: 252, spa: 252, spd: 252, spe: 252 };
@@ -3723,6 +3696,18 @@ class StatForm extends preact.Component<{
 		}
 
 		if (target.type === 'range') {
+			const step = editor.format.isLetsGo || editor.format.isChampions ? 1 : 4;
+			const iv = editor.getIVs(set)[statID];
+			// while dragging, always round down, but other methods (e.g. pressing Right on a keyboard)
+			// should jump a whole step
+			if (this.draggingEVSlider !== target && value > previousValue) {
+				const previousStat = editor.getStat(statID, set, iv, previousValue);
+				const maxValue = editor.format.isChampions ? 32 : editor.format.isLetsGo ? 200 : 252;
+				while (value < maxValue && editor.getStat(statID, set, iv, value) === previousStat) {
+					value = Math.min(value + step, maxValue);
+				}
+				set.evs![statID] = value;
+			}
 			// enforce limit
 			const maxEv = this.maxEVs();
 			let usableMaxEv = maxEv === 510 ? 508 : maxEv;
@@ -3731,12 +3716,18 @@ class StatForm extends preact.Component<{
 				for (const curEv of Object.values(set.evs || {})) totalEv += curEv;
 				if (totalEv > maxEv && totalEv - value <= maxEv) {
 					set.evs![statID] = usableMaxEv - (totalEv - value);
-					// in mobile, you can drag the slider while the textbox is still focused,
-					// so onChange won't update it, so we manually update it here too
-					const textbox = this.base!.querySelector<HTMLInputElement>(`input.stat-input[name="ev-${statID}"]`);
-					if (textbox) textbox.value = this.getEVText(statID);
 				}
 			}
+			// snap to the fewest EVs necessary for this (round down)
+			value = Math.max(0, Math.floor(set.evs![statID]! / step) * step);
+			const stat = editor.getStat(statID, set, iv, value);
+			while (value > 0 && editor.getStat(statID, set, iv, value - step) === stat) value -= step;
+			set.evs![statID] = value;
+			target.value = `${value}`;
+			// in mobile, the textbox can still be focused while dragging the slider,
+			// so onChange won't update it, so we manually update it here
+			const textbox = this.base!.querySelector<HTMLInputElement>(`input.stat-input[name="ev-${statID}"]`);
+			if (textbox) textbox.value = this.getEVText(statID);
 		} else {
 			if (target.value.includes('+')) {
 				if (statID === 'hp') {
@@ -3900,8 +3891,8 @@ class StatForm extends preact.Component<{
 	};
 	maxEVs() {
 		const editor = this.props.editor;
-		const useCappedEVs = !editor.isLetsGo && editor.gen >= 3 && !editor.isChampions;
-		return editor.isChampions ? 66 : useCappedEVs ? 510 : Infinity;
+		const useCappedEVs = !editor.format.isLetsGo && editor.gen >= 3 && !editor.format.isChampions;
+		return editor.format.isChampions ? 66 : useCappedEVs ? 510 : Infinity;
 	}
 	override render() {
 		const { editor, set } = this.props;
@@ -3910,9 +3901,9 @@ class StatForm extends preact.Component<{
 
 		const baseStats = species.baseStats;
 
-		const useEVs = !editor.isLetsGo && !editor.isChampions;
-		// const useAVs = editor.isLetsGo && team.format.endsWith('norestrictions');
-		const maxEV = editor.isChampions ? 32 : useEVs ? 252 : 200;
+		const useEVs = !editor.format.isLetsGo && !editor.format.isChampions;
+		// const useAVs = editor.format.isLetsGo && team.format.endsWith('norestrictions');
+		const maxEV = editor.format.isChampions ? 32 : useEVs ? 252 : 200;
 		const stepEV = useEVs ? 4 : 1;
 		const defaultEV = useEVs && editor.gen <= 2 && !set.evs ? maxEV : 0;
 		const useIVs = editor.gen > 2;
@@ -3931,7 +3922,7 @@ class StatForm extends preact.Component<{
 		if (maxEVs < 6 * 252) {
 			let totalEv = 0;
 			for (const ev of Object.values(set.evs || {})) totalEv += ev;
-			if (totalEv <= maxEVs && !editor.isChampions) {
+			if (totalEv <= maxEVs && !editor.format.isChampions) {
 				remaining = (totalEv > (maxEVs - 2) ? 0 : (maxEVs - 2) - totalEv);
 			} else {
 				remaining = maxEVs - totalEv;
@@ -3949,15 +3940,15 @@ class StatForm extends preact.Component<{
 						<th>{/* Stat name */}</th>
 						<th>{TL`Base`}</th>
 						<th class="setstatbar">{/* Stat bar */}</th>
-						<th>{editor.isLetsGo ? TL`AVs` : editor.isChampions ? TL`Points` : TL`EVs`}</th>
+						<th>{editor.format.isLetsGo ? TL`AVs` : editor.format.isChampions ? TL`Points` : TL`EVs`}</th>
 						<th>{/* EV slider */}</th>
-						{!editor.isChampions && <th>{useIVs ? TL`IVs` : TL`DVs`}</th>}
+						{!editor.format.isChampions && <th>{useIVs ? TL`IVs` : TL`DVs`}</th>}
 						<th>{/* Final stat */}</th>
 					</tr>
 					{stats.map(([statID, statName, stat]) => <tr>
 						<th style="text-align:right;font-weight:normal">{statName}</th>
 						<td style="text-align:right">
-							{editor.isRelumiTesting ? (
+							{editor.format.isRelumiTesting ? (
 								<input
 									type="number" name={`custombase-${statID}`}
 									value={set.customBaseStats?.[statID] ?? baseStats[statID]}
@@ -3978,9 +3969,10 @@ class StatForm extends preact.Component<{
 						<td><input
 							name={`evslider-${statID}`} value={set.evs?.[statID] ?? defaultEV} min="0" max={maxEV} step={stepEV}
 							type="range" class="evslider" tabIndex={-1} aria-hidden
+							onPointerDown={this.startEVSliderDrag}
 							onInput={this.changeEV} onChange={this.changeEV}
 						/></td>
-						{!editor.isChampions && <td><input
+						{!editor.format.isChampions && <td><input
 							name={`iv-${statID}`} min={0} max={useIVs ? 31 : 15} placeholder={`${defaultIVs[statID]}`}
 							style={narrow ? "width:22px" : "width:40px"} type={narrow ? 'text' : 'number'} inputMode="numeric"
 							class="textbox default-placeholder stat-input" onInput={this.changeIV}
@@ -4171,10 +4163,10 @@ class DetailsForm extends preact.Component<{
 					onInput={this.changeNickname} onChange={this.changeNickname}
 				/></label></p>
 				<p><label class="label">{TL.label(TL`Level`)}<input
-					name="level" value={set.level ?? ''} placeholder={`${editor.defaultLevel}`}
+					name="level" value={set.level ?? ''} placeholder={`${editor.format.defaultLevel}`}
 					type="number" inputMode="numeric" min="1" max="100" step="1"
 					class="textbox inputform numform default-placeholder" style="width: 50px"
-					onInput={this.changeLevel} onChange={this.changeLevel} disabled={editor.isChampions}
+					onInput={this.changeLevel} onChange={this.changeLevel} disabled={editor.format.isChampions}
 				/></label><small>(You probably want to change the team's levels by changing the format, not here)</small></p>
 				{editor.gen > 1 && (<>
 					<p><div class="label">{TL.label(TL`Shiny`)}<div class="labeled">
@@ -4201,14 +4193,14 @@ class DetailsForm extends preact.Component<{
 							/> Random</label>
 						</div>
 					)}</div></p>
-					{editor.isLetsGo ? (
+					{editor.format.isLetsGo ? (
 						<p><label class="label">{TL.label(TL`Happiness`)}<input
 							name="happiness" value="" placeholder="70"
 							type="number" inputMode="numeric"
 							class="textbox inputform numform default-placeholder" style="width: 50px"
 							onInput={this.changeHappiness} onChange={this.changeHappiness}
 						/></label></p>
-					) : (editor.gen < 8 || editor.isNatDex || editor.isRelumi) && (
+					) : (editor.gen < 8 || editor.format.isNatDex || editor.format.isRelumi) && (
 						<p><label class="label">{TL.label(TL`Happiness`)}<input
 							name="happiness" value={set.happiness ?? ''} placeholder="255"
 							type="number" inputMode="numeric" min="0" max="255" step="1"
@@ -4218,7 +4210,8 @@ class DetailsForm extends preact.Component<{
 					)}
 				</>
 				)}
-				{editor.gen === 8 && !editor.isBDSP && !species.cannotDynamax && (!editor.isRelumi || editor.isRelumiTesting) && (
+				{editor.gen === 8 && !editor.format.isBDSP && !species.cannotDynamax &&
+					(!editor.format.isRelumi || editor.format.isRelumiTesting) && (
 					<p>
 						<label class="label" style="display:inline">{TL.label(TL`Dynamax Level`)}<input
 							name="dynamaxlevel" value={set.dynamaxLevel ?? ''} placeholder="10"
@@ -4237,7 +4230,7 @@ class DetailsForm extends preact.Component<{
 						)}
 					</p>
 				)}
-				{((!editor.isLetsGo && editor.gen === 7) || editor.isNatDex || species.baseSpecies === 'Unown') && <p>
+				{((!editor.format.isLetsGo && editor.gen === 7) || editor.format.isNatDex || species.baseSpecies === 'Unown') && <p>
 					<label class="label">{TL.label(TL`Hidden Power Type`)}<select
 						name="hptype" class="select" onChange={this.changeHPType} value={editor.getHPType(set)}
 					>
@@ -4248,10 +4241,10 @@ class DetailsForm extends preact.Component<{
 						))}
 					</select></label>
 				</p>}
-				{editor.gen === 9 && !editor.isChampions && <p>
+				{editor.gen === 9 && !editor.format.isChampions && <p>
 					<label class="label" title={TL`Tera Type`}>
 						{TL.label(TL`Tera Type`)}{}
-						{species.requiredTeraType && editor.formeLegality === 'normal' ? (
+						{species.requiredTeraType && editor.format.formeLegality === 'normal' ? (
 							<button name="teratype" class="button cur" disabled>
 								<PSIcon type={species.requiredTeraType} new tera />
 							</button>
@@ -4268,7 +4261,7 @@ class DetailsForm extends preact.Component<{
 						)}
 					</label>
 				</p>}
-				{editor.isRelumiTesting && <p style="clear:both">
+				{editor.format.isRelumiTesting && <p style="clear:both">
 					<label class="label">Types: {}
 						<select
 							name="customtype1" class="button" onChange={this.changeCustomType}

@@ -738,7 +738,7 @@ export class DexSearch {
 					if (PSEUDO_FLAG_IDS.includes(fId)) {
 						if (!moveHasPseudoFlag(BattleMovedex[id], fId)) continue;
 					} else {
-						if (!BattleMovedex[id].flags || !(BattleMovedex[id].flags as any)[fId]) continue;
+						if (!BattleMovedex[id].flags?.[fId]) continue;
 					}
 					(illegal && id in illegal ? illegalBuf : buf).push(['move', id as ID]);
 				}
@@ -801,7 +801,7 @@ abstract class BattleTypedSearch<T extends SearchType> {
 
 	protected formatType: 'doubles' | 'bdsp' | 'bdspdoubles' | 'rs' | 'frlg' | 'bw1' | 'letsgo' | 'metronome' | 'natdex' |
 		'nfe' | 'ssdlc1' | 'ssdlc1doubles' | 'predlc' | 'predlcdoubles' | 'svdlc1' | 'svdlc1doubles' | 'stadium' | 'lc' |
-		'champions' | 'natdexchampions' | null = null;
+		'champions' | 'natdexchampions' | 'legendsza' | null = null;
 	isDoubles = false;
 
 	/**
@@ -834,10 +834,7 @@ abstract class BattleTypedSearch<T extends SearchType> {
 			this.dex = Dex;
 		}
 
-		if (
-			fullFormatId.includes("relumi") &&
-			window.BattleTeambuilderTable?.gen8relumi
-		) {
+		if (Dex.formats.get(fullFormatId).isRelumi) {
 			this.dex = Dex.mod("gen8relumi" as ID);
 		}
 
@@ -1488,7 +1485,7 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 					var offset = hasGmax ? formeOrder.length + 1 : formeOrder.length;
 					var otherIDs = (baseSpecies.otherFormes || [])
 						.map(function (f: string) { return toID(f); })
-						.filter(function (f: string) { return !foIDs.includes(f) && !f.endsWith('gmax'); });
+						.filter(function (f: ID) { return !foIDs.includes(f) && !f.endsWith('gmax'); });
 					otherIDs.sort();
 					var oi = otherIDs.indexOf(row.id);
 					map[row.id] = offset + Math.max(0, oi);

@@ -21,7 +21,7 @@
 import { Pokemon, type ServerPokemon } from "./battle";
 import {
 	BattleAvatarNumbers, BattleBaseSpeciesChart, BattlePokemonIconIndexes, BattlePokemonIconIndexesLeft,
-	Ability, Item, Move, Species, PureEffect, type ID, type NatureEffect, type Type,
+	Ability, Item, Move, Species, PureEffect, Format, type FormatData, type ID, type NatureEffect, type Type,
 } from "./battle-dex-data";
 import type * as DexData from "./battle-dex-data";
 import type { Teams } from "./battle-teams";
@@ -34,6 +34,7 @@ export declare namespace Dex {
 	export type Item = DexData.Item;
 	export type Move = DexData.Move;
 	export type Species = DexData.Species;
+	export type Format = DexData.Format;
 	export type Type = DexData.Type;
 	export type Nature = DexData.Nature;
 	export type PureEffect = DexData.PureEffect;
@@ -542,48 +543,38 @@ export const Dex = new class implements ModdedDex {
 		if (!gen) return this;
 		return this.mod(`gen${gen}` as ID);
 	}
+	formats = {
+		cache: Object.create(null) as { [id: string]: Format },
+		get(name: string): Format {
+			const id = toID(name);
+			this.cache[id] ||= new Format(name, window.BattleFormats?.[id]);
+			return this.cache[id];
+		},
+		load(data: { [id: string]: FormatData }): { [id: string]: Format } {
+			// Update in-place so retained references get updated too
+			for (const id in this.cache) {
+				Object.assign(this.cache[id], new Format(this.cache[id].name, data[id]));
+			}
+			const formats: { [id: string]: Format } = {};
+			for (const id in data) {
+				const format = this.cache[id] ||= new Format(data[id].name, data[id]);
+				formats[id] = format;
+			}
+			return formats;
+		},
+	};
 	formatGen(format: string) {
-		const formatid = toID(format);
-		if (!formatid) return Dex.gen;
-		if (!formatid.startsWith('gen')) return 6;
-		return parseInt(formatid.charAt(3)) || Dex.gen;
+		return this.formats.get(format).gen;
 	}
 	forFormat(format: string) {
-		let dex = Dex.forGen(Dex.formatGen(format));
-		const fullFormatId = toID(format);
-
-		// Format metadata parsed from /formats does not always include `mod`.
-		// Ensure Relumi teambuilder queries use the Relumi mod table.
-		if (
-			fullFormatId.includes("relumi") &&
-			window.BattleTeambuilderTable?.gen8relumi
-		) {
-			return Dex.mod("gen8relumi" as ID);
+		const formatData = this.formats.get(format);
+		if (formatData.isRelumi) {
+			// Cached Formats may predate the Relumi table loading, so the cached
+			// `mod` can't be relied on here. Check the Relumi table directly.
+			return this.mod(window.BattleTeambuilderTable?.gen8relumi ? 'gen8relumi' as ID : formatData.mod);
 		}
-
-		const knownFormat = (window.BattleFormats?.[fullFormatId]) as
-			| {
-				mod?: string,
-			}
-			| undefined;
-		const modid = toID(knownFormat?.mod || "");
-		if (modid && window.BattleTeambuilderTable?.[modid]) {
-			return Dex.mod(modid);
-		}
-
-		const formatid = fullFormatId.slice(4);
-		if (dex.gen === 7 && formatid.includes('letsgo')) {
-			dex = Dex.mod('gen7letsgo' as ID);
-		}
-		if (dex.gen === 8 && formatid.includes('bdsp')) {
-			dex = Dex.mod('gen8bdsp' as ID);
-		}
-		if (dex.gen === 9 && formatid.includes('champions')) {
-			dex = Dex.mod('champions' as ID);
-		}
-		return dex;
+		return this.mod(formatData.mod);
 	}
-
 	resolveAvatar(avatar: string): string {
 		if (window.BattleAvatarNumbers && avatar in BattleAvatarNumbers) {
 			avatar = BattleAvatarNumbers[avatar];

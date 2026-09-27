@@ -159,7 +159,7 @@ export class BattleTooltips {
 		getDex: () => this.battle.dex,
 		shouldHighlight: () => {
 			if (Dex.prefs('relumiHighlightBalanceChangesBT') === false) return false;
-			return toID(this.battle.tier).includes('relumi');
+			return this.battle.format.isRelumi;
 		},
 	});
 
@@ -254,7 +254,8 @@ export class BattleTooltips {
 		$elem.on('click.battleTooltips', '.has-tooltip', this.clickTooltipEvent);
 		$elem.on('focus.battleTooltips', '.has-tooltip', this.showTooltipEvent);
 		$elem.on('mouseout.battleTooltips', '.has-tooltip', BattleTooltips.unshowTooltip);
-		$elem.on('mousedown.battleTooltips', '.has-tooltip', this.holdLockTooltipEvent);
+		const pressEvent = window.PointerEvent ? 'pointerdown' : 'mousedown';
+		$elem.on(`${pressEvent}.battleTooltips`, '.has-tooltip', this.holdLockTooltipEvent);
 		$elem.on('blur.battleTooltips', '.has-tooltip', BattleTooltips.unshowTooltip);
 		$elem.on('mouseup.battleTooltips', '.has-tooltip', BattleTooltips.unshowTooltip);
 
@@ -300,10 +301,13 @@ export class BattleTooltips {
 	 * (Namely, a long-tap or long-click)
 	 */
 	holdLockTooltipEvent = (e: JQuery.TriggeredEvent) => {
+		// Safari iOS simulates a mouse click (mousedown) after a touchend
+		// we need to ignore it so we don't hide the locked tooltip when this happens
+		if (e.type === 'pointerdown' && (e.originalEvent as PointerEvent).pointerType === 'touch') return;
 		if (BattleTooltips.isLocked) BattleTooltips.hideTooltip();
 		const target = e.currentTarget as HTMLElement;
 		this.showTooltip(target);
-		const isClick = (e.type === 'mousedown' && target.tagName === 'BUTTON');
+		const isClick = (e.type !== 'touchstart' && target.tagName === 'BUTTON');
 
 		BattleTooltips.longTapTimeout = setTimeout(() => {
 			BattleTooltips.longTapTimeout = null;
@@ -809,7 +813,7 @@ export class BattleTooltips {
 			text += `<p class="tooltip-section">${this.battle.dex.text.get(move).shortDesc}</p>`;
 		} else {
 			text += '<p class="tooltip-section">';
-			const isRelumi = toID(this.battle.tier).includes("relumi");
+			const isRelumi = this.battle.format.isRelumi;
 			const hasGaleWings = ability === 'galewings' && moveType === 'Flying' && (isRelumi || pokemon.hp === pokemon.maxhp);
 			const priority = move.id === 'grassyglide' && this.battle.hasPseudoWeather('Grassy Terrain') ? 1 : hasGaleWings ? 1 : move.priority;
 			if (priority > 1) {
@@ -2325,8 +2329,9 @@ export class BattleTooltips {
 	}
 	getMoveTypeText(move: Dex.Move, value: ModifiableValue, forMaxMove?: boolean | Dex.Move) {
 		const [moveType, category] = this.getMoveType(move, value, forMaxMove);
-
 		const pokemon = value.pokemon;
+		if (!pokemon) return [moveType, ''] as const;
+
 		let foeActive = [...pokemon.side.foe.active].reverse();
 		if (this.battle.gameType === 'freeforall') {
 			foeActive = [...foeActive, ...pokemon.side.active].filter(active => active !== pokemon);
@@ -2728,7 +2733,7 @@ export class BattleTooltips {
 			value.abilityModify(1.5, "Flare Boost");
 		}
 		if (move.flags['punch']) {
-			const isRelumi = toID(this.battle.tier).includes('relumi');
+			const isRelumi = this.battle.format.isRelumi;
 			value.abilityModify(isRelumi ? 1.5 : 1.2, 'Iron Fist');
 		}
 		if (move.flags['pulse']) {
