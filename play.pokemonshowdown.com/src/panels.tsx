@@ -22,7 +22,7 @@ import {
 import type { ChatRoom } from "./panel-chat";
 import { PSHeader, PSMiniHeader } from "./panel-topbar";
 
-export const EXTERNAL_REDIRECTS = /^(appeals?|rooms?suggestions?|suggestions?|adminrequests?|bugs?|bugreports?|rules?|faq|credits?|privacy|contact|dex|insecure)$/;
+export const EXTERNAL_REDIRECTS = /^(appeals?|rooms?suggestions?|suggestions?|adminrequests?|bugs?|bugreports?|rules?|faq|credits?|privacy|contact|dex|insecure|oldclient)$/;
 
 export class PSRouter {
 	roomid = '' as RoomID;
@@ -86,8 +86,8 @@ export class PSRouter {
 		let room = PS.room;
 		// some popups don't have URLs and don't generate history
 		// there's definitely a better way to do this but I'm lazy
-		if (room.noURL) room = PS.rooms[PS.popups[PS.popups.length - 2]] || PS.panel;
-		if (room.noURL) room = PS.panel;
+		if (room.noURL) room = PS.rooms[PS.popups[PS.popups.length - 2]] || PS.baseRoom;
+		if (room.noURL) room = PS.baseRoom;
 
 		// don't generate history when focusing things on things visible on the home screen
 		if (room.id === 'news' && room.location === 'mini-window') room = PS.mainmenu;
@@ -97,7 +97,7 @@ export class PSRouter {
 		if (room.id === 'rooms' && PS.leftPanelWidth) room = PS.leftPanel;
 
 		let roomid = room.id;
-		const panelState = (PS.leftPanelWidth && room === PS.panel ?
+		const panelState = (PS.leftPanelWidth && PS.baseRoom ?
 			PS.leftPanel.id + '..' + PS.rightPanel!.id :
 			room.id);
 		const newTitle = roomid === '' ? 'Showdown!' : `${room.getTitle()} - Showdown!`;
@@ -142,8 +142,14 @@ export class PSRouter {
 	}
 	subscribeHistory() {
 		const currentRoomid = location.pathname.slice(1);
+		if (currentRoomid === 'newclient' && !/(?:^|;\s*)preactalpha=/.test(document.cookie)) {
+			this.setDefaultClientCookie('new');
+		}
 		if (/^[a-z0-9-]+$/.test(currentRoomid)) {
-			if (currentRoomid !== 'preactalpha' && currentRoomid !== 'preactbeta' && currentRoomid !== 'beta') {
+			if (
+				currentRoomid !== 'preactalpha' && currentRoomid !== 'preactbeta' &&
+				currentRoomid !== 'beta' && currentRoomid !== 'newclient'
+			) {
 				PS.join(currentRoomid as RoomID);
 			}
 		}
@@ -183,6 +189,9 @@ export class PSRouter {
 				PS.join(roomid);
 			}
 		});
+	}
+	setDefaultClientCookie(client: 'old' | 'new') {
+		document.cookie = `preactalpha=${client === 'new' ? '1' : '0'}; expires=Thu, 1 Sep 2027 12:00:00 UTC; path=/`;
 	}
 }
 PS.router = new PSRouter();
@@ -912,7 +921,7 @@ export class PSView extends preact.Component {
 		return null;
 	}
 	getCommandPreviewTextbox(elem: HTMLElement): HTMLElement | null {
-		const rooms = [PS.getRoom(elem), PS.room, PS.panel, PS.leftPanel, PS.rightPanel];
+		const rooms = [PS.getRoom(elem), PS.room, PS.baseRoom, PS.leftPanel, PS.rightPanel];
 		for (const room of rooms) {
 			if (!room || !(room.type === 'chat' || room.type === 'battle' || room.type === 'rooms')) {
 				continue;
@@ -1071,7 +1080,7 @@ export class PSView extends preact.Component {
 					let roomid = PS.router.extractRoomID(href);
 
 					// keep this in sync with .htaccess
-					const shortLinks = /^(rooms?suggestions?|suggestions?|adminrequests?|forgotpassword|bugs?(reports?)?|formatsuggestions|rules?|faq|credits?|privacy|contact|dex|insecure|replays?|devdiscord|smogdex|smogcord|forums?|trustworthy-dlc-link)$/;
+					const shortLinks = /^(rooms?suggestions?|suggestions?|adminrequests?|forgotpassword|bugs?(reports?)?|formatsuggestions|rules?|faq|credits?|privacy|contact|dex|insecure|replays?|devdiscord|smogdex|smogcord|forums?|trustworthy-dlc-link|oldclient|newclient)$/;
 					if (roomid === 'appeal' || roomid === 'appeals') roomid = 'view-help-request--appeal' as RoomID;
 					if (roomid === 'report') roomid = 'view-help-request--report' as RoomID;
 					if (roomid === 'requesthelp') roomid = 'view-help-request--other' as RoomID;
@@ -1138,7 +1147,10 @@ export class PSView extends preact.Component {
 				elem = elem.parentElement;
 			}
 			if (PS.room !== clickedRoom) {
-				if (clickedRoom) PS.room = clickedRoom;
+				if (clickedRoom) {
+					PS.room = clickedRoom;
+					if (!PS.isPopup(clickedRoom)) PS.baseRoom = clickedRoom;
+				}
 				PS.room.autoDismissNotifications();
 				PS.closePopupsAbove(clickedRoom);
 				PS.update();
@@ -1545,13 +1557,13 @@ Supported file types:
 	static posStyle(room: PSRoom) {
 		if (PS.leftPanelWidth === null) {
 			// vertical mode
-			if (room === PS.panel) {
+			if (room === PS.getPanel()) {
 				// const minWidth = Math.min(500, Math.max(320, window.innerWidth - 9));
 				return { top: '30px', left: `${PSView.verticalHeaderWidth}px`, minWidth: `none` };
 			}
 		} else if (PS.leftPanelWidth === 0) {
 			// one panel visible
-			if (room === PS.panel) return {};
+			if (room === PS.getPanel()) return {};
 		} else {
 			// both panels visible
 			if (room === PS.leftPanel) return { width: `${PS.leftPanelWidth}px`, right: 'auto' };
@@ -1676,8 +1688,9 @@ Supported file types:
 	renderDebugMenu() {
 		if (PSView.debugMenu === 'panels') {
 			return `room: ${JSON.stringify(PS.room?.id)} (connected: ${JSON.stringify(PS.room?.connected)}) (connectMode: ${JSON.stringify(PS.room?.connectMode)})\n` +
+				`baseRoom: ${JSON.stringify(PS.baseRoom?.id)}\n` +
 				`onepanel: ${JSON.stringify(PS.prefs.onepanel)}, leftPanelWidth: ${JSON.stringify(PS.leftPanelWidth)}\n` +
-				`panel: ${JSON.stringify(PS.panel?.id)}, left: ${JSON.stringify(PS.leftPanel?.id)}, right: ${JSON.stringify(PS.rightPanel?.id)}\n` +
+				`panel: ${JSON.stringify(PS.getPanel()?.id)}, left: ${JSON.stringify(PS.leftPanel?.id)}, right: ${JSON.stringify(PS.rightPanel?.id)}\n` +
 				`popups: ${JSON.stringify(PS.popups)}`;
 		}
 		return null;

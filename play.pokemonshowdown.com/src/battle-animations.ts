@@ -605,7 +605,7 @@ export class BattleScene implements BattleSceneStub {
 			bg = 'fx/bg-scl.png';
 			this.setBgm(-101);
 		} else {
-			const isRelumi = this.battle.tier && toID(this.battle.tier).includes('relumi');
+			const isRelumi = this.battle.format.isRelumi;
 			if (gen <= 1) bg = 'fx/bg-gen1.png?';
 			else if (gen <= 2) bg = 'fx/bg-gen2.png?';
 			else if (gen <= 3) bg = `fx/${BattleBackdropsThree[this.numericId % BattleBackdropsThree.length]}?`;

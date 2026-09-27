@@ -923,7 +923,7 @@ export class Side {
 		}
 		pokemon.statusData.toxicTurns = 0;
 		if (this.battle.gen === 5) pokemon.statusData.sleepTurns = 0;
-		if (this.battle.tier.includes('Champions')) {
+		if (this.battle.format.isChampions) {
 			pokemon.timesAttacked = 0;
 		}
 		this.lastPokemon = pokemon;
@@ -1121,6 +1121,7 @@ export class Battle {
 	teamPreviewCount = 0;
 	speciesClause = false;
 	tier = '';
+	format = Dex.formats.get('');
 	gameType: 'singles' | 'doubles' | 'triples' | 'multi' | 'freeforall' | 'rotation' = 'singles';
 	compatMode = true;
 	rated: string | boolean = false;
@@ -1308,6 +1309,7 @@ export class Battle {
 		// activity queue state
 		this.activeMoveIsSpread = null;
 		this.currentStep = 0;
+		this.preemptStepQueue = [];
 		this.resetTurnsSinceMoved();
 		this.nextStep();
 	}
@@ -3485,6 +3487,7 @@ export class Battle {
 		}
 		case 'tier': {
 			this.tier = args[1];
+			this.format = Dex.formats.get(this.tier);
 			if (this.tier.endsWith('Random Battle')) {
 				this.speciesClause = true;
 			}
@@ -3492,16 +3495,16 @@ export class Battle {
 				this.messageFadeTime = 40;
 				this.isBlitz = true;
 			}
-			if (this.tier.includes(`Let's Go`)) {
+			if (this.format.isLetsGo) {
 				this.dex = Dex.mod('gen7letsgo' as ID);
 			}
 			if (this.tier.includes('Super Staff Bros')) {
 				this.dex = Dex.mod('gen9ssb' as ID);
 			}
-			if (this.tier.includes(`Champions`)) {
+			if (this.format.isChampions) {
 				this.dex = Dex.mod('champions' as ID);
 			}
-			if (toID(this.tier).includes('relumi') && window.BattleTeambuilderTable?.gen8relumi) {
+			if (this.format.isRelumi) {
 				this.dex = Dex.mod('gen8relumi' as ID);
 			}
 			this.log(args);
