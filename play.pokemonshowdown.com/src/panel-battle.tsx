@@ -714,14 +714,9 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 	} {
 		const room = this.props.room;
 		const layoutState = PS.chooseBattleLayout(room.width, room.height, PS.prefs.battlelayout);
-		// Big Picture Mode is only compatible with the side-by-side (desktop)
-		// layout, and only when the viewport is wide enough to fit the 2x canvas.
-		// Both `side-by-side` and `side-by-side-overlay` count as side-by-side
-		// here because `chooseBattleLayout` strips the `-overlay` suffix.
-		// The room-width check matches panel-popups.tsx and panels.tsx (both
-		// gate on `document.body.offsetWidth >= 800`); the room.width check is
-		// defense-in-depth in case the battle panel is much narrower than the
-		// viewport (e.g. a popup or a narrow sidebar).
+		// bigpicture needs the side-by-side layout (chooseBattleLayout already
+		// strips the -overlay suffix) and enough width for the 2x canvas.
+		// same 800px check as panels.tsx / panel-popups.tsx.
 		const bigpicture = PS.prefs.bigpicture &&
 			layoutState.layout === 'side-by-side' &&
 			document.body.offsetWidth >= 800 &&

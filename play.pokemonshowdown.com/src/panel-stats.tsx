@@ -292,9 +292,8 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 				? message
 				: 'Could not copy automatically — the full team text was logged to your browser console (open DevTools).',
 		});
-		// Auto-dismiss the banner after a few seconds. Bump a generation
-		// counter so a stale timer cannot wipe a newer banner, and track
-		// the timer id so we can cancel on unmount.
+		// auto-dismiss the banner; copyGeneration keeps a stale timer from
+		// clearing a newer banner
 		const gen = ++this.copyGeneration;
 		if (this.copyTimeoutId !== null) clearTimeout(this.copyTimeoutId);
 		this.copyTimeoutId = setTimeout(() => {
@@ -758,11 +757,8 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 	renderRandomTeam() {
 		const team = this.state.randomTeam;
 		if (!team) return null;
-		// Match the top-teams card visually (icon + name per slot) so users
-		// can scan the rolled team at a glance, and offer the same Export
-		// button so a picked team can be moved into the teambuilder.
-		// Iterate in API order rather than sorting, since the server returns
-		// BattleStatsPokemon[] without a sorted signature.
+		// same card as the top teams list, so a rolled team can be exported
+		// into the teambuilder the same way
 		return <div class="stats-team-card stats-random-team-card">
 			<div class="stats-team-header">
 				<strong>Random Team</strong>
@@ -838,9 +834,7 @@ class StatsPanel extends PSRoomPanel<StatsRoom> {
 		</svg>;
 	}
 
-	// Tracks the in-flight auto-dismiss timeout + the active notice so we
-	// can cancel on unmount and stop a stale timer from dismissing a newer
-	// banner (each invocation bumps `copyGeneration`).
+	// copy-notice banner timer, cleared on unmount
 	private copyTimeoutId: ReturnType<typeof setTimeout> | null = null;
 	private copyGeneration = 0;
 

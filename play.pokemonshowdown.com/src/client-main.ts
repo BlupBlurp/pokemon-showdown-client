@@ -138,9 +138,8 @@ class PSPrefs extends PSStreamModel<string | null> {
 	extraowninfo: boolean | null = null;
 	spectatefromstart: boolean | null = null;
 	battlelayout: BattleLayoutPreference | null = null;
-	// Big Picture Mode is only usable with the side-by-side (desktop) layout.
-	// See panel-popups.tsx BattleOptionsPanel and panels.tsx PSView.posStyle
-	// for the layout gating that applies it.
+	// only usable with the side-by-side (desktop) layout; the gating lives
+	// in panels.tsx PSView.posStyle and panel-popups.tsx
 	bigpicture: boolean | null = null;
 	relumiHighlightBalanceChangesBT: boolean | null = null;
 	rightpanelbattles: boolean | null = null;
@@ -2247,11 +2246,8 @@ export const PS = new class extends PSModel {
 		const viewportWidth = document.documentElement.clientWidth;
 		const viewportHeight = document.documentElement.clientHeight;
 		const roomHeight = viewportHeight - 56;
-		// Big Picture Mode: hide the chat (right) panel so the battle canvas
-		// gets the full viewport. Only applies when the focused panel is a
-		// battle, when the viewport is wide enough to fit the 2x battle canvas
-		// (1280px), and when the layout is (or auto-resolves to) side-by-side.
-		// Same gating as panel-popups.tsx and panel-battle.tsx chooseLayout.
+		// bigpicture: hide the chat panel so the battle gets the full viewport.
+		// same gating as panel-battle.tsx chooseLayout.
 		let effectiveLeftPanelWidth = leftPanelWidth;
 		if (
 			this.prefs.bigpicture && panel?.type === 'battle' &&

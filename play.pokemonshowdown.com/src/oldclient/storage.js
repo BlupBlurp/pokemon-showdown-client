@@ -1367,7 +1367,7 @@ Storage.importTeam = function (buffer, teams) {
 			line = line.substr(11);
 			curSet.teraType = line;
 		} else if (line.substr(0, 14) === 'Custom-Stats: ') {
-			/* Parse Custom-Stats: hp/atk/def/spa/spd/spe — silently ignored by non-Relumi formats */
+			/* Custom-Stats: hp/atk/def/spa/spd/spe */
 			line = line.substr(14);
 			var statParts = line.split('/');
 			if (statParts.length === 6) {
@@ -1381,7 +1381,7 @@ Storage.importTeam = function (buffer, teams) {
 				};
 			}
 		} else if (line.substr(0, 14) === 'Custom-Types: ') {
-			/* Parse Custom-Types: Type1/Type2 — silently ignored by non-Relumi formats */
+			/* Custom-Types: Type1/Type2 */
 			line = line.substr(14);
 			curSet.customTypes = line.split('/').filter(function (t) { return t; });
 		} else if (line.substr(0, 15) === 'Dynamax Level: ') {

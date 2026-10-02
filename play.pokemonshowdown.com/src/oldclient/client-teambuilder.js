@@ -915,19 +915,17 @@
 				format = BattleFormats[format].battleFormat;
 			}
 
-			// Validate before uploading; intercept the next vtm popup to check the result.
+			// validate first: /vtm pops up the result, so hijack app.addPopup
+			// until it shows
 			var originalAddPopup = app.addPopup.bind(app);
 			app.addPopup = function (type, data) {
-				// Restore immediately so only the next popup is intercepted.
 				app.addPopup = originalAddPopup;
 
 				var message = data && data.message;
-				// The server prefixes valid results with "Your team is valid".
 				if (message && message.indexOf('Your team is valid') !== -1) {
-					// Team passed — suppress the popup and proceed with the upload.
+					// valid, go ahead with the upload
 					self._doUpload();
 				} else {
-					// Team failed or unexpected popup — show it normally.
 					originalAddPopup(type, data);
 				}
 			};
@@ -937,7 +935,7 @@
 			});
 		},
 		_doUpload: function () {
-			// Perform the actual database upload after legality check passes.
+			// reached only after the /vtm check above passes
 			var cmd = '/teams ';
 			cmd += this.curTeam.teamid ? 'update' : 'save';
 			// teamName, formatid, rawPrivacy, rawTeam

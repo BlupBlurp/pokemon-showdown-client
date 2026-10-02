@@ -74,9 +74,8 @@ export class RelumiDiffHelper {
 			if (relumiTable.overrideSpeciesData[speciesId]) {
 				result = speciesId;
 			} else {
-				// Fall back to base form only if base has overrides AND this form is
-				// effectively the same as base (custom form, or cosmetic form with
-				// identical vanilla stats to base).
+				// fold into the base form when the base has overrides and this form
+				// has no stats of its own (custom form, or cosmetic copy of base)
 				const baseId = this.resolveBaseSpeciesId(speciesId);
 				if (baseId && baseId !== speciesId && relumiTable.overrideSpeciesData[baseId]) {
 					const vanillaSpecies = Dex.forGen(9).species.get(speciesId);
@@ -86,8 +85,7 @@ export class RelumiDiffHelper {
 						const vanillaBase = Dex.forGen(9).species.get(baseId);
 						if (vanillaBase?.exists &&
 							!this.formsShareBaseStats(vanillaSpecies.baseStats, vanillaBase.baseStats)) {
-							// Vanilla stats differ from base = form has its own stats
-							// (e.g. Rotom appliances); do not coalesce.
+							// form has its own stats (Rotom appliances etc), don't fold
 							result = speciesId;
 						} else {
 							result = baseId;
@@ -111,7 +109,7 @@ export class RelumiDiffHelper {
 		if (hasVanillaData) {
 			result = speciesId;
 		} else if (relumiTable?.overrideSpeciesData && speciesId in relumiTable.overrideSpeciesData) {
-			// Custom form (override, no vanilla snapshot) — fall back to base form.
+			// custom form: no vanilla snapshot, diff against the base form
 			result = this.resolveBaseSpeciesId(speciesId) || speciesId;
 		} else {
 			const vanillaSpecies = Dex.forGen(9).species.get(speciesId);
@@ -133,8 +131,8 @@ export class RelumiDiffHelper {
 		if (relumiTable?.vanillaSpeciesData?.[speciesId]) {
 			result = relumiTable.vanillaSpeciesData[speciesId];
 		} else if (relumiTable?.overrideSpeciesData && speciesId in relumiTable.overrideSpeciesData) {
-			// Custom form (override present, no vanilla snapshot) — Dex.forGen would
-			// return the mod-added BattlePokedex entry, not true vanilla data.
+			// custom form: no vanilla snapshot. can't use Dex.forGen(9) here,
+			// it would return the modded dex entry
 			result = null;
 		} else {
 			const vanillaSpecies = Dex.forGen(9).species.get(speciesId);

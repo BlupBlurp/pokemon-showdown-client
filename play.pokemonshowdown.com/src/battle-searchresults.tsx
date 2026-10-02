@@ -246,7 +246,6 @@ export class PSSearchResults extends preact.Component<{
 	private getNextLearnsetId(learnsetid: ID, speciesId: ID, learnsets: any): ID {
 		const lsetSpecies = this.props.search.dex.species.get(learnsetid);
 		if (!lsetSpecies?.exists) return '' as ID;
-		// Special cases for specific forms
 		if (learnsetid === 'lycanrocdusk' || (speciesId === 'rockruff' && learnsetid === 'rockruff')) {
 			return 'rockruffdusk' as ID;
 		}

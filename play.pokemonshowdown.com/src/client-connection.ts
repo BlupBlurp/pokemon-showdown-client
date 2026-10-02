@@ -14,39 +14,20 @@ const KEEPALIVE_INTERVAL = 25000;
 const KEEPALIVE_RANGE = 20000;
 
 /**
- * LOCAL DEV BYPASS — Relumi Showdown
+ * Local dev bypass (Relumi)
  *
- * The upstream client uses a web worker (client-connection-worker.js) and
- * cross-origin iframe storage (PSStorage.init) to communicate with the
- * game server. Both mechanisms fail when the client is served from a local
- * HTTP dev server (localhost / LAN IP) because:
+ * Upstream connects through a web worker plus cross-origin iframe storage,
+ * and neither works when the client is served from localhost/LAN: the worker
+ * builds socket URLs off the production origin, and the iframe storage
+ * blocks Config.server resolution. So when PSStorage.isLocalDev() is true:
  *
- *   1. The worker constructs WebSocket URLs relative to the production
- *      origin, so it never reaches the local game server on port 8000.
- *   2. PSStorage.init creates a cross-origin iframe to play.pokemonshowdown.com
- *      for shared prefs/teams, which blocks resolution of Config.server and
- *      delays (or prevents) the socket connection on localhost.
+ * - PSConnection.initConnection() skips the worker and directConnect()s to
+ *   the server config injected by serve-relumi-client.js.
+ * - PSStorage.init() returns early after setting Config.server.
  *
- * To fix this, two things are patched:
- *
- *   • PSConnection.initConnection() — when isLocalDev() is true, skip the
- *     worker entirely and call directConnect() which opens a SockJS/WebSocket
- *     connection using the server config that our local config injection
- *     (serve-relumi-client.js) has already set to localhost:8000.
- *
- *   • PSStorage.init() — when isLocalDev() is true, return early after
- *     assigning Config.server from Config.defaultserver, skipping the
- *     cross-origin iframe setup.
- *
- * PSStorage.isLocalDev() is the single source of truth for detecting local
- * environments. It matches localhost, 127.0.0.1, ::1, .local hostnames,
- * and RFC-1918/CGN private IP ranges.
- *
- * IMPORTANT: These changes may be reverted by upstream merges. After merging
- * upstream, verify that isLocalDev() and the early-return paths still exist.
- * The serve-relumi-client.js dev server also applies LAN-aware rewrites to
- * the compiled JS via rewriteLanLocalDevChecks() as a belt-and-suspenders
- * measure, but the TypeScript source is the canonical location.
+ * Upstream merges tend to revert this; check isLocalDev() and the early
+ * returns after every merge. rewriteLanLocalDevChecks() in the dev server
+ * patches the compiled JS as a fallback, but this file is the real fix.
  */
 
 export class PSConnection {

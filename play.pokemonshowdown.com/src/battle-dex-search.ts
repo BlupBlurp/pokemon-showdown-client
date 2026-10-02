@@ -1371,7 +1371,6 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 				forme: string,
 			}[] = [];
 
-			// Pre-computed tag-ban check to avoid arrow-function closures in the species loop
 			for (const id in BattlePokedex) {
 				if (id === "missingno") continue;
 				const species = this.dex.species.get(id);
@@ -1388,7 +1387,6 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 				const hasRelumiBasePokemonBan =
 					relumiBasePokemonBans.includes(species.id) ||
 					relumiBasePokemonBans.includes(toID(species.name));
-				// All variables use 'var' here to avoid Babel block-scoping closure limits in this file.
 				var hasRelumiBaseTagBan = false;
 				for (var ti = 0; ti < relumiBaseTagBans.length; ti++) {
 					if (bannedSpeciesByTag[toID(relumiBaseTagBans[ti].replace(/^tag:/, ''))]?.includes(species.id)) {
@@ -1440,15 +1438,12 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 				});
 			}
 
-			// Build form ordering index map from the pokedex data file's formeOrder.
-			// Forms not in formeOrder are sorted alphabetically after all formeOrder entries.
-			// All variables use 'var' to avoid Babel block-scoping closure limits in this file.
+			// form index map for the species list sort mirroring the server formeOrder
 			function buildRelumiFormIndexMap(
 				rows: { id: ID; baseId: ID; isBase: boolean }[],
 				dex: ModdedDex
 			): Record<string, number> {
-				// Pre-computed map from export-relumi-client-overrides.js — always correct
-				// because it's built from the server-side Dex (which has formeOrder).
+				// indexes precomputed by export-relumi-client-overrides.js from the server Dex
 				var precomputed = (window.BattleTeambuilderTable &&
 					window.BattleTeambuilderTable.gen8relumi &&
 					window.BattleTeambuilderTable.gen8relumi.relumiFormIndexMap) || {};
@@ -1456,12 +1451,11 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 				var map: Record<string, number> = {};
 				for (var i = 0; i < rows.length; i++) {
 					var row = rows[i];
-					// Pre-computed map is authoritative — use it if the entry exists.
 					if (row.id in precomputed) {
 						map[row.id] = precomputed[row.id];
 						continue;
 					}
-					// Fallback for species not in the pre-computed map (shouldn't happen in practice).
+					// not in the precomputed map so derive it from the base species formeOrder
 					if (row.isBase) {
 						map[row.id] = 0;
 						continue;
@@ -1474,13 +1468,13 @@ class BattlePokemonSearch extends BattleTypedSearch<'pokemon'> {
 						map[row.id] = fi;
 						continue;
 					}
-					// Gmax always goes at formeOrder.length, before custom forms.
+					// gmax sorts right after formeOrder before custom forms
 					var gmaxId = row.baseId + 'gmax';
 					if (row.id === gmaxId) {
 						map[row.id] = formeOrder.length;
 						continue;
 					}
-					// Custom forms not in formeOrder: sorted alphabetically after Gmax.
+					// custom forms sort alphabetically after that
 					var hasGmax = dex.species.get(gmaxId).exists;
 					var offset = hasGmax ? formeOrder.length + 1 : formeOrder.length;
 					var otherIDs = (baseSpecies.otherFormes || [])

@@ -847,7 +847,7 @@ export const Dex = new class implements ModdedDex {
 				const baseSpecies = this.species.get(data.baseSpecies);
 				if (baseSpecies.exists) {
 					const cosmeticName = data.name || baseSpecies.name;
-					// Explicitly preserve forme from cosmetic data to ensure correct spriteid
+					// keep forme so spriteid resolves to the cosmetic form
 					const cosmeticForme = (data).forme || '';
 					const cosmeticSpecies = new Species(formid, cosmeticName, {
 						...baseSpecies,
@@ -1429,8 +1429,7 @@ export const Dex = new class implements ModdedDex {
 			const species = Dex.species.get(nameOrId);
 			if (!species.exists) return '#';
 			if (species.baseSpecies && species.forme && species.baseSpecies !== species.name) {
-			// Pre-computed form index map from export-relumi-client-overrides.js.
-			// Uses the server-side Dex (which has formeOrder) so it's always correct.
+				// form index precomputed by export-relumi-client-overrides.js
 				const precomputed = (window.BattleTeambuilderTable?.gen8relumi?.relumiFormIndexMap) || {};
 				if (species.id in precomputed) {
 					return `//${Config.routes.dex}/pokedex/${species.num}_${precomputed[species.id]}`;
@@ -1609,10 +1608,9 @@ export class ModdedDex {
 	species = {
 		get: (name: string): Species => {
 			let id = toID(name);
-			// Cosmetic forms (e.g. furfroudiamond→Furfrou in BattleAliases) need
-			// the original name so Dex.species.get synthesizes cosmetic formes
-			// instead of resolving them to the base species, which would then
-			// hide the cosmetic form picker in the teambuilder.
+			// furfroudiamond etc alias to the base species, keep the original
+			// name so Dex.species.get synthesizes the cosmetic forme instead of
+			// resolving to base (which would hide the form picker in the teambuilder)
 			const origId = id;
 			const origName = name;
 			if (window.BattleAliases && id in BattleAliases && !(window.BattlePokedex && id in window.BattlePokedex)) {
@@ -1623,16 +1621,12 @@ export class ModdedDex {
 				(base: ID) => origId.startsWith(base)
 			);
 			const cacheId = isCosmeticAlias ? origId : id;
-			// Keep both the resolved id/name and the original alias around so the
-			// synthesized Species matches the cosmetic forme that was requested
-			// (e.g. furfroudiamond instead of collapsing back to furfrou).
+			// cache under the requested id (furfroudiamond), not the resolved one
 			const speciesName = isCosmeticAlias ? origName : name;
 			if (this.cache.Species.hasOwnProperty(cacheId)) return this.cache.Species[cacheId];
 
 			let data = { ...Dex.species.get(speciesName) };
-			// Dex.species.get's cosmeticFormes loop synthesizes the canonical
-			// display name (e.g. "Furfrou-Diamond"); prefer it so lowercase
-			// input ids still produce a properly cased species.name.
+			// prefer the cased name from dex data ("Furfrou-Diamond") over the raw input
 			const finalName = data.name || speciesName;
 
 			for (let i = Dex.gen - 1; i >= this.gen; i--) {

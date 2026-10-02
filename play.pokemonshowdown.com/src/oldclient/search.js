@@ -317,8 +317,8 @@
 		if (relumiTable && relumiTable.vanillaSpeciesData && relumiTable.vanillaSpeciesData[speciesId]) {
 			result = relumiTable.vanillaSpeciesData[speciesId];
 		} else if (relumiTable && relumiTable.overrideSpeciesData && speciesId in relumiTable.overrideSpeciesData) {
-			// Species with override data but no vanillaSpeciesData entry are custom forms
-			// — Dex.forGen would return the mod-added BattlePokedex entry, not true vanilla data.
+			// custom form: override data but no vanillaSpeciesData snapshot.
+			// Dex.forGen(9) would just return the modded entry
 			result = null;
 		} else {
 			var vanillaSpecies = Dex.forGen(9).species.get(speciesId);
@@ -381,9 +381,8 @@
 			if (relumiTable.overrideSpeciesData[speciesId]) {
 				result = speciesId;
 			} else {
-				// Fall back to base form only if base has overrides AND this form is effectively
-				// the same as base (either custom form with no vanilla data, or cosmetic form
-				// with identical vanilla stats to base).
+			// fold into the base form when the base has overrides and this form
+			// has no stats of its own (custom form, or cosmetic copy of base)
 				var baseId = this._resolveBaseSpeciesId(speciesId);
 				if (baseId && baseId !== speciesId && relumiTable.overrideSpeciesData[baseId]) {
 					var vanillaSpecies = Dex.forGen(9).species.get(speciesId);
@@ -392,13 +391,11 @@
 						result = baseId;
 					} else {
 						var vanillaBase = Dex.forGen(9).species.get(baseId);
-						// Vanilla stats differ from base = form has different stats (e.g., Rotom
-						// appliances); do not coalesce.
+						// form has its own stats (Rotom appliances etc), don't fold
 						if (vanillaBase && vanillaBase.exists &&
 							!this._formsShareBaseStats(vanillaSpecies.baseStats, vanillaBase.baseStats)) {
 							result = speciesId;
 						} else {
-							// Cosmetic form (identical vanilla stats to base) - fall back to base
 							result = baseId;
 						}
 					}
@@ -419,8 +416,7 @@
 		if (hasVanillaData) {
 			result = speciesId;
 		} else if (relumiTable && relumiTable.overrideSpeciesData && speciesId in relumiTable.overrideSpeciesData) {
-			// Species with override data but no vanillaSpeciesData entry are custom forms.
-			// Dex.forGen would return the mod-added BattlePokedex entry, not true vanilla.
+			// custom form: no vanilla snapshot, diff against the base form
 			result = this._resolveBaseSpeciesId(speciesId) || speciesId;
 		} else {
 			var vanillaSpecies = Dex.forGen(9).species.get(speciesId);
@@ -720,7 +716,6 @@
 		var lsetSpecies = this.engine.dex.species.get(learnsetid);
 		if (!lsetSpecies || !lsetSpecies.exists) return '';
 
-		// Special cases for specific forms
 		if (learnsetid === 'lycanrocdusk' || (speciesId === 'rockruff' && learnsetid === 'rockruff')) {
 			return 'rockruffdusk';
 		}
