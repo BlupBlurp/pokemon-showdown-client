@@ -482,7 +482,7 @@ export class MainMenuRoom extends PSRoom {
 				team.uploaded = {
 					teamid: response.teamid,
 					notLoaded: false,
-					private: response.private,
+					private: response.privacy,
 				};
 				PS.rooms[`team-${team.key}`]?.update(null);
 				PS.rooms.teambuilder?.update(null);
@@ -491,11 +491,11 @@ export class MainMenuRoom extends PSRoom {
 			break;
 		case 'teamupdate':
 			for (const team of PS.teams.list) {
-				if (team.teamid === response.teamid) {
+				if (team.teamid === Number(response.teamid)) {
 					team.uploaded = {
-						teamid: response.teamid,
+						teamid: team.teamid,
 						notLoaded: false,
-						private: response.private,
+						private: response.privacy,
 					};
 					PS.rooms[`team-${team.key}`]?.update(null);
 					PS.rooms.teambuilder?.update(null);
@@ -569,6 +569,7 @@ class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
 	override componentDidMount() {
 		super.componentDidMount();
 		this.subscribeTo(PSBackground);
+		Config.includes?.htmlDidMount?.();
 	}
 	override focus(options?: PSRoomFocusOptions) {
 		if (!options?.preventScroll) PSView.scrollToRoom();

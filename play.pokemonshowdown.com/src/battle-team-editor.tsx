@@ -3511,7 +3511,11 @@ class StatForm extends preact.Component<{
 			}
 			format = format.slice(4);
 		}
-		const generation = ['rb', 'gs', 'rs', 'dp', 'bw', 'xy', 'sm', 'ss', 'sv'][generationNumber - 1];
+		let generation = ['rb', 'gs', 'rs', 'dp', 'bw', 'xy', 'sm', 'ss', 'sv'][generationNumber - 1];
+		if (format.startsWith('champions')) {
+			generation = 'champions';
+			format = format.slice(9);
+		}
 		if (format === 'battlespotdoubles') {
 			smogdexid += '/vgc15';
 		} else if (format === 'doublesou' || format === 'doublesuu') {
