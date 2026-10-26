@@ -3167,7 +3167,7 @@
         "species": "Beartic",
         "moves": [
           "Superpower",
-          "Snowscape",
+          "Hail",
           "Thrash",
           "Sheer Cold"
         ],
@@ -3186,7 +3186,7 @@
         "species": "Beartic",
         "moves": [
           "Superpower",
-          "Snowscape",
+          "Hail",
           "Thrash",
           "Sheer Cold"
         ],
@@ -3225,7 +3225,7 @@
         "moves": [
           "Sheer Cold",
           "Superpower",
-          "Snowscape",
+          "Hail",
           "Thrash"
         ],
         "ability": "Snow Cloak",
@@ -5675,7 +5675,7 @@
           "Weather Ball",
           "Scald",
           "Energy Ball",
-          "Snowscape"
+          "Hail"
         ],
         "ability": "Forecast",
         "nature": "Hardy",
@@ -5730,8 +5730,8 @@
         "species": "Castform",
         "moves": [
           "Headbutt",
+          "Hail",
           "Rain Dance",
-          "Snowscape",
           "Sunny Day"
         ],
         "ability": "Forecast",
@@ -8961,7 +8961,7 @@
           "Rest",
           "Sheer Cold",
           "Blizzard",
-          "Snowscape"
+          "Hail"
         ],
         "ability": "Slush Rush",
         "nature": "Serious",
@@ -14546,7 +14546,7 @@
       "Snow Cloak (Bulky Support) - ID 1055": {
         "species": "Froslass",
         "moves": [
-          "Snowscape",
+          "Hail",
           "Blizzard",
           "Shadow Ball",
           "Double Team"
@@ -15954,7 +15954,7 @@
       "Snow Cloak (Bulky Support) - ID 1055": {
         "species": "Glaceon",
         "moves": [
-          "Snowscape",
+          "Hail",
           "Blizzard",
           "Aurora Veil",
           "Toxic"
@@ -15996,8 +15996,8 @@
       "Levitate (Bulky Attacker) - ID 625": {
         "species": "Glalie",
         "moves": [
+          "Hail",
           "Headbutt",
-          "Snowscape",
           "Weather Ball",
           "Sheer Cold"
         ],
@@ -16032,10 +16032,11 @@
           "spe": 250
         }
       },
-      "Refrigerate (Bulky Attacker) - ID 111": {
+      "Refrigerate (Bulky Support) - ID 111": {
         "species": "Glalie",
         "moves": [
           "Freeze-Dry",
+          "Hail",
           "Snowscape",
           "Blizzard"
         ],
@@ -35997,6 +35998,7 @@
       "Snow Cloak (Bulky Support) - ID 630": {
         "species": "Sandslash-Alola",
         "moves": [
+          "Slash",
           "Snowscape",
           "Swift",
           "Swords Dance"
@@ -36034,6 +36036,7 @@
       "Snow Cloak (Bulky Support) - ID 629": {
         "species": "Sandslash-Alola",
         "moves": [
+          "Slash",
           "Snowscape",
           "Swift",
           "Swords Dance"
@@ -36852,7 +36855,7 @@
         "species": "Sealeo",
         "moves": [
           "Encore",
-          "Snowscape",
+          "Hail",
           "Rest",
           "Snore"
         ],
@@ -36895,7 +36898,7 @@
         "moves": [
           "Aqua Tail",
           "Ice Beam",
-          "Snowscape",
+          "Hail",
           "Dive"
         ],
         "ability": "Thick Fat",
@@ -44659,7 +44662,7 @@
       "Snow Cloak (Bulky Attacker) - ID 114": {
         "species": "Vanillite",
         "moves": [
-          "Snowscape",
+          "Ice Beam",
           "Mirror Coat",
           "Sheer Cold",
           "Blizzard"
@@ -44719,7 +44722,7 @@
       "Ice Body (Bulky Attacker) - ID 108": {
         "species": "Vanilluxe",
         "moves": [
-          "Snowscape",
+          "Hail",
           "Ice Beam",
           "Mirror Coat",
           "Blizzard"
@@ -46049,7 +46052,7 @@
       "Ice Body (Bulky Attacker) - ID 984": {
         "species": "Walrein",
         "moves": [
-          "Snowscape",
+          "Hail",
           "Body Press",
           "Hydro Pump",
           "Blizzard"
@@ -46111,7 +46114,7 @@
         "moves": [
           "Surf",
           "Blizzard",
-          "Snowscape",
+          "Hail",
           "Sheer Cold"
         ],
         "ability": "Thick Fat",

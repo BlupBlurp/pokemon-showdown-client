@@ -461,7 +461,7 @@
 			'change input[name=nogif]': 'setNogif',
 			'change input[name=bwgfx]': 'setBwgfx',
 			'change input[name=nopastgens]': 'setNopastgens',
-			'change input[name=useupstreamsprites]': 'setUseUpstreamSprites',
+			'change select[name=useupstreamsprites]': 'setUseUpstreamSprites',
 			'change input[name=relumiHighlightBalanceChangesTB]': 'setRelumiHighlightBalanceChanges',
 			'change input[name=relumiHighlightBalanceChangesBT]': 'setRelumiHighlightBattleChanges',
 			'change select[name=tournaments]': 'setTournaments',
@@ -540,7 +540,8 @@
 			}
 			buf += '<p><label class="checkbox"><input type="checkbox" name="bwgfx"' + (Dex.prefs('bwgfx') ? ' checked' : '') + ' /> Use 2D sprites instead of 3D models</label></p>';
 			buf += '<p><label class="checkbox"><input type="checkbox" name="nopastgens"' + (Dex.prefs('nopastgens') ? ' checked' : '') + ' /> Use modern sprites for past generations</label></p>';
-			buf += '<p><label class="checkbox"><input type="checkbox" name="useupstreamsprites"' + (Dex.prefs("useupstreamsprites") ? " checked" : "") + ' /> Use upstream (official) sprites instead of custom</label></p>';
+			var useUpstreamSprites = !!Dex.prefs('useupstreamsprites');
+			buf += '<p><label class="optlabel">3D Sprite Source: <select name="useupstreamsprites" class="button"><option value="relumi"' + (!useUpstreamSprites ? ' selected="selected"' : '') + '>Relumi Custom</option><option value="upstream"' + (useUpstreamSprites ? ' selected="selected"' : '') + '>Upstream (Official)</option><option value="pokeapi" disabled>PokeAPI</option><option value="showdownplus" disabled>ShowdownPlus</option></select></label></p>';
 			buf += '<p><label class="checkbox"><input type="checkbox" name="relumiHighlightBalanceChangesTB"' + (Dex.prefs("relumiHighlightBalanceChangesTB") !== false ? " checked" : "") + ' /> Highlight Relumi balance changes in Teambuilder</label></p>';
 			buf += '<p><label class="checkbox"><input type="checkbox" name="relumiHighlightBalanceChangesBT"' + (Dex.prefs("relumiHighlightBalanceChangesBT") !== false ? " checked" : "") + ' /> Highlight Relumi balance changes in battle tooltips</label></p>';
 
@@ -653,7 +654,7 @@
 			Storage.prefs('nopastgens', nopastgens);
 		},
 		setUseUpstreamSprites: function (e) {
-			var useupstreamsprites = !!e.currentTarget.checked;
+			var useupstreamsprites = e.currentTarget.value === 'upstream';
 			Storage.prefs("useupstreamsprites", useupstreamsprites);
 		},
 		setRelumiHighlightBalanceChanges: function (e) {

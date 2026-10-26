@@ -659,6 +659,11 @@ class OptionsPanel extends PSRoomPanel {
 		const timestamp = (ev.currentTarget as HTMLSelectElement).value as TimestampOptions;
 		PS.prefs.set('timestamps', { ...PS.prefs.timestamps, pms: timestamp || undefined });
 	};
+	setSpriteSource = (ev: Event) => {
+		const useUpstream = (ev.currentTarget as HTMLSelectElement).value === 'upstream';
+		PS.prefs.set('useupstreamsprites', useUpstream);
+		this.forceUpdate();
+	};
 	setDefaultClient = (ev: Event) => {
 		const client = (ev.currentTarget as HTMLSelectElement).value;
 		PS.router.setDefaultClientCookie(client as 'old' | 'new');
@@ -698,7 +703,6 @@ class OptionsPanel extends PSRoomPanel {
 		case 'refreshprompt':
 		case 'noanim':
 		case 'nopastgens':
-		case 'useupstreamsprites':
 		case 'relumiHighlightBalanceChangesTB':
 		case 'relumiShowLearnsetMethods':
 		case 'noselfhighlight':
@@ -817,9 +821,15 @@ class OptionsPanel extends PSRoomPanel {
 				/> {TL`Use modern sprites for past generations`}</label>
 			</p>
 			<p>
-				<label class="checkbox"><input
-					name="useupstreamsprites" checked={PS.prefs.useupstreamsprites || false} type="checkbox" onChange={this.handleOnChange}
-				/> Use upstream (official) sprites instead of custom</label>
+				<label class="optlabel">{TL.label(TL`3D Sprite Source`)}<select
+					name="useupstreamsprites" class="select" onChange={this.setSpriteSource}
+					value={PS.prefs.useupstreamsprites ? 'upstream' : 'relumi'}
+				>
+					<option value="relumi">{TL`Relumi Custom`}</option>
+					<option value="upstream">{TL`Upstream (Official)`}</option>
+					<option value="pokeapi" disabled>{TL`PokeAPI`}</option>
+					<option value="showdownplus" disabled>{TL`ShowdownPlus`}</option>
+				</select></label>
 			</p>
 			<p>
 				<label class="checkbox"><input
