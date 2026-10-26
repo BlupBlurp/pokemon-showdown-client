@@ -252,6 +252,11 @@ export const translations: TranslationCatalog = {
 	"Password (confirm)": null,
 	"An Electric-type mouse that is the mascot of the Pokémon franchise.": null,
 	"What is this Pokémon?": null,
+	"3D Sprite Source": null,
+	"Relumi Custom": null,
+	"Upstream (Official)": null,
+	"PokeAPI": null,
+	"ShowdownPlus": null,
 
 	// #endregion Popups
 

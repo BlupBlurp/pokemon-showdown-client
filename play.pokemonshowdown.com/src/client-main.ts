@@ -385,8 +385,8 @@ export interface Team {
 	/** `uploaded` will only exist if you're logged into the correct account. otherwise teamid is still tracked */
 	uploaded?: {
 		teamid: number,
-		/** Promise = loading. */
-		notLoaded: boolean | Promise<void>,
+		/** Promise = loading; resolves to whether the load succeeded. */
+		notLoaded: boolean | Promise<boolean>,
 		/** password, if private. null = public, undefined = unknown, not loaded yet */
 		private?: string | null,
 	};
@@ -608,21 +608,21 @@ class PSTeams extends PSStreamModel<'team' | 'format'> {
 		const mons = uploadedTeam.split(',').map((m: string) => ({ species: m, moves: [] }));
 		return Teams.pack(mons);
 	}
-	loadTeam(team: Team | undefined | null, ifNeeded: true): void | Promise<void>;
-	loadTeam(team: Team | undefined | null): Promise<void>;
-	loadTeam(team: Team | undefined | null, ifNeeded?: boolean): void | Promise<void> {
-		if (!team?.uploaded || team.uploadedPackedTeam) return ifNeeded ? undefined : Promise.resolve();
+	loadTeam(team: Team | undefined | null, ifNeeded: true): void | Promise<boolean>;
+	loadTeam(team: Team | undefined | null): Promise<boolean>;
+	loadTeam(team: Team | undefined | null, ifNeeded?: boolean): void | Promise<boolean> {
+		if (!team?.uploaded || team.uploadedPackedTeam) return ifNeeded ? undefined : Promise.resolve(true);
 		if (team.uploaded.notLoaded && team.uploaded.notLoaded !== true) return team.uploaded.notLoaded;
 
 		const notLoaded = team.uploaded.notLoaded;
 		return (team.uploaded.notLoaded = PSLoginServer.query('getteam', {
 			teamid: team.uploaded.teamid,
 		}).then(data => {
-			if (!team.uploaded) return;
+			if (!team.uploaded) return false;
 			if (!data?.team) {
 				const actionError = data?.actionerror as string || TL`Error unknown. Try again later.`;
 				PS.alert(TL`Failed to load team: ${actionError}`);
-				return;
+				return false;
 			}
 			team.uploaded.notLoaded = false;
 			team.uploadedPackedTeam = data.team;
@@ -630,6 +630,7 @@ class PSTeams extends PSStreamModel<'team' | 'format'> {
 				team.packedTeam = data.team;
 				PS.teams.save();
 			}
+			return true;
 		}));
 	}
 	compareTeams(serverTeam: UploadedTeam, localTeam: Team) {
