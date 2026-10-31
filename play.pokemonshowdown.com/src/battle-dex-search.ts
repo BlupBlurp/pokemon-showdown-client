@@ -1111,7 +1111,8 @@ abstract class BattleTypedSearch<T extends SearchType> {
 	protected canLearn(speciesid: ID, moveid: ID) {
 		const move = this.dex.moves.get(moveid);
 		const isRelumiFormat = this.format.includes("relumi");
-		if (this.formatType?.includes('natdex') && move.isNonstandard && move.isNonstandard !== 'Past') {
+		if (this.formatType?.includes('natdex') && move.isNonstandard &&
+			move.isNonstandard !== 'Past' && move.isNonstandard !== 'Unobtainable') {
 			return false;
 		}
 		const gen = isRelumiFormat ? Math.max(this.dex.gen, 9) : this.dex.gen;
