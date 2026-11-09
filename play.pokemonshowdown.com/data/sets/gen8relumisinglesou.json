@@ -9791,27 +9791,6 @@
         }
       }
     },
-    "Dialga": {
-      "Pressure (Fast Attacker) - ID 886": {
-        "species": "Dialga",
-        "moves": [
-          "Flash Cannon",
-          "Roar of Time",
-          "Earth Power",
-          "Aura Sphere"
-        ],
-        "ability": "Pressure",
-        "nature": "Hardy",
-        "evs": {
-          "hp": 84,
-          "atk": 84,
-          "def": 84,
-          "spa": 88,
-          "spd": 84,
-          "spe": 86
-        }
-      }
-    },
     "Diancie": {
       "Filter (Bulky Attacker) - ID 892": {
         "species": "Diancie",
@@ -30367,27 +30346,6 @@
         }
       }
     },
-    "Palkia": {
-      "Pressure (Fast Attacker) - ID 886": {
-        "species": "Palkia",
-        "moves": [
-          "Hydro Pump",
-          "Spacial Rend",
-          "Earth Power",
-          "Aura Sphere"
-        ],
-        "ability": "Pressure",
-        "nature": "Docile",
-        "evs": {
-          "hp": 84,
-          "atk": 84,
-          "def": 84,
-          "spa": 88,
-          "spd": 84,
-          "spe": 86
-        }
-      }
-    },
     "Palossand": {
       "Water Compaction (Bulky Attacker) - ID 1002": {
         "species": "Palossand",
@@ -48121,9 +48079,9 @@
         }
       }
     },
-    "Zygarde": {
+    "Zygarde-10%": {
       "Power Construct (Fast Attacker) - ID 927": {
-        "species": "Zygarde",
+        "species": "Zygarde-10%",
         "moves": [
           "Thousand Arrows",
           "Stone Edge",
