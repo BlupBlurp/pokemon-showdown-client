@@ -602,6 +602,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Skill Link (Bulky Support) - bt-49-2": {
+        "species": "Aipom",
+        "moves": [
+          "Fury Swipes",
+          "Sand Attack",
+          "Baton Pass",
+          "Agility"
+        ],
+        "ability": "Skill Link",
+        "item": "Silk Scarf",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Alakazam": {
@@ -824,6 +844,26 @@
           "spd": 0,
           "spe": 0
         }
+      },
+      "Cloud Nine (Bulky Attacker) - bt-218-4": {
+        "species": "Altaria",
+        "moves": [
+          "Draco Meteor",
+          "Hyper Beam",
+          "Ice Beam",
+          "Flamethrower"
+        ],
+        "ability": "Cloud Nine",
+        "item": "White Herb",
+        "nature": "Modest",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        }
       }
     },
     "Amaura": {
@@ -926,6 +966,46 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Technician (Setup Sweeper) - bt-268": {
+        "species": "Ambipom",
+        "moves": [
+          "Shadow Ball",
+          "Thunderbolt",
+          "Swift",
+          "Nasty Plot"
+        ],
+        "ability": "Technician",
+        "item": "Wise Glasses",
+        "nature": "Modest",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Technician (Fast Attacker) - bt-237-2": {
+        "species": "Ambipom",
+        "moves": [
+          "Double Hit",
+          "Thief",
+          "Dual Chop",
+          "Fake Out"
+        ],
+        "ability": "Technician",
+        "item": "Muscle Band",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 20,
+          "atk": 246,
+          "def": 84,
+          "spa": 0,
+          "spd": 4,
+          "spe": 156
         }
       }
     },
@@ -1149,6 +1229,26 @@
           "spd": 236,
           "spe": 0
         }
+      },
+      "Battle Armor (Bulky Attacker) - bt-44": {
+        "species": "Anorith",
+        "moves": [
+          "Metal Claw",
+          "Fury Cutter",
+          "Ancient Power",
+          "Water Gun"
+        ],
+        "ability": "Battle Armor",
+        "item": "Scope Lens",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Appletun": {
@@ -1328,6 +1428,26 @@
           "spa": 2,
           "spd": 0,
           "spe": 252
+        }
+      },
+      "Intimidate (Bulky Attacker) - bt-84-2": {
+        "species": "Arbok",
+        "moves": [
+          "Poison Fang",
+          "Dig",
+          "Bite",
+          "Glare"
+        ],
+        "ability": "Intimidate",
+        "item": "Persim Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 32,
+          "spd": 28,
+          "spe": 140
         }
       }
     },
@@ -1759,6 +1879,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Insomnia (Bulky Support) - bt-57": {
+        "species": "Ariados",
+        "moves": [
+          "Sticky Web",
+          "Toxic Spikes",
+          "Night Shade",
+          "Toxic Thread"
+        ],
+        "ability": "Insomnia",
+        "item": "Focus Sash",
+        "nature": "Timid",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Armaldo": {
@@ -1922,6 +2062,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Sturdy (Bulky Support) - bt-34-2": {
+        "species": "Aron",
+        "moves": [
+          "Metal Claw",
+          "Aerial Ace",
+          "Metal Sound",
+          "Roar"
+        ],
+        "ability": "Sturdy",
+        "item": "Metal Coat",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Arrokuda": {
@@ -1984,6 +2144,66 @@
           "spa": 252,
           "spd": 252,
           "spe": 6
+        }
+      },
+      "Pressure (Bulky Support) - bt-260": {
+        "species": "Articuno",
+        "moves": [
+          "Agility",
+          "Ice Beam",
+          "Water Pulse",
+          "Rest"
+        ],
+        "ability": "Pressure",
+        "item": "Chesto Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 6
+        }
+      },
+      "Pressure (Bulky Support) - bt-252-3": {
+        "species": "Articuno",
+        "moves": [
+          "Sheer Cold",
+          "Mind Reader",
+          "Substitute",
+          "Roost"
+        ],
+        "ability": "Pressure",
+        "item": "Bright Powder",
+        "nature": "Timid",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 6,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Pressure (Bulky Attacker) - bt-213-3": {
+        "species": "Articuno",
+        "moves": [
+          "Sheer Cold",
+          "Ice Beam",
+          "Aerial Ace",
+          "Roar"
+        ],
+        "ability": "Pressure",
+        "item": "Wacan Berry",
+        "nature": "Calm",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 0,
+          "spa": 6,
+          "spd": 252,
+          "spe": 0
         }
       }
     },
@@ -2474,6 +2694,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Rock Head (Bulky Attacker) - bt-35": {
+        "species": "Bagon",
+        "moves": [
+          "Dragon Breath",
+          "Headbutt",
+          "Brick Break",
+          "Scary Face"
+        ],
+        "ability": "Rock Head",
+        "item": "Liechi Berry",
+        "nature": "Naughty",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Baltoy": {
@@ -2494,6 +2734,46 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Levitate (Bulky Attacker) - bt-28-2": {
+        "species": "Baltoy",
+        "moves": [
+          "Psybeam",
+          "Ancient Power",
+          "Light Screen",
+          "Mud-Slap"
+        ],
+        "ability": "Levitate",
+        "item": "Twisted Spoon",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Levitate (Bulky Attacker) - bt-11-3": {
+        "species": "Baltoy",
+        "moves": [
+          "Psybeam",
+          "Ancient Power",
+          "Light Screen",
+          "Mud-Slap"
+        ],
+        "ability": "Levitate",
+        "item": "Twisted Spoon",
+        "nature": "Naughty",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -3140,6 +3420,26 @@
           "spd": 0,
           "spe": 6
         }
+      },
+      "Overgrow (Bulky Support) - bt-85-2": {
+        "species": "Bayleef",
+        "moves": [
+          "Razor Leaf",
+          "Synthesis",
+          "Safeguard",
+          "Light Screen"
+        ],
+        "ability": "Overgrow",
+        "item": "Bright Powder",
+        "nature": "Docile",
+        "evs": {
+          "hp": 140,
+          "atk": 32,
+          "def": 30,
+          "spa": 140,
+          "spd": 28,
+          "spe": 140
+        }
       }
     },
     "Beartic": {
@@ -3319,6 +3619,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Swarm (Bulky Support) - bt-42": {
+        "species": "Beautifly",
+        "moves": [
+          "Bug Buzz",
+          "Mega Drain",
+          "Attract",
+          "Quiver Dance"
+        ],
+        "ability": "Swarm",
+        "item": "Mental Herb",
+        "nature": "Modest",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Beedrill": {
@@ -3377,6 +3697,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Swarm (Bulky Setup) - bt-65-2": {
+        "species": "Beedrill",
+        "moves": [
+          "Poison Jab",
+          "Fell Stinger",
+          "Endeavor",
+          "Agility"
+        ],
+        "ability": "Swarm",
+        "item": "Focus Sash",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -3698,6 +4038,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Simple (Bulky Support) - bt-63-3": {
+        "species": "Bibarel",
+        "moves": [
+          "Defense Curl",
+          "Rollout",
+          "Waterfall",
+          "Yawn"
+        ],
+        "ability": "Simple",
+        "item": "Metronome",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 140,
+          "spa": 30,
+          "spd": 28,
+          "spe": 32
+        }
       }
     },
     "Bidoof": {
@@ -3717,6 +4077,46 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Simple (Bulky Support) - bt-26-2": {
+        "species": "Bidoof",
+        "moves": [
+          "Curse",
+          "Headbutt",
+          "Pluck",
+          "Yawn"
+        ],
+        "ability": "Simple",
+        "item": "Leftovers",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Simple (Bulky Support) - bt-22": {
+        "species": "Bidoof",
+        "moves": [
+          "Defense Curl",
+          "Headbutt",
+          "Rollout",
+          "Yawn"
+        ],
+        "ability": "Simple",
+        "item": "Metronome",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -4401,6 +4801,26 @@
           "spd": 76,
           "spe": 80
         }
+      },
+      "Sturdy (Bulky Support) - bt-2": {
+        "species": "Bonsly",
+        "moves": [
+          "Fake Tears",
+          "Rock Throw",
+          "Copycat",
+          "Low Kick"
+        ],
+        "ability": "Sturdy",
+        "item": "Passho Berry",
+        "nature": "Careful",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 158,
+          "spe": 48
+        }
       }
     },
     "Bouffalant": {
@@ -4930,6 +5350,26 @@
           "spd": 150,
           "spe": 72
         }
+      },
+      "Levitate (Bulky Support) - bt-34-3": {
+        "species": "Bronzor",
+        "moves": [
+          "Confusion",
+          "Hypnosis",
+          "Confuse Ray",
+          "Gyro Ball"
+        ],
+        "ability": "Levitate",
+        "item": "Sitrus Berry",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Bruxish": {
@@ -5012,6 +5452,26 @@
           "spd": 0,
           "spe": 148
         }
+      },
+      "Poison Point (Bulky Support) - bt-22": {
+        "species": "Budew",
+        "moves": [
+          "Giga Drain",
+          "Stun Spore",
+          "Worry Seed",
+          "Growth"
+        ],
+        "ability": "Poison Point",
+        "item": "Big Root",
+        "nature": "Timid",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Buizel": {
@@ -5032,6 +5492,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Swift Swim (Bulky Attacker) - bt-10": {
+        "species": "Buizel",
+        "moves": [
+          "Aqua Jet",
+          "Quick Attack",
+          "Brick Break",
+          "Growl"
+        ],
+        "ability": "Swift Swim",
+        "item": "Wacan Berry",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -5071,6 +5551,46 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Overgrow (Bulky Support) - bt-25-2": {
+        "species": "Bulbasaur",
+        "moves": [
+          "Giga Drain",
+          "Toxic",
+          "Synthesis",
+          "Leech Seed"
+        ],
+        "ability": "Overgrow",
+        "item": "Leftovers",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Overgrow (Bulky Support) - bt-32": {
+        "species": "Bulbasaur",
+        "moves": [
+          "Razor Leaf",
+          "Take Down",
+          "Sleep Powder",
+          "Leech Seed"
+        ],
+        "ability": "Overgrow",
+        "item": "Bright Powder",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -5113,6 +5633,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Limber (Bulky Support) - bt-17": {
+        "species": "Buneary",
+        "moves": [
+          "Bounce",
+          "Quick Attack",
+          "Charm",
+          "Splash"
+        ],
+        "ability": "Limber",
+        "item": "Black Belt",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Bunnelby": {
@@ -5134,6 +5674,28 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      }
+    },
+    "Burmy": {
+      "Shed Skin (Bulky Support) - bt-30": {
+        "species": "Burmy",
+        "moves": [
+          "Bug Bite",
+          "String Shot",
+          "Protect",
+          "Tackle"
+        ],
+        "ability": "Shed Skin",
+        "item": "Choice Scarf",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -5213,6 +5775,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Compound Eyes (Bulky Support) - bt-56": {
+        "species": "Butterfree",
+        "moves": [
+          "Sleep Powder",
+          "Quiver Dance",
+          "Substitute",
+          "Bug Buzz"
+        ],
+        "ability": "Compound Eyes",
+        "item": "Leftovers",
+        "nature": "Timid",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Buzzwole": {
@@ -5255,6 +5837,26 @@
           "spa": 0,
           "spd": 156,
           "spe": 0
+        }
+      },
+      "Water Absorb (Bulky Support) - bt-28": {
+        "species": "Cacnea",
+        "moves": [
+          "Pin Missile",
+          "Payback",
+          "Cotton Spore",
+          "Sand Attack"
+        ],
+        "ability": "Water Absorb",
+        "item": "Sitrus Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -5315,6 +5917,26 @@
           "spa": 36,
           "spd": 36,
           "spe": 36
+        }
+      },
+      "Water Absorb (Bulky Attacker) - bt-87-3": {
+        "species": "Cacturne",
+        "moves": [
+          "Seed Bomb",
+          "Sucker Punch",
+          "Poison Jab",
+          "Revenge"
+        ],
+        "ability": "Water Absorb",
+        "item": "Scope Lens",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 12,
+          "spd": 8,
+          "spe": 160
         }
       }
     },
@@ -5585,6 +6207,26 @@
           "spd": 60,
           "spe": 60
         }
+      },
+      "Levitate (Bulky Support) - bt-75-3": {
+        "species": "Carnivine",
+        "moves": [
+          "Power Whip",
+          "Crunch",
+          "Sweet Scent",
+          "Leech Seed"
+        ],
+        "ability": "Levitate",
+        "item": "Rose Incense",
+        "nature": "Sassy",
+        "evs": {
+          "hp": 160,
+          "atk": 12,
+          "def": 160,
+          "spa": 8,
+          "spd": 160,
+          "spe": 10
+        }
       }
     },
     "Carracosta": {
@@ -5666,6 +6308,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Rough Skin (Bulky Support) - bt-9": {
+        "species": "Carvanha",
+        "moves": [
+          "Bite",
+          "Screech",
+          "Scary Face",
+          "Swagger"
+        ],
+        "ability": "Rough Skin",
+        "item": "Shell Bell",
+        "nature": "Quiet",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Castform": {
@@ -5743,6 +6405,26 @@
           "spa": 252,
           "spd": 0,
           "spe": 6
+        }
+      },
+      "Forecast (Bulky Attacker) - bt-39-3": {
+        "species": "Castform",
+        "moves": [
+          "Ember",
+          "Water Pulse",
+          "Shock Wave",
+          "Weather Ball"
+        ],
+        "ability": "Forecast",
+        "item": "Persim Berry",
+        "nature": "Hasty",
+        "evs": {
+          "hp": 140,
+          "atk": 32,
+          "def": 30,
+          "spa": 140,
+          "spd": 28,
+          "spe": 140
         }
       }
     },
@@ -6188,6 +6870,46 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Blaze (Bulky Attacker) - bt-0-3": {
+        "species": "Charmander",
+        "moves": [
+          "Dragon Breath",
+          "Inferno",
+          "Fire Spin",
+          "Scary Face"
+        ],
+        "ability": "Blaze",
+        "item": "Scope Lens",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Blaze (Bulky Support) - bt-1-3": {
+        "species": "Charmander",
+        "moves": [
+          "Fire Fang",
+          "Brick Break",
+          "Smokescreen",
+          "Scary Face"
+        ],
+        "ability": "Blaze",
+        "item": "Scope Lens",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Charmeleon": {
@@ -6208,6 +6930,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Blaze (Bulky Setup) - bt-85": {
+        "species": "Charmeleon",
+        "moves": [
+          "Slash",
+          "Fire Spin",
+          "Swords Dance",
+          "Aerial Ace"
+        ],
+        "ability": "Blaze",
+        "item": "Scope Lens",
+        "nature": "Naughty",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 32,
+          "spd": 28,
+          "spe": 140
         }
       }
     },
@@ -6427,6 +7169,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Chlorophyll (Bulky Support) - bt-8": {
+        "species": "Cherubi",
+        "moves": [
+          "Magical Leaf",
+          "Leech Seed",
+          "Sunny Day",
+          "Take Down"
+        ],
+        "ability": "Chlorophyll",
+        "item": "Occa Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Chesnaught": {
@@ -6529,6 +7291,46 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Overgrow (Bulky Support) - bt-5": {
+        "species": "Chikorita",
+        "moves": [
+          "Body Slam",
+          "Bullet Seed",
+          "Growl",
+          "Light Screen"
+        ],
+        "ability": "Overgrow",
+        "item": "Bright Powder",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Overgrow (Bulky Support) - bt-7": {
+        "species": "Chikorita",
+        "moves": [
+          "Magical Leaf",
+          "Reflect",
+          "Synthesis",
+          "Poison Powder"
+        ],
+        "ability": "Overgrow",
+        "item": "Leftovers",
+        "nature": "Bold",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Chimchar": {
@@ -6607,6 +7409,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Blaze (Bulky Support) - bt-3-2": {
+        "species": "Chimchar",
+        "moves": [
+          "Fire Spin",
+          "Double Team",
+          "Nasty Plot",
+          "Grass Knot"
+        ],
+        "ability": "Blaze",
+        "item": "Sitrus Berry",
+        "nature": "Timid",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -6688,6 +7510,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Levitate (Bulky Attacker) - bt-12-2": {
+        "species": "Chimecho",
+        "moves": [
+          "Extrasensory",
+          "Yawn",
+          "Uproar",
+          "Shadow Ball"
+        ],
+        "ability": "Levitate",
+        "item": "Grip Claw",
+        "nature": "Timid",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Chinchou": {
@@ -6708,6 +7550,26 @@
           "spa": 252,
           "spd": 8,
           "spe": 0
+        }
+      },
+      "Volt Absorb (Bulky Attacker) - bt-4-2": {
+        "species": "Chinchou",
+        "moves": [
+          "Spark",
+          "Bubble Beam",
+          "Confuse Ray",
+          "Take Down"
+        ],
+        "ability": "Volt Absorb",
+        "item": "Lax Incense",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -6870,6 +7732,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Shell Armor (Bulky Support) - bt-13": {
+        "species": "Clamperl",
+        "moves": [
+          "Surf",
+          "Protect",
+          "Iron Defense",
+          "Double Team"
+        ],
+        "ability": "Shell Armor",
+        "item": "Deep Sea Scale",
+        "nature": "Modest",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -7275,6 +8157,26 @@
           "spd": 0,
           "spe": 6
         }
+      },
+      "Magic Guard (Bulky Support) - bt-2": {
+        "species": "Clefairy",
+        "moves": [
+          "Moonblast",
+          "Metronome",
+          "Encore",
+          "Sing"
+        ],
+        "ability": "Magic Guard",
+        "item": "Lax Incense",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Cleffa": {
@@ -7641,6 +8543,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Honey Gather (Bulky Attacker) - bt-0": {
+        "species": "Combee",
+        "moves": [
+          "Sweet Scent",
+          "Gust",
+          "Struggle Bug",
+          "Bug Bite"
+        ],
+        "ability": "Honey Gather",
+        "item": "Quick Claw",
+        "nature": "Modest",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Combusken": {
@@ -7681,6 +8603,26 @@
           "spa": 88,
           "spd": 0,
           "spe": 96
+        }
+      },
+      "Blaze (Bulky Attacker) - bt-101": {
+        "species": "Combusken",
+        "moves": [
+          "Ember",
+          "Double Kick",
+          "Quick Attack",
+          "Sand Attack"
+        ],
+        "ability": "Blaze",
+        "item": "Scope Lens",
+        "nature": "Docile",
+        "evs": {
+          "hp": 32,
+          "atk": 140,
+          "def": 140,
+          "spa": 30,
+          "spd": 28,
+          "spe": 140
         }
       }
     },
@@ -7883,6 +8825,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Adaptability (Bulky Support) - bt-9-2": {
+        "species": "Corphish",
+        "moves": [
+          "Crabhammer",
+          "Water Pulse",
+          "Knock Off",
+          "Protect"
+        ],
+        "ability": "Adaptability",
+        "item": "Mystic Water",
+        "nature": "Brave",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Corsola": {
@@ -7903,6 +8865,26 @@
           "spa": 220,
           "spd": 220,
           "spe": 16
+        }
+      },
+      "Natural Cure (Bulky Attacker) - bt-63": {
+        "species": "Corsola",
+        "moves": [
+          "Bubble Beam",
+          "Mirror Coat",
+          "Attract",
+          "Ancient Power"
+        ],
+        "ability": "Natural Cure",
+        "item": "Focus Sash",
+        "nature": "Impish",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -8369,6 +9351,26 @@
           "spd": 0,
           "spe": 6
         }
+      },
+      "Storm Drain (Bulky Attacker) - bt-263-2": {
+        "species": "Cradily",
+        "moves": [
+          "Mirror Coat",
+          "Energy Ball",
+          "Stone Edge",
+          "Ingrain"
+        ],
+        "ability": "Storm Drain",
+        "item": "Sitrus Berry",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 0,
+          "spd": 6,
+          "spe": 0
+        }
       }
     },
     "Cramorant": {
@@ -8491,6 +9493,26 @@
           "spa": 78,
           "spd": 76,
           "spe": 80
+        }
+      },
+      "Mold Breaker (Bulky Support) - bt-14-2": {
+        "species": "Cranidos",
+        "moves": [
+          "Headbutt",
+          "Rock Slide",
+          "Scary Face",
+          "Leer"
+        ],
+        "ability": "Mold Breaker",
+        "item": "King's Rock",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -8633,6 +9655,66 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Levitate (Bulky Support) - bt-304-3": {
+        "species": "Cresselia",
+        "moves": [
+          "Trick Room",
+          "Icy Wind",
+          "Calm Mind",
+          "Psyshock"
+        ],
+        "ability": "Levitate",
+        "item": "Mental Herb",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 0,
+          "spd": 0,
+          "spe": 6
+        }
+      },
+      "Levitate (Bulky Support) - bt-306": {
+        "species": "Cresselia",
+        "moves": [
+          "Calm Mind",
+          "Moonlight",
+          "Stored Power",
+          "Substitute"
+        ],
+        "ability": "Levitate",
+        "item": "Leftovers",
+        "nature": "Timid",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 6,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Levitate (Bulky Support) - bt-276": {
+        "species": "Cresselia",
+        "moves": [
+          "Lunar Dance",
+          "Safeguard",
+          "Future Sight",
+          "Psychic"
+        ],
+        "ability": "Levitate",
+        "item": "Focus Band",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 0,
+          "spd": 6,
+          "spe": 0
         }
       }
     },
@@ -8891,6 +9973,26 @@
           "spd": 0,
           "spe": 138
         }
+      },
+      "Torrent (Bulky Attacker) - bt-81": {
+        "species": "Croconaw",
+        "moves": [
+          "Slash",
+          "Water Pulse",
+          "Bite",
+          "Scary Face"
+        ],
+        "ability": "Torrent",
+        "item": "Scope Lens",
+        "nature": "Docile",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 140,
+          "spa": 30,
+          "spd": 28,
+          "spe": 32
+        }
       }
     },
     "Crustle": {
@@ -9013,6 +10115,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Battle Armor (Bulky Attacker) - bt-5": {
+        "species": "Cubone",
+        "moves": [
+          "Bonemerang",
+          "Headbutt",
+          "Brick Break",
+          "Aerial Ace"
+        ],
+        "ability": "Battle Armor",
+        "item": "Soft Sand",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Cufant": {
@@ -9115,6 +10237,46 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Blaze (Bulky Attacker) - bt-12-3": {
+        "species": "Cyndaquil",
+        "moves": [
+          "Flame Charge",
+          "Lava Plume",
+          "Aerial Ace",
+          "Rollout"
+        ],
+        "ability": "Blaze",
+        "item": "Sitrus Berry",
+        "nature": "Docile",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Blaze (Bulky Attacker) - bt-27-2": {
+        "species": "Cyndaquil",
+        "moves": [
+          "Flame Wheel",
+          "Swift",
+          "Quick Attack",
+          "Smokescreen"
+        ],
+        "ability": "Blaze",
+        "item": "Focus Sash",
+        "nature": "Docile",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -9565,6 +10727,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Cute Charm (Bulky Support) - bt-21-4": {
+        "species": "Delcatty",
+        "moves": [
+          "Fake Out",
+          "Sing",
+          "Double Team",
+          "Shadow Ball"
+        ],
+        "ability": "Cute Charm",
+        "item": "Sitrus Berry",
+        "nature": "Lonely",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Delibird": {
@@ -9605,6 +10787,26 @@
           "spa": 6,
           "spd": 252,
           "spe": 252
+        }
+      },
+      "Vital Spirit (Bulky Attacker) - bt-34": {
+        "species": "Delibird",
+        "moves": [
+          "Present",
+          "Ice Beam",
+          "Aerial Ace",
+          "Hail"
+        ],
+        "ability": "Vital Spirit",
+        "item": "Never-Melt Ice",
+        "nature": "Docile",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -9725,6 +10927,46 @@
           "spa": 220,
           "spd": 16,
           "spe": 16
+        }
+      },
+      "Thick Fat (Bulky Support) - bt-212-3": {
+        "species": "Dewgong",
+        "moves": [
+          "Encore",
+          "Disable",
+          "Rest",
+          "Ice Beam"
+        ],
+        "ability": "Thick Fat",
+        "item": "Chesto Berry",
+        "nature": "Calm",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 0,
+          "spa": 0,
+          "spd": 252,
+          "spe": 6
+        }
+      },
+      "Thick Fat (Bulky Attacker) - bt-166": {
+        "species": "Dewgong",
+        "moves": [
+          "Aqua Jet",
+          "Ice Shard",
+          "Fake Out",
+          "Protect"
+        ],
+        "ability": "Thick Fat",
+        "item": "Razor Fang",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 12,
+          "spa": 12,
+          "spd": 12,
+          "spe": 156
         }
       }
     },
@@ -9966,6 +11208,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Early Bird (Bulky Support) - bt-87-4": {
+        "species": "Dodrio",
+        "moves": [
+          "Drill Peck",
+          "Tri Attack",
+          "Sleep Talk",
+          "Rest"
+        ],
+        "ability": "Early Bird",
+        "item": "Chesto Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 12,
+          "spd": 8,
+          "spe": 160
+        }
       }
     },
     "Doduo": {
@@ -10006,6 +11268,46 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Early Bird (Bulky Support) - bt-14": {
+        "species": "Doduo",
+        "moves": [
+          "Fury Attack",
+          "Uproar",
+          "Quick Attack",
+          "Rest"
+        ],
+        "ability": "Early Bird",
+        "item": "Liechi Berry",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
+      },
+      "Early Bird (Bulky Support) - bt-32-3": {
+        "species": "Doduo",
+        "moves": [
+          "Fury Attack",
+          "Uproar",
+          "Quick Attack",
+          "Rest"
+        ],
+        "ability": "Early Bird",
+        "item": "Liechi Berry",
+        "nature": "Lonely",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -10847,6 +12149,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Shed Skin (Bulky Support) - bt-11": {
+        "species": "Dratini",
+        "moves": [
+          "Outrage",
+          "Thunder Wave",
+          "Dragon Dance",
+          "Water Pulse"
+        ],
+        "ability": "Shed Skin",
+        "item": "Persim Berry",
+        "nature": "Docile",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Drednaw": {
@@ -11146,6 +12468,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Aftermath (Bulky Support) - bt-26": {
+        "species": "Drifloon",
+        "moves": [
+          "Shadow Ball",
+          "Will-O-Wisp",
+          "Gust",
+          "Astonish"
+        ],
+        "ability": "Aftermath",
+        "item": "Grip Claw",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Drilbur": {
@@ -11227,6 +12569,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Insomnia (Bulky Attacker) - bt-30": {
+        "species": "Drowzee",
+        "moves": [
+          "Confusion",
+          "Headbutt",
+          "Disable",
+          "Shadow Ball"
+        ],
+        "ability": "Insomnia",
+        "item": "Sitrus Berry",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -11756,6 +13118,26 @@
           "spd": 0,
           "spe": 252
         }
+      },
+      "Pressure (Bulky Support) - bt-114": {
+        "species": "Dusclops",
+        "moves": [
+          "Will-O-Wisp",
+          "Night Shade",
+          "Pain Split",
+          "Confuse Ray"
+        ],
+        "ability": "Pressure",
+        "item": "Leftovers",
+        "nature": "Impish",
+        "evs": {
+          "hp": 160,
+          "atk": 12,
+          "def": 160,
+          "spa": 8,
+          "spd": 160,
+          "spe": 10
+        }
       }
     },
     "Dusknoir": {
@@ -11876,6 +13258,26 @@
           "spa": 116,
           "spd": 0,
           "spe": 0
+        }
+      },
+      "Levitate (Bulky Support) - bt-31-3": {
+        "species": "Duskull",
+        "moves": [
+          "Shadow Sneak",
+          "Will-O-Wisp",
+          "Disable",
+          "Confuse Ray"
+        ],
+        "ability": "Levitate",
+        "item": "Spell Tag",
+        "nature": "Impish",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -12141,6 +13543,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Adaptability (Bulky Support) - bt-19-3": {
+        "species": "Eevee",
+        "moves": [
+          "Charm",
+          "Attract",
+          "Take Down",
+          "Endure"
+        ],
+        "ability": "Adaptability",
+        "item": "Salac Berry",
+        "nature": "Docile",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -12690,6 +14112,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Static (Fast Attacker) - bt-42-2": {
+        "species": "Elekid",
+        "moves": [
+          "Thunder Punch",
+          "Quick Attack",
+          "Swift",
+          "Light Screen"
+        ],
+        "ability": "Static",
+        "item": "Cheri Berry",
+        "nature": "Naive",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Elgyem": {
@@ -12935,6 +14377,46 @@
           "spa": 0,
           "spd": 252,
           "spe": 0
+        }
+      },
+      "Pressure (Setup Sweeper) - bt-291": {
+        "species": "Entei",
+        "moves": [
+          "Fire Blast",
+          "Extrasensory",
+          "Shadow Ball",
+          "Calm Mind"
+        ],
+        "ability": "Pressure",
+        "item": "Leftovers",
+        "nature": "Timid",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 0,
+          "spa": 6,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Inner Focus (Fast Attacker) - bt-226-4": {
+        "species": "Entei",
+        "moves": [
+          "Fire Fang",
+          "Iron Tail",
+          "Bite",
+          "Double Team"
+        ],
+        "ability": "Inner Focus",
+        "item": "Passho Berry",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
         }
       }
     },
@@ -13239,6 +14721,26 @@
           "spd": 36,
           "spe": 80
         }
+      },
+      "Chlorophyll (Bulky Support) - bt-24-2": {
+        "species": "Exeggcute",
+        "moves": [
+          "Confusion",
+          "Giga Drain",
+          "Leech Seed",
+          "Light Screen"
+        ],
+        "ability": "Chlorophyll",
+        "item": "Persim Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Exeggutor": {
@@ -13539,6 +15041,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Defiant (Bulky Support) - bt-12-2": {
+        "species": "Farfetch’d",
+        "moves": [
+          "Slash",
+          "Knock Off",
+          "Swords Dance",
+          "Agility"
+        ],
+        "ability": "Defiant",
+        "item": "Leek",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Farfetch’d-Galar": {
@@ -13681,6 +15203,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Keen Eye (Bulky Support) - bt-128": {
+        "species": "Fearow",
+        "moves": [
+          "Drill Peck",
+          "Tri Attack",
+          "Facade",
+          "Roost"
+        ],
+        "ability": "Keen Eye",
+        "item": "Sharp Beak",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 12,
+          "spd": 8,
+          "spe": 160
         }
       }
     },
@@ -13885,6 +15427,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Swift Swim (Bulky Support) - bt-8-2": {
+        "species": "Finneon",
+        "moves": [
+          "Water Pulse",
+          "Gust",
+          "Attract",
+          "Aqua Ring"
+        ],
+        "ability": "Swift Swim",
+        "item": "Wave Incense",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Flaaffy": {
@@ -13924,6 +15486,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Static (Bulky Support) - bt-64": {
+        "species": "Flaaffy",
+        "moves": [
+          "Shock Wave",
+          "Thunder Wave",
+          "Cotton Spore",
+          "Light Screen"
+        ],
+        "ability": "Static",
+        "item": "Shuca Berry",
+        "nature": "Mild",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -14800,6 +16382,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Keen Eye (Bulky Support) - bt-47-3": {
+        "species": "Furret",
+        "moves": [
+          "Slam",
+          "Protect",
+          "Helping Hand",
+          "Follow Me"
+        ],
+        "ability": "Keen Eye",
+        "item": "Liechi Berry",
+        "nature": "Serious",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 32,
+          "spd": 28,
+          "spe": 140
+        }
       }
     },
     "Gabite": {
@@ -14859,6 +16461,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Rough Skin (Bulky Support) - bt-71": {
+        "species": "Gabite",
+        "moves": [
+          "Dragon Claw",
+          "Take Down",
+          "Sand Attack",
+          "Roar"
+        ],
+        "ability": "Rough Skin",
+        "item": "Yache Berry",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 32,
+          "spd": 28,
+          "spe": 140
         }
       }
     },
@@ -15623,6 +17245,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Sturdy (Bulky Attacker) - bt-32-3": {
+        "species": "Geodude",
+        "moves": [
+          "Bulldoze",
+          "Rock Blast",
+          "Strength",
+          "Protect"
+        ],
+        "ability": "Sturdy",
+        "item": "Sitrus Berry",
+        "nature": "Brave",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Geodude-Alola": {
@@ -15684,6 +17326,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Rough Skin (Bulky Attacker) - bt-23": {
+        "species": "Gible",
+        "moves": [
+          "Dragon Claw",
+          "Dig",
+          "Sand Tomb",
+          "Sand Attack"
+        ],
+        "ability": "Rough Skin",
+        "item": "Soft Sand",
+        "nature": "Brave",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -15844,6 +17506,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Sap Sipper (Bulky Support) - bt-109": {
+        "species": "Girafarig",
+        "moves": [
+          "Psybeam",
+          "Thunderbolt",
+          "Wish",
+          "Skill Swap"
+        ],
+        "ability": "Sap Sipper",
+        "item": "Petaya Berry",
+        "nature": "Quiet",
+        "evs": {
+          "hp": 160,
+          "atk": 10,
+          "def": 8,
+          "spa": 160,
+          "spd": 160,
+          "spe": 12
         }
       }
     },
@@ -16029,6 +17711,46 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Moody (Bulky Attacker) - bt-279": {
+        "species": "Glalie",
+        "moves": [
+          "Ice Beam",
+          "Shadow Ball",
+          "Water Pulse",
+          "Safeguard"
+        ],
+        "ability": "Moody",
+        "item": "Scope Lens",
+        "nature": "Modest",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Moody (Bulky Support) - bt-224-4": {
+        "species": "Glalie",
+        "moves": [
+          "Double Team",
+          "Sheer Cold",
+          "Rest",
+          "Sleep Talk"
+        ],
+        "ability": "Moody",
+        "item": "Leftovers",
+        "nature": "Timid",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 6,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
       }
     },
     "Glameow": {
@@ -16088,6 +17810,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Limber (Bulky Support) - bt-23": {
+        "species": "Glameow",
+        "moves": [
+          "Fake Out",
+          "Fury Swipes",
+          "Growl",
+          "Attract"
+        ],
+        "ability": "Limber",
+        "item": "Quick Claw",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Gligar": {
@@ -16127,6 +17869,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Hyper Cutter (Bulky Attacker) - bt-64-2": {
+        "species": "Gligar",
+        "moves": [
+          "Metal Claw",
+          "Dig",
+          "Aerial Ace",
+          "Quick Attack"
+        ],
+        "ability": "Hyper Cutter",
+        "item": "Scope Lens",
+        "nature": "Hasty",
+        "evs": {
+          "hp": 140,
+          "atk": 32,
+          "def": 140,
+          "spa": 30,
+          "spd": 28,
+          "spe": 140
         }
       }
     },
@@ -16525,6 +18287,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Lightning Rod (Bulky Setup) - bt-35-3": {
+        "species": "Goldeen",
+        "moves": [
+          "Waterfall",
+          "Peck",
+          "Agility",
+          "Horn Drill"
+        ],
+        "ability": "Lightning Rod",
+        "item": "Petaya Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -17167,6 +18949,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Swift Swim (Bulky Support) - bt-102-2": {
+        "species": "Gorebyss",
+        "moves": [
+          "Hydro Pump",
+          "Psychic",
+          "Baton Pass",
+          "Shell Smash"
+        ],
+        "ability": "Swift Swim",
+        "item": "Focus Sash",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 12,
+          "def": 10,
+          "spa": 160,
+          "spd": 8,
+          "spe": 160
+        }
       }
     },
     "Gothitelle": {
@@ -17608,6 +19410,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Sturdy (Bulky Attacker) - bt-6-4": {
+        "species": "Graveler",
+        "moves": [
+          "Rollout",
+          "Rock Throw",
+          "Defense Curl",
+          "Brick Break"
+        ],
+        "ability": "Sturdy",
+        "item": "Focus Band",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Graveler-Alola": {
@@ -17771,6 +19593,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Stench (Bulky Support) - bt-7": {
+        "species": "Grimer",
+        "moves": [
+          "Sludge",
+          "Rock Tomb",
+          "Acid Armor",
+          "Minimize"
+        ],
+        "ability": "Stench",
+        "item": "Black Sludge",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -17998,6 +19840,26 @@
           "spd": 60,
           "spe": 60
         }
+      },
+      "Overgrow (Fast Attacker) - bt-71": {
+        "species": "Grovyle",
+        "moves": [
+          "Fury Cutter",
+          "Endeavor",
+          "Brick Break",
+          "Double Team"
+        ],
+        "ability": "Overgrow",
+        "item": "Bright Powder",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 32,
+          "spd": 28,
+          "spe": 140
+        }
       }
     },
     "Growlithe": {
@@ -18018,6 +19880,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Intimidate (Bulky Support) - bt-22": {
+        "species": "Growlithe",
+        "moves": [
+          "Flame Wheel",
+          "Bite",
+          "Roar",
+          "Agility"
+        ],
+        "ability": "Intimidate",
+        "item": "Shuca Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -18667,6 +20549,26 @@
           "spd": 6,
           "spe": 0
         }
+      },
+      "Levitate (Bulky Support) - bt-35-4": {
+        "species": "Haunter",
+        "moves": [
+          "Shadow Punch",
+          "Confuse Ray",
+          "Spite",
+          "Grudge"
+        ],
+        "ability": "Levitate",
+        "item": "Persim Berry",
+        "nature": "Rash",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Hawlucha": {
@@ -18890,6 +20792,66 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Flash Fire (Bulky Attacker) - bt-278": {
+        "species": "Heatran",
+        "moves": [
+          "Explosion",
+          "Fire Fang",
+          "Crunch",
+          "Iron Head"
+        ],
+        "ability": "Flash Fire",
+        "item": "Quick Claw",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Flash Fire (Bulky Attacker) - bt-330": {
+        "species": "Heatran",
+        "moves": [
+          "Heat Wave",
+          "Protect",
+          "Flash Cannon",
+          "Magma Storm"
+        ],
+        "ability": "Flash Fire",
+        "item": "Leftovers",
+        "nature": "Timid",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 0,
+          "spa": 6,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Flash Fire (Bulky Attacker) - bt-265": {
+        "species": "Heatran",
+        "moves": [
+          "Flamethrower",
+          "Earth Power",
+          "Dragon Pulse",
+          "Ancient Power"
+        ],
+        "ability": "Flash Fire",
+        "item": "Shuca Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
         }
       }
     },
@@ -19157,6 +21119,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Sand Stream (Bulky Support) - bt-8": {
+        "species": "Hippopotas",
+        "moves": [
+          "Bite",
+          "Sand Attack",
+          "Sand Tomb",
+          "Yawn"
+        ],
+        "ability": "Sand Stream",
+        "item": "Passho Berry",
+        "nature": "Brave",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Hippowdon": {
@@ -19336,6 +21318,26 @@
           "spa": 132,
           "spd": 24,
           "spe": 26
+        }
+      },
+      "Iron Fist (Bulky Attacker) - bt-116": {
+        "species": "Hitmonchan",
+        "moves": [
+          "Mach Punch",
+          "Ice Punch",
+          "Detect",
+          "Counter"
+        ],
+        "ability": "Iron Fist",
+        "item": "King's Rock",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 12,
+          "spd": 8,
+          "spe": 160
         }
       }
     },
@@ -19864,6 +21866,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Flash Fire (Bulky Support) - bt-34-3": {
+        "species": "Houndour",
+        "moves": [
+          "Crunch",
+          "Ember",
+          "Roar",
+          "Protect"
+        ],
+        "ability": "Flash Fire",
+        "item": "Charcoal",
+        "nature": "Docile",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Huntail": {
@@ -19903,6 +21925,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Swift Swim (Bulky Support) - bt-125-2": {
+        "species": "Huntail",
+        "moves": [
+          "Whirlpool",
+          "Scary Face",
+          "Screech",
+          "Bite"
+        ],
+        "ability": "Swift Swim",
+        "item": "Persim Berry",
+        "nature": "Quiet",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 160,
+          "spd": 8,
+          "spe": 12
         }
       }
     },
@@ -20124,6 +22166,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Tinted Lens (Bulky Support) - bt-70-2": {
+        "species": "Illumise",
+        "moves": [
+          "Bug Buzz",
+          "Wish",
+          "Quick Attack",
+          "Helping Hand"
+        ],
+        "ability": "Tinted Lens",
+        "item": "Liechi Berry",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -20515,6 +22577,26 @@
           "spd": 0,
           "spe": 252
         }
+      },
+      "Overgrow (Bulky Support) - bt-84": {
+        "species": "Ivysaur",
+        "moves": [
+          "Petal Dance",
+          "Growth",
+          "Sweet Scent",
+          "Take Down"
+        ],
+        "ability": "Overgrow",
+        "item": "Persim Berry",
+        "nature": "Gentle",
+        "evs": {
+          "hp": 140,
+          "atk": 28,
+          "def": 140,
+          "spa": 32,
+          "spd": 140,
+          "spe": 30
+        }
       }
     },
     "Jangmo-o": {
@@ -20859,6 +22941,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Chlorophyll (Bulky Support) - bt-77-3": {
+        "species": "Jumpluff",
+        "moves": [
+          "Aerial Ace",
+          "Swagger",
+          "Psych Up",
+          "Synthesis"
+        ],
+        "ability": "Chlorophyll",
+        "item": "Lax Incense",
+        "nature": "Docile",
+        "evs": {
+          "hp": 160,
+          "atk": 12,
+          "def": 10,
+          "spa": 160,
+          "spd": 8,
+          "spe": 160
+        }
       }
     },
     "Jynx": {
@@ -21001,6 +23103,26 @@
           "spd": 0,
           "spe": 6
         }
+      },
+      "Battle Armor (Bulky Support) - bt-30-3": {
+        "species": "Kabuto",
+        "moves": [
+          "Mega Drain",
+          "Ancient Power",
+          "Sand Attack",
+          "Protect"
+        ],
+        "ability": "Battle Armor",
+        "item": "Sitrus Berry",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Kabutops": {
@@ -21041,6 +23163,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Swift Swim (Bulky Attacker) - bt-73-3": {
+        "species": "Kabutops",
+        "moves": [
+          "Slash",
+          "Dig",
+          "Night Slash",
+          "Metal Sound"
+        ],
+        "ability": "Swift Swim",
+        "item": "Scope Lens",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 12,
+          "spd": 8,
+          "spe": 160
         }
       }
     },
@@ -21605,6 +23747,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Hyper Cutter (Bulky Support) - bt-126": {
+        "species": "Kingler",
+        "moves": [
+          "Crabhammer",
+          "Metal Claw",
+          "Knock Off",
+          "Protect"
+        ],
+        "ability": "Hyper Cutter",
+        "item": "Scope Lens",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 12,
+          "spd": 8,
+          "spe": 160
+        }
       }
     },
     "Kirlia": {
@@ -22003,6 +24165,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Levitate (Bulky Support) - bt-9-2": {
+        "species": "Koffing",
+        "moves": [
+          "Sludge",
+          "Smokescreen",
+          "Torment",
+          "Haze"
+        ],
+        "ability": "Levitate",
+        "item": "Poison Barb",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Komala": {
@@ -22145,6 +24327,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Hyper Cutter (Bulky Attacker) - bt-31-3": {
+        "species": "Krabby",
+        "moves": [
+          "Crabhammer",
+          "Mud Shot",
+          "Flail",
+          "Guillotine"
+        ],
+        "ability": "Hyper Cutter",
+        "item": "Focus Sash",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Kricketot": {
@@ -22184,6 +24386,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Shed Skin (Bulky Attacker) - bt-12": {
+        "species": "Kricketot",
+        "moves": [
+          "Struggle Bug",
+          "Bug Bite",
+          "Growl",
+          "Pound"
+        ],
+        "ability": "Shed Skin",
+        "item": "Sticky Barb",
+        "nature": "Impish",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -22464,6 +24686,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Sturdy (Bulky Support) - bt-48-3": {
+        "species": "Lairon",
+        "moves": [
+          "Metal Claw",
+          "Rock Tomb",
+          "Iron Defense",
+          "Protect"
+        ],
+        "ability": "Sturdy",
+        "item": "Metal Coat",
+        "nature": "Sassy",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 32,
+          "spd": 28,
+          "spe": 140
         }
       }
     },
@@ -22747,6 +24989,46 @@
           "spd": 74,
           "spe": 36
         }
+      },
+      "Guts (Bulky Attacker) - bt-0-2": {
+        "species": "Larvitar",
+        "moves": [
+          "Thrash",
+          "Rock Slide",
+          "Dig",
+          "Bite"
+        ],
+        "ability": "Guts",
+        "item": "Persim Berry",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
+      },
+      "Guts (Bulky Attacker) - bt-34": {
+        "species": "Larvitar",
+        "moves": [
+          "Thrash",
+          "Rock Slide",
+          "Dig",
+          "Bite"
+        ],
+        "ability": "Guts",
+        "item": "Persim Berry",
+        "nature": "Naughty",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Latias": {
@@ -22766,6 +25048,86 @@
           "atk": 0,
           "def": 252,
           "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Levitate (Setup Sweeper) - bt-253-3": {
+        "species": "Latias",
+        "moves": [
+          "Calm Mind",
+          "Recover",
+          "Stored Power",
+          "Mystical Fire"
+        ],
+        "ability": "Levitate",
+        "item": "Leftovers",
+        "nature": "Timid",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 0,
+          "spa": 6,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Levitate (Bulky Support) - bt-267": {
+        "species": "Latias",
+        "moves": [
+          "Psychic",
+          "Energy Ball",
+          "Grass Knot",
+          "Recover"
+        ],
+        "ability": "Levitate",
+        "item": "Colbur Berry",
+        "nature": "Timid",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Levitate (Setup Sweeper) - bt-255-2": {
+        "species": "Latias",
+        "moves": [
+          "Mist Ball",
+          "Dragon Pulse",
+          "Calm Mind",
+          "Safeguard"
+        ],
+        "ability": "Levitate",
+        "item": "Leftovers",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 6,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Levitate (Fast Attacker) - bt-263": {
+        "species": "Latias",
+        "moves": [
+          "Psychic",
+          "Dragon Pulse",
+          "Thunderbolt",
+          "Surf"
+        ],
+        "ability": "Levitate",
+        "item": "Bright Powder",
+        "nature": "Timid",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
           "spd": 0,
           "spe": 252
         }
@@ -22810,6 +25172,66 @@
           "spa": 252,
           "spd": 252,
           "spe": 6
+        }
+      },
+      "Levitate (Setup Sweeper) - bt-256": {
+        "species": "Latios",
+        "moves": [
+          "Dragon Dance",
+          "Recover",
+          "Dragon Claw",
+          "Shadow Claw"
+        ],
+        "ability": "Levitate",
+        "item": "Lum Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Levitate (Fast Attacker) - bt-291": {
+        "species": "Latios",
+        "moves": [
+          "Draco Meteor",
+          "Psychic",
+          "Thunder",
+          "Hyper Beam"
+        ],
+        "ability": "Levitate",
+        "item": "White Herb",
+        "nature": "Modest",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Levitate (Bulky Support) - bt-263": {
+        "species": "Latios",
+        "moves": [
+          "Luster Purge",
+          "Water Pulse",
+          "Dragon Breath",
+          "Recover"
+        ],
+        "ability": "Levitate",
+        "item": "Haban Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
         }
       }
     },
@@ -22972,6 +25394,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Early Bird (Bulky Support) - bt-5-4": {
+        "species": "Ledian",
+        "moves": [
+          "Light Screen",
+          "Baton Pass",
+          "Swords Dance",
+          "Agility"
+        ],
+        "ability": "Early Bird",
+        "item": "Focus Band",
+        "nature": "Bashful",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 158,
+          "spe": 48
+        }
       }
     },
     "Ledyba": {
@@ -23132,6 +25574,26 @@
           "spd": 0,
           "spe": 0
         }
+      },
+      "Own Tempo (Bulky Attacker) - bt-6-4": {
+        "species": "Lickitung",
+        "moves": [
+          "Slam",
+          "Brick Break",
+          "Lick",
+          "Screech"
+        ],
+        "ability": "Own Tempo",
+        "item": "Sitrus Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Liepard": {
@@ -23231,6 +25693,26 @@
           "spa": 20,
           "spd": 16,
           "spe": 128
+        }
+      },
+      "Storm Drain (Bulky Support) - bt-49-2": {
+        "species": "Lileep",
+        "moves": [
+          "Giga Drain",
+          "Acid",
+          "Ingrain",
+          "Confuse Ray"
+        ],
+        "ability": "Storm Drain",
+        "item": "Lax Incense",
+        "nature": "Docile",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -23412,6 +25894,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Gluttony (Bulky Support) - bt-59-2": {
+        "species": "Linoone",
+        "moves": [
+          "Extreme Speed",
+          "Sand Attack",
+          "Covet",
+          "Tickle"
+        ],
+        "ability": "Gluttony",
+        "item": "Sitrus Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 32,
+          "spd": 28,
+          "spe": 140
         }
       }
     },
@@ -23677,6 +26179,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Scrappy (Bulky Support) - bt-44": {
+        "species": "Loudred",
+        "moves": [
+          "Hyper Voice",
+          "Howl",
+          "Astonish",
+          "Supersonic"
+        ],
+        "ability": "Scrappy",
+        "item": "Focus Band",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -24078,6 +26600,26 @@
           "spd": 6,
           "spe": 252
         }
+      },
+      "Levitate (Bulky Support) - bt-80": {
+        "species": "Lunatone",
+        "moves": [
+          "Confusion",
+          "Cosmic Power",
+          "Light Screen",
+          "Sandstorm"
+        ],
+        "ability": "Levitate",
+        "item": "Sitrus Berry",
+        "nature": "Quiet",
+        "evs": {
+          "hp": 140,
+          "atk": 28,
+          "def": 140,
+          "spa": 32,
+          "spd": 140,
+          "spe": 30
+        }
       }
     },
     "Lurantis": {
@@ -24138,6 +26680,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Swift Swim (Bulky Support) - bt-18": {
+        "species": "Luvdisc",
+        "moves": [
+          "Sweet Kiss",
+          "Attract",
+          "Water Pulse",
+          "Rain Dance"
+        ],
+        "ability": "Swift Swim",
+        "item": "Quick Claw",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -24519,6 +27081,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Guts (Bulky Attacker) - bt-15-4": {
+        "species": "Machoke",
+        "moves": [
+          "Low Kick",
+          "Rock Tomb",
+          "Facade",
+          "Scary Face"
+        ],
+        "ability": "Guts",
+        "item": "Focus Band",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Machop": {
@@ -24656,6 +27238,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Flame Body (Bulky Support) - bt-8-4": {
+        "species": "Magby",
+        "moves": [
+          "Fire Punch",
+          "Smokescreen",
+          "Confuse Ray",
+          "Smog"
+        ],
+        "ability": "Flame Body",
+        "item": "Lax Incense",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Magcargo": {
@@ -24677,6 +27279,26 @@
           "spa": 0,
           "spd": 252,
           "spe": 0
+        }
+      },
+      "Flame Body (Bulky Support) - bt-101": {
+        "species": "Magcargo",
+        "moves": [
+          "Rock Slide",
+          "Ember",
+          "Acid Armor",
+          "Sandstorm"
+        ],
+        "ability": "Flame Body",
+        "item": "Lax Incense",
+        "nature": "Gentle",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 140,
+          "spd": 28,
+          "spe": 32
         }
       }
     },
@@ -24800,6 +27422,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Flame Body (Fast Attacker) - bt-97-3": {
+        "species": "Magmar",
+        "moves": [
+          "Flamethrower",
+          "Smokescreen",
+          "Brick Break",
+          "Psychic"
+        ],
+        "ability": "Flame Body",
+        "item": "Rawst Berry",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 160,
+          "spd": 8,
+          "spe": 12
         }
       }
     },
@@ -24941,6 +27583,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Sturdy (Bulky Support) - bt-15": {
+        "species": "Magnemite",
+        "moves": [
+          "Shock Wave",
+          "Supersonic",
+          "Metal Sound",
+          "Reflect"
+        ],
+        "ability": "Sturdy",
+        "item": "Rawst Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -25642,6 +28304,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Swift Swim (Bulky Attacker) - bt-96-3": {
+        "species": "Mantine",
+        "moves": [
+          "Bubble Beam",
+          "Aerial Ace",
+          "Rain Dance",
+          "Psybeam"
+        ],
+        "ability": "Swift Swim",
+        "item": "Mystic Water",
+        "nature": "Docile",
+        "evs": {
+          "hp": 160,
+          "atk": 12,
+          "def": 10,
+          "spa": 160,
+          "spd": 8,
+          "spe": 160
+        }
       }
     },
     "Mantyke": {
@@ -25662,6 +28344,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Swift Swim (Bulky Support) - bt-25": {
+        "species": "Mantyke",
+        "moves": [
+          "Bubble Beam",
+          "Agility",
+          "Aqua Ring",
+          "Air Slash"
+        ],
+        "ability": "Swift Swim",
+        "item": "Bright Powder",
+        "nature": "Modest",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -25788,6 +28490,66 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Battle Armor (Bulky Attacker) - bt-149": {
+        "species": "Marowak",
+        "moves": [
+          "Brick Break",
+          "Earthquake",
+          "Rock Tomb",
+          "Iron Head"
+        ],
+        "ability": "Battle Armor",
+        "item": "Thick Club",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 12,
+          "spa": 12,
+          "spd": 12,
+          "spe": 156
+        }
+      },
+      "Battle Armor (Bulky Attacker) - bt-289": {
+        "species": "Marowak",
+        "moves": [
+          "Thunder Punch",
+          "Stone Edge",
+          "Earthquake",
+          "Low Kick"
+        ],
+        "ability": "Battle Armor",
+        "item": "Thick Club",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 6,
+          "spa": 0,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Battle Armor (Bulky Attacker) - bt-239": {
+        "species": "Marowak",
+        "moves": [
+          "Earthquake",
+          "Double-Edge",
+          "Aerial Ace",
+          "Brick Break"
+        ],
+        "ability": "Battle Armor",
+        "item": "Thick Club",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 48,
+          "atk": 226,
+          "def": 4,
+          "spa": 4,
+          "spd": 4,
+          "spe": 224
+        }
       }
     },
     "Marowak-Alola": {
@@ -25891,6 +28653,26 @@
           "spa": 140,
           "spd": 0,
           "spe": 0
+        }
+      },
+      "Torrent (Bulky Attacker) - bt-50-3": {
+        "species": "Marshtomp",
+        "moves": [
+          "Mud Shot",
+          "Water Gun",
+          "Rock Tomb",
+          "Mud-Slap"
+        ],
+        "ability": "Torrent",
+        "item": "Focus Band",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 140,
+          "spd": 28,
+          "spe": 32
         }
       }
     },
@@ -27021,6 +29803,26 @@
           "spd": 44,
           "spe": 124
         }
+      },
+      "Intimidate (Bulky Support) - bt-101": {
+        "species": "Mightyena",
+        "moves": [
+          "Bite",
+          "Poison Fang",
+          "Taunt",
+          "Roar"
+        ],
+        "ability": "Intimidate",
+        "item": "Mental Herb",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 32,
+          "spd": 28,
+          "spe": 140
+        }
       }
     },
     "Milcery": {
@@ -27203,6 +30005,46 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Scrappy (Bulky Support) - bt-272-2": {
+        "species": "Miltank",
+        "moves": [
+          "Endure",
+          "Reversal",
+          "Milk Drink",
+          "Rock Slide"
+        ],
+        "ability": "Scrappy",
+        "item": "Salac Berry",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Thick Fat (Bulky Support) - bt-205": {
+        "species": "Miltank",
+        "moves": [
+          "Defense Curl",
+          "Rollout",
+          "Milk Drink",
+          "Seismic Toss"
+        ],
+        "ability": "Thick Fat",
+        "item": "Muscle Band",
+        "nature": "Impish",
+        "evs": {
+          "hp": 212,
+          "atk": 212,
+          "def": 68,
+          "spa": 6,
+          "spd": 4,
+          "spe": 8
+        }
       }
     },
     "Mime Jr.": {
@@ -27242,6 +30084,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Soundproof (Bulky Support) - bt-21": {
+        "species": "Mime Jr.",
+        "moves": [
+          "Copycat",
+          "Confusion",
+          "Reflect",
+          "Light Screen"
+        ],
+        "ability": "Soundproof",
+        "item": "Lax Incense",
+        "nature": "Bold",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -27424,6 +30286,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Minus (Bulky Support) - bt-6-4": {
+        "species": "Minun",
+        "moves": [
+          "Spark",
+          "Charm",
+          "Encore",
+          "Helping Hand"
+        ],
+        "ability": "Minus",
+        "item": "Salac Berry",
+        "nature": "Docile",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Misdreavus": {
@@ -27463,6 +30345,26 @@
           "spa": 0,
           "spd": 252,
           "spe": 0
+        }
+      },
+      "Levitate (Bulky Support) - bt-73": {
+        "species": "Misdreavus",
+        "moves": [
+          "Pain Split",
+          "Shadow Ball",
+          "Confuse Ray",
+          "Thunder Wave"
+        ],
+        "ability": "Levitate",
+        "item": "Focus Band",
+        "nature": "Impish",
+        "evs": {
+          "hp": 140,
+          "atk": 28,
+          "def": 140,
+          "spa": 32,
+          "spd": 140,
+          "spe": 30
         }
       }
     },
@@ -27605,6 +30507,66 @@
           "def": 0,
           "spa": 252,
           "spd": 6,
+          "spe": 252
+        }
+      },
+      "Flame Body (Setup Sweeper) - bt-258": {
+        "species": "Moltres",
+        "moves": [
+          "Air Slash",
+          "Agility",
+          "Heat Wave",
+          "Will-O-Wisp"
+        ],
+        "ability": "Flame Body",
+        "item": "King's Rock",
+        "nature": "Timid",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Flame Body (Bulky Support) - bt-258-3": {
+        "species": "Moltres",
+        "moves": [
+          "Mystical Fire",
+          "Hurricane",
+          "Will-O-Wisp",
+          "Roost"
+        ],
+        "ability": "Flame Body",
+        "item": "Lax Incense",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 6,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Flame Body (Bulky Support) - bt-254": {
+        "species": "Moltres",
+        "moves": [
+          "Overheat",
+          "Sky Attack",
+          "Fire Blast",
+          "U-turn"
+        ],
+        "ability": "Flame Body",
+        "item": "Bright Powder",
+        "nature": "Modest",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
           "spe": 252
         }
       }
@@ -27871,6 +30833,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Tinted Lens (Bulky Attacker) - bt-84": {
+        "species": "Mothim",
+        "moves": [
+          "Psybeam",
+          "Gust",
+          "Poison Powder",
+          "Bug Buzz"
+        ],
+        "ability": "Tinted Lens",
+        "item": "Coba Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 140,
+          "atk": 32,
+          "def": 30,
+          "spa": 140,
+          "spd": 28,
+          "spe": 140
+        }
       }
     },
     "Mr. Mime": {
@@ -28117,6 +31099,48 @@
         }
       }
     },
+    "Mudkip": {
+      "Torrent (Bulky Attacker) - bt-26": {
+        "species": "Mudkip",
+        "moves": [
+          "Rock Slide",
+          "Dig",
+          "Avalanche",
+          "Waterfall"
+        ],
+        "ability": "Torrent",
+        "item": "Rindo Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Torrent (Bulky Attacker) - bt-0": {
+        "species": "Mudkip",
+        "moves": [
+          "Water Pulse",
+          "Endeavor",
+          "Rock Slide",
+          "Dig"
+        ],
+        "ability": "Torrent",
+        "item": "Rindo Berry",
+        "nature": "Docile",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
+      }
+    },
     "Mudsdale": {
       "Stamina (Bulky Attacker) - ID 929": {
         "species": "Mudsdale",
@@ -28234,6 +31258,66 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Poison Touch (Bulky Attacker) - bt-229-4": {
+        "species": "Muk",
+        "moves": [
+          "Gunk Shot",
+          "Brick Break",
+          "Shadow Punch",
+          "Rock Slide"
+        ],
+        "ability": "Poison Touch",
+        "item": "Focus Sash",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 6,
+          "spa": 0,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Poison Touch (Bulky Support) - bt-201-2": {
+        "species": "Muk",
+        "moves": [
+          "Poison Jab",
+          "Minimize",
+          "Acid Armor",
+          "Brick Break"
+        ],
+        "ability": "Poison Touch",
+        "item": "Black Sludge",
+        "nature": "Impish",
+        "evs": {
+          "hp": 212,
+          "atk": 68,
+          "def": 212,
+          "spa": 6,
+          "spd": 4,
+          "spe": 8
+        }
+      },
+      "Poison Touch (Bulky Attacker) - bt-275": {
+        "species": "Muk",
+        "moves": [
+          "Gunk Shot",
+          "Fling",
+          "Explosion",
+          "Shadow Punch"
+        ],
+        "ability": "Poison Touch",
+        "item": "Quick Claw",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 6
         }
       }
     },
@@ -28453,6 +31537,26 @@
           "spd": 6,
           "spe": 252
         }
+      },
+      "Prankster (Bulky Support) - bt-11-4": {
+        "species": "Murkrow",
+        "moves": [
+          "Dark Pulse",
+          "Fly",
+          "Torment",
+          "Taunt"
+        ],
+        "ability": "Prankster",
+        "item": "Wacan Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Musharna": {
@@ -28555,6 +31659,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Magic Bounce (Bulky Attacker) - bt-5-2": {
+        "species": "Natu",
+        "moves": [
+          "Night Shade",
+          "Future Sight",
+          "Psychic",
+          "Flash"
+        ],
+        "ability": "Magic Bounce",
+        "item": "Twisted Spoon",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -28779,6 +31903,26 @@
           "spd": 4,
           "spe": 4
         }
+      },
+      "Poison Point (Bulky Attacker) - bt-289-2": {
+        "species": "Nidoqueen",
+        "moves": [
+          "Stone Edge",
+          "Avalanche",
+          "Iron Tail",
+          "Aerial Ace"
+        ],
+        "ability": "Poison Point",
+        "item": "Bright Powder",
+        "nature": "Brave",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 6,
+          "spa": 0,
+          "spd": 0,
+          "spe": 0
+        }
       }
     },
     "Nidoran-F": {
@@ -28900,6 +32044,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Poison Point (Bulky Attacker) - bt-69": {
+        "species": "Nidorina",
+        "moves": [
+          "Double Kick",
+          "Bite",
+          "Aerial Ace",
+          "Flatter"
+        ],
+        "ability": "Poison Point",
+        "item": "Focus Band",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Nidorino": {
@@ -28939,6 +32103,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Poison Point (Bulky Support) - bt-43": {
+        "species": "Nidorino",
+        "moves": [
+          "Double Kick",
+          "Water Pulse",
+          "Toxic Spikes",
+          "Flatter"
+        ],
+        "ability": "Poison Point",
+        "item": "Focus Band",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -29301,6 +32485,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Speed Boost (Bulky Support) - bt-75-3": {
+        "species": "Ninjask",
+        "moves": [
+          "Baton Pass",
+          "Swords Dance",
+          "Endure",
+          "Dig"
+        ],
+        "ability": "Speed Boost",
+        "item": "Petaya Berry",
+        "nature": "Mild",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 12,
+          "spd": 8,
+          "spe": 160
+        }
       }
     },
     "Noctowl": {
@@ -29562,6 +32766,26 @@
           "spd": 196,
           "spe": 0
         }
+      },
+      "Sturdy (Bulky Support) - bt-59": {
+        "species": "Nosepass",
+        "moves": [
+          "Rock Slide",
+          "Shock Wave",
+          "Thunder Wave",
+          "Sandstorm"
+        ],
+        "ability": "Sturdy",
+        "item": "Hard Stone",
+        "nature": "Sassy",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Numel": {
@@ -29601,6 +32825,48 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Oblivious (Bulky Attacker) - bt-28": {
+        "species": "Numel",
+        "moves": [
+          "Ember",
+          "Earth Power",
+          "Rock Tomb",
+          "Sandstorm"
+        ],
+        "ability": "Oblivious",
+        "item": "Lax Incense",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
+      }
+    },
+    "Nuzleaf": {
+      "Chlorophyll (Bulky Attacker) - bt-9-3": {
+        "species": "Nuzleaf",
+        "moves": [
+          "Extrasensory",
+          "Fake Out",
+          "Razor Leaf",
+          "Rock Tomb"
+        ],
+        "ability": "Chlorophyll",
+        "item": "Sitrus Berry",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -29862,6 +33128,26 @@
           "spd": 238,
           "spe": 196
         }
+      },
+      "Shell Armor (Bulky Attacker) - bt-63": {
+        "species": "Omanyte",
+        "moves": [
+          "Mud Shot",
+          "Water Gun",
+          "Ancient Power",
+          "Tickle"
+        ],
+        "ability": "Shell Armor",
+        "item": "Sitrus Berry",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Omastar": {
@@ -29882,6 +33168,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Swift Swim (Bulky Attacker) - bt-114": {
+        "species": "Omastar",
+        "moves": [
+          "Bubble Beam",
+          "Rock Blast",
+          "Tickle",
+          "Ancient Power"
+        ],
+        "ability": "Swift Swim",
+        "item": "Shell Bell",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 160,
+          "spd": 8,
+          "spe": 12
         }
       }
     },
@@ -30650,6 +33956,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Effect Spore (Bulky Support) - bt-2-4": {
+        "species": "Parasect",
+        "moves": [
+          "Slash",
+          "Psybeam",
+          "Spore",
+          "Flash"
+        ],
+        "ability": "Effect Spore",
+        "item": "Sticky Barb",
+        "nature": "Rash",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Passimian": {
@@ -30891,6 +34217,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Technician (Bulky Support) - bt-68-3": {
+        "species": "Persian",
+        "moves": [
+          "Fake Out",
+          "Slash",
+          "Torment",
+          "Swagger"
+        ],
+        "ability": "Technician",
+        "item": "Silk Scarf",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 32,
+          "atk": 140,
+          "def": 140,
+          "spa": 30,
+          "spd": 28,
+          "spe": 140
+        }
       }
     },
     "Persian-Alola": {
@@ -30973,6 +34319,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Pickup (Bulky Support) - bt-12": {
+        "species": "Phanpy",
+        "moves": [
+          "Rollout",
+          "Defense Curl",
+          "Rock Tomb",
+          "Sandstorm"
+        ],
+        "ability": "Pickup",
+        "item": "Lax Incense",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -31236,6 +34602,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Big Pecks (Bulky Support) - bt-32-2": {
+        "species": "Pidgeotto",
+        "moves": [
+          "Aerial Ace",
+          "Quick Attack",
+          "Feather Dance",
+          "Sand Attack"
+        ],
+        "ability": "Big Pecks",
+        "item": "White Herb",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -31819,6 +35205,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Plus (Bulky Support) - bt-43": {
+        "species": "Plusle",
+        "moves": [
+          "Spark",
+          "Fake Tears",
+          "Quick Attack",
+          "Helping Hand"
+        ],
+        "ability": "Plus",
+        "item": "Petaya Berry",
+        "nature": "Docile",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Politoed": {
@@ -31978,6 +35384,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Water Absorb (Bulky Support) - bt-49": {
+        "species": "Poliwhirl",
+        "moves": [
+          "Water Pulse",
+          "Earth Power",
+          "Hypnosis",
+          "Rain Dance"
+        ],
+        "ability": "Water Absorb",
+        "item": "Petaya Berry",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -32200,6 +35626,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Flame Body (Fast Attacker) - bt-51": {
+        "species": "Ponyta",
+        "moves": [
+          "Flame Charge",
+          "Iron Tail",
+          "Take Down",
+          "Tail Whip"
+        ],
+        "ability": "Flame Body",
+        "item": "Passho Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Ponyta-Galar": {
@@ -32320,6 +35766,26 @@
           "spa": 114,
           "spd": 36,
           "spe": 252
+        }
+      },
+      "Download (Bulky Support) - bt-36-2": {
+        "species": "Porygon",
+        "moves": [
+          "Psybeam",
+          "Tri Attack",
+          "Recycle",
+          "Agility"
+        ],
+        "ability": "Download",
+        "item": "Sitrus Berry",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -32622,6 +36088,26 @@
           "spd": 252,
           "spe": 0
         }
+      },
+      "Defiant (Fast Attacker) - bt-73-3": {
+        "species": "Primeape",
+        "moves": [
+          "Cross Chop",
+          "Stomping Tantrum",
+          "Swagger",
+          "Thief"
+        ],
+        "ability": "Defiant",
+        "item": "Sitrus Berry",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 12,
+          "spd": 8,
+          "spe": 160
+        }
       }
     },
     "Prinplup": {
@@ -32882,6 +36368,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Cloud Nine (Bulky Attacker) - bt-1-3": {
+        "species": "Psyduck",
+        "moves": [
+          "Confusion",
+          "Fury Swipes",
+          "Aerial Ace",
+          "Disable"
+        ],
+        "ability": "Cloud Nine",
+        "item": "Persim Berry",
+        "nature": "Hasty",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Pumpkaboo": {
@@ -32923,6 +36429,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Shed Skin (Bulky Support) - bt-79-2": {
+        "species": "Pupitar",
+        "moves": [
+          "Dig",
+          "Bite",
+          "Scary Face",
+          "Sandstorm"
+        ],
+        "ability": "Shed Skin",
+        "item": "Soft Sand",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 140,
+          "spa": 30,
+          "spd": 28,
+          "spe": 32
         }
       }
     },
@@ -33227,6 +36753,28 @@
         }
       }
     },
+    "Quilava": {
+      "Blaze (Bulky Attacker) - bt-72": {
+        "species": "Quilava",
+        "moves": [
+          "Flame Wheel",
+          "Fury Swipes",
+          "Swift",
+          "Smokescreen"
+        ],
+        "ability": "Blaze",
+        "item": "Focus Band",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 28,
+          "spa": 32,
+          "spd": 140,
+          "spe": 30
+        }
+      }
+    },
     "Quilladin": {
       "Overgrow (Bulky Attacker) - ID 184": {
         "species": "Quilladin",
@@ -33306,6 +36854,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Intimidate (Bulky Support) - bt-79": {
+        "species": "Qwilfish",
+        "moves": [
+          "Bubble Beam",
+          "Pin Missile",
+          "Spikes",
+          "Minimize"
+        ],
+        "ability": "Intimidate",
+        "item": "Cheri Berry",
+        "nature": "Impish",
+        "evs": {
+          "hp": 140,
+          "atk": 32,
+          "def": 140,
+          "spa": 28,
+          "spd": 140,
+          "spe": 30
         }
       }
     },
@@ -33562,6 +37130,86 @@
         "ability": "Volt Absorb",
         "item": "Focus Sash",
         "nature": "Modest",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Pressure (Setup Sweeper) - bt-225-3": {
+        "species": "Raikou",
+        "moves": [
+          "Rain Dance",
+          "Thunder",
+          "Calm Mind",
+          "Iron Tail"
+        ],
+        "ability": "Pressure",
+        "item": "Magnet",
+        "nature": "Timid",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 0,
+          "spa": 6,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Pressure (Bulky Support) - bt-233-4": {
+        "species": "Raikou",
+        "moves": [
+          "Scald",
+          "Calm Mind",
+          "Rest",
+          "Double Team"
+        ],
+        "ability": "Pressure",
+        "item": "Lax Incense",
+        "nature": "Timid",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 6,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Pressure (Bulky Support) - bt-246-2": {
+        "species": "Raikou",
+        "moves": [
+          "Shadow Ball",
+          "Scald",
+          "Thunderbolt",
+          "Volt Switch"
+        ],
+        "ability": "Pressure",
+        "item": "Wise Glasses",
+        "nature": "Timid",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Inner Focus (Bulky Support) - bt-276-3": {
+        "species": "Raikou",
+        "moves": [
+          "Thunderbolt",
+          "Volt Switch",
+          "Shadow Ball",
+          "Scald"
+        ],
+        "ability": "Inner Focus",
+        "item": "Choice Specs",
+        "nature": "Timid",
         "evs": {
           "hp": 6,
           "atk": 0,
@@ -33894,6 +37542,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Guts (Fast Attacker) - bt-80": {
+        "species": "Raticate",
+        "moves": [
+          "Endeavor",
+          "Super Fang",
+          "Scary Face",
+          "Quick Attack"
+        ],
+        "ability": "Guts",
+        "item": "Silk Scarf",
+        "nature": "Naive",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 32,
+          "spd": 28,
+          "spe": 140
+        }
       }
     },
     "Raticate-Alola": {
@@ -33999,6 +37667,108 @@
         }
       }
     },
+    "Regice": {
+      "Ice Body (Bulky Support) - bt-312": {
+        "species": "Regice",
+        "moves": [
+          "Blizzard",
+          "Thunderbolt",
+          "Amnesia",
+          "Rest"
+        ],
+        "ability": "Ice Body",
+        "item": "Leftovers",
+        "nature": "Bold",
+        "evs": {
+          "hp": 174,
+          "atk": 0,
+          "def": 252,
+          "spa": 84,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Clear Body (Bulky Setup) - bt-297": {
+        "species": "Regice",
+        "moves": [
+          "Focus Blast",
+          "Blizzard",
+          "Giga Impact",
+          "Rock Polish"
+        ],
+        "ability": "Clear Body",
+        "item": "Ganlon Berry",
+        "nature": "Serious",
+        "evs": {
+          "hp": 252,
+          "atk": 6,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Clear Body (Bulky Support) - bt-250": {
+        "species": "Regice",
+        "moves": [
+          "Ice Beam",
+          "Ancient Power",
+          "Charge Beam",
+          "Rest"
+        ],
+        "ability": "Clear Body",
+        "item": "Chesto Berry",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 6,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Clear Body (Bulky Attacker) - bt-266-2": {
+        "species": "Regice",
+        "moves": [
+          "Ice Beam",
+          "Thunderbolt",
+          "Hyper Beam",
+          "Flash Cannon"
+        ],
+        "ability": "Clear Body",
+        "item": "Shell Bell",
+        "nature": "Modest",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 6,
+          "spe": 0
+        }
+      },
+      "Clear Body (Bulky Attacker) - bt-299-2": {
+        "species": "Regice",
+        "moves": [
+          "Thunder",
+          "Blizzard",
+          "Focus Blast",
+          "Flash Cannon"
+        ],
+        "ability": "Clear Body",
+        "item": "Zoom Lens",
+        "nature": "Quiet",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 6,
+          "spa": 252,
+          "spd": 0,
+          "spe": 0
+        }
+      }
+    },
     "Regieleki": {
       "Transistor (Fast Attacker) - ID 919": {
         "species": "Regieleki",
@@ -34061,6 +37831,66 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Slow Start (Fast Attacker) - bt-252": {
+        "species": "Regigigas",
+        "moves": [
+          "Crush Grip",
+          "Protect",
+          "Stone Edge",
+          "Brick Break"
+        ],
+        "ability": "Slow Start",
+        "item": "Chople Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 6
+        }
+      },
+      "Slow Start (Bulky Support) - bt-261": {
+        "species": "Regigigas",
+        "moves": [
+          "Substitute",
+          "Double Team",
+          "Thunder Wave",
+          "Ice Punch"
+        ],
+        "ability": "Slow Start",
+        "item": "Leftovers",
+        "nature": "Careful",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 6,
+          "spa": 0,
+          "spd": 252,
+          "spe": 0
+        }
+      },
+      "Slow Start (Bulky Support) - bt-260": {
+        "species": "Regigigas",
+        "moves": [
+          "Swagger",
+          "Psych Up",
+          "Crush Grip",
+          "Aerial Ace"
+        ],
+        "ability": "Slow Start",
+        "item": "Bright Powder",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 252,
+          "atk": 6,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
       }
     },
     "Regirock": {
@@ -34079,6 +37909,86 @@
           "hp": 252,
           "atk": 6,
           "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Sturdy (Bulky Attacker) - bt-243-3": {
+        "species": "Regirock",
+        "moves": [
+          "Superpower",
+          "Stone Edge",
+          "Rock Tomb",
+          "Strength"
+        ],
+        "ability": "Sturdy",
+        "item": "Passho Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Clear Body (Bulky Attacker) - bt-245-3": {
+        "species": "Regirock",
+        "moves": [
+          "Explosion",
+          "Stone Edge",
+          "Earthquake",
+          "Brick Break"
+        ],
+        "ability": "Clear Body",
+        "item": "Quick Claw",
+        "nature": "Careful",
+        "evs": {
+          "hp": 252,
+          "atk": 6,
+          "def": 0,
+          "spa": 0,
+          "spd": 252,
+          "spe": 0
+        }
+      },
+      "Sturdy (Bulky Attacker) - bt-304-2": {
+        "species": "Regirock",
+        "moves": [
+          "Rock Slide",
+          "Protect",
+          "Ice Punch",
+          "Thunder Punch"
+        ],
+        "ability": "Sturdy",
+        "item": "Custap Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Sturdy (Bulky Setup) - bt-267-3": {
+        "species": "Regirock",
+        "moves": [
+          "Rock Polish",
+          "Earthquake",
+          "Stone Edge",
+          "Body Press"
+        ],
+        "ability": "Sturdy",
+        "item": "Liechi Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 0,
+          "atk": 252,
+          "def": 6,
           "spa": 0,
           "spd": 0,
           "spe": 252
@@ -34103,6 +38013,86 @@
           "def": 252,
           "spa": 0,
           "spd": 252,
+          "spe": 0
+        }
+      },
+      "Clear Body (Bulky Support) - bt-269": {
+        "species": "Registeel",
+        "moves": [
+          "Curse",
+          "Rest",
+          "Flash Cannon",
+          "Metal Claw"
+        ],
+        "ability": "Clear Body",
+        "item": "Chesto Berry",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 6,
+          "spa": 252,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Clear Body (Bulky Support) - bt-257": {
+        "species": "Registeel",
+        "moves": [
+          "Explosion",
+          "Double Team",
+          "Swagger",
+          "Substitute"
+        ],
+        "ability": "Clear Body",
+        "item": "Quick Claw",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 6,
+          "spa": 0,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Clear Body (Bulky Support) - bt-251-2": {
+        "species": "Registeel",
+        "moves": [
+          "Rain Dance",
+          "Thunder",
+          "Stealth Rock",
+          "Protect"
+        ],
+        "ability": "Clear Body",
+        "item": "Damp Rock",
+        "nature": "Timid",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Clear Body (Bulky Attacker) - bt-282-3": {
+        "species": "Registeel",
+        "moves": [
+          "Explosion",
+          "Iron Head",
+          "Flash Cannon",
+          "Thunderbolt"
+        ],
+        "ability": "Clear Body",
+        "item": "Life Orb",
+        "nature": "Brave",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
           "spe": 0
         }
       }
@@ -34164,6 +38154,46 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Sturdy (Bulky Support) - bt-137": {
+        "species": "Relicanth",
+        "moves": [
+          "Ancient Power",
+          "Water Pulse",
+          "Harden",
+          "Amnesia"
+        ],
+        "ability": "Sturdy",
+        "item": "Liechi Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 160,
+          "spa": 10,
+          "spd": 8,
+          "spe": 12
+        }
+      },
+      "Swift Swim (Bulky Attacker) - bt-144-5": {
+        "species": "Relicanth",
+        "moves": [
+          "Waterfall",
+          "Head Smash",
+          "Earthquake",
+          "Body Press"
+        ],
+        "ability": "Swift Swim",
+        "item": "Figy Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
       }
     },
     "Remoraid": {
@@ -34184,6 +38214,46 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Sniper (Bulky Attacker) - bt-11": {
+        "species": "Remoraid",
+        "moves": [
+          "Bubble Beam",
+          "Aurora Beam",
+          "Psybeam",
+          "Protect"
+        ],
+        "ability": "Sniper",
+        "item": "Petaya Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Sniper (Bulky Attacker) - bt-4": {
+        "species": "Remoraid",
+        "moves": [
+          "Bubble Beam",
+          "Aurora Beam",
+          "Psybeam",
+          "Protect"
+        ],
+        "ability": "Sniper",
+        "item": "Petaya Berry",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -34305,6 +38375,66 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Lightning Rod (Bulky Attacker) - bt-250-2": {
+        "species": "Rhydon",
+        "moves": [
+          "Earthquake",
+          "Hammer Arm",
+          "Shadow Claw",
+          "Stone Edge"
+        ],
+        "ability": "Lightning Rod",
+        "item": "Passho Berry",
+        "nature": "Brave",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 6,
+          "spa": 0,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Lightning Rod (Bulky Attacker) - bt-133-2": {
+        "species": "Rhydon",
+        "moves": [
+          "Ice Beam",
+          "Thunderbolt",
+          "Dragon Pulse",
+          "Surf"
+        ],
+        "ability": "Lightning Rod",
+        "item": "Wise Glasses",
+        "nature": "Quiet",
+        "evs": {
+          "hp": 160,
+          "atk": 12,
+          "def": 158,
+          "spa": 156,
+          "spd": 12,
+          "spe": 12
+        }
+      },
+      "Lightning Rod (Bulky Attacker) - bt-256": {
+        "species": "Rhydon",
+        "moves": [
+          "Rock Blast",
+          "Fire Fang",
+          "Earthquake",
+          "Avalanche"
+        ],
+        "ability": "Lightning Rod",
+        "item": "Smooth Rock",
+        "nature": "Brave",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 6,
+          "spa": 0,
+          "spd": 0,
+          "spe": 0
+        }
       }
     },
     "Rhyhorn": {
@@ -34345,6 +38475,26 @@
           "spa": 26,
           "spd": 24,
           "spe": 28
+        }
+      },
+      "Rock Head (Bulky Support) - bt-31": {
+        "species": "Rhyhorn",
+        "moves": [
+          "Rock Blast",
+          "Dig",
+          "Scary Face",
+          "Roar"
+        ],
+        "ability": "Rock Head",
+        "item": "Focus Band",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -34589,6 +38739,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Prankster (Bulky Support) - bt-23-2": {
+        "species": "Riolu",
+        "moves": [
+          "Force Palm",
+          "Counter",
+          "Copycat",
+          "Screech"
+        ],
+        "ability": "Prankster",
+        "item": "Focus Sash",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Roggenrola": {
@@ -34732,6 +38902,26 @@
           "spa": 236,
           "spd": 24,
           "spe": 0
+        }
+      },
+      "Poison Point (Bulky Support) - bt-48": {
+        "species": "Roselia",
+        "moves": [
+          "Magical Leaf",
+          "Toxic",
+          "Sludge Bomb",
+          "Cotton Spore"
+        ],
+        "ability": "Poison Point",
+        "item": "Black Sludge",
+        "nature": "Modest",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -35082,6 +39272,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Levitate (Bulky Support) - bt-314-3": {
+        "species": "Rotom-Heat",
+        "moves": [
+          "Overheat",
+          "Thunderbolt",
+          "Volt Switch",
+          "Will-O-Wisp"
+        ],
+        "ability": "Levitate",
+        "item": "Sitrus Berry",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 6,
+          "spd": 0,
+          "spe": 0
+        }
       }
     },
     "Rotom-Mow": {
@@ -35122,6 +39332,46 @@
           "spa": 252,
           "spd": 252,
           "spe": 6
+        }
+      },
+      "Levitate (Bulky Support) - bt-308-2": {
+        "species": "Rotom-Mow",
+        "moves": [
+          "Thunderbolt",
+          "Leaf Storm",
+          "Volt Switch",
+          "Thunder Wave"
+        ],
+        "ability": "Levitate",
+        "item": "Sitrus Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 6
+        }
+      },
+      "Levitate (Bulky Support) - bt-308-3": {
+        "species": "Rotom-Mow",
+        "moves": [
+          "Thunderbolt",
+          "Leaf Storm",
+          "Volt Switch",
+          "Trick"
+        ],
+        "ability": "Levitate",
+        "item": "Choice Specs",
+        "nature": "Modest",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
         }
       }
     },
@@ -35829,6 +40079,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Sand Rush (Bulky Support) - bt-21": {
+        "species": "Sandshrew",
+        "moves": [
+          "Dig",
+          "Rock Tomb",
+          "Sandstorm",
+          "Sand Attack"
+        ],
+        "ability": "Sand Rush",
+        "item": "Soft Sand",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -36709,6 +40979,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Sniper (Bulky Support) - bt-50-3": {
+        "species": "Seadra",
+        "moves": [
+          "Aurora Beam",
+          "Smokescreen",
+          "Water Gun",
+          "Rain Dance"
+        ],
+        "ability": "Sniper",
+        "item": "Mystic Water",
+        "nature": "Sassy",
+        "evs": {
+          "hp": 140,
+          "atk": 32,
+          "def": 30,
+          "spa": 140,
+          "spd": 28,
+          "spe": 140
+        }
       }
     },
     "Seaking": {
@@ -36827,6 +41117,26 @@
           "spd": 16,
           "spe": 220
         }
+      },
+      "Ice Body (Bulky Support) - bt-96": {
+        "species": "Sealeo",
+        "moves": [
+          "Blizzard",
+          "Hail",
+          "Snore",
+          "Rest"
+        ],
+        "ability": "Ice Body",
+        "item": "Icy Rock",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 140,
+          "atk": 28,
+          "def": 140,
+          "spa": 32,
+          "spd": 140,
+          "spe": 30
+        }
       }
     },
     "Seedot": {
@@ -36868,6 +41178,26 @@
           "spa": 36,
           "spd": 0,
           "spe": 0
+        }
+      },
+      "Thick Fat (Bulky Support) - bt-6": {
+        "species": "Seel",
+        "moves": [
+          "Aurora Beam",
+          "Dive",
+          "Encore",
+          "Surf"
+        ],
+        "ability": "Thick Fat",
+        "item": "Aspear Berry",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -37151,6 +41481,26 @@
           "spd": 0,
           "spe": 220
         }
+      },
+      "Shed Skin (Bulky Support) - bt-97-5": {
+        "species": "Seviper",
+        "moves": [
+          "Poison Tail",
+          "Bite",
+          "Glare",
+          "Screech"
+        ],
+        "ability": "Shed Skin",
+        "item": "Scope Lens",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 12,
+          "spd": 8,
+          "spe": 160
+        }
       }
     },
     "Sharpedo": {
@@ -37356,6 +41706,46 @@
           "spd": 0,
           "spe": 252
         }
+      },
+      "Wonder Guard (Bulky Attacker) - bt-28-2": {
+        "species": "Shedinja",
+        "moves": [
+          "Shadow Claw",
+          "Metal Claw",
+          "X-Scissor",
+          "Aerial Ace"
+        ],
+        "ability": "Wonder Guard",
+        "item": "Choice Band",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
+      },
+      "Wonder Guard (Bulky Attacker) - bt-311": {
+        "species": "Shedinja",
+        "moves": [
+          "Shadow Claw",
+          "Leech Life",
+          "Shadow Sneak",
+          "Night Slash"
+        ],
+        "ability": "Wonder Guard",
+        "item": "Focus Sash",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 0,
+          "atk": 252,
+          "def": 6,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
       }
     },
     "Shelgon": {
@@ -37497,6 +41887,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Storm Drain (Bulky Support) - bt-3-2": {
+        "species": "Shellos",
+        "moves": [
+          "Water Pulse",
+          "Mud-Slap",
+          "Harden",
+          "Rain Dance"
+        ],
+        "ability": "Storm Drain",
+        "item": "Lax Incense",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Shieldon": {
@@ -37537,6 +41947,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Sturdy (Bulky Support) - bt-3": {
+        "species": "Shieldon",
+        "moves": [
+          "Take Down",
+          "Protect",
+          "Iron Defense",
+          "Metal Sound"
+        ],
+        "ability": "Sturdy",
+        "item": "Focus Sash",
+        "nature": "Sassy",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -37597,6 +42027,46 @@
           "spa": 60,
           "spd": 60,
           "spe": 108
+        }
+      },
+      "Early Bird (Bulky Support) - bt-156": {
+        "species": "Shiftry",
+        "moves": [
+          "Double Team",
+          "Leech Seed",
+          "Swagger",
+          "Synthesis"
+        ],
+        "ability": "Early Bird",
+        "item": "Leftovers",
+        "nature": "Bold",
+        "evs": {
+          "hp": 160,
+          "atk": 12,
+          "def": 158,
+          "spa": 156,
+          "spd": 12,
+          "spe": 12
+        }
+      },
+      "Chlorophyll (Bulky Attacker) - bt-277": {
+        "species": "Shiftry",
+        "moves": [
+          "Explosion",
+          "Fake Out",
+          "X-Scissor",
+          "Sucker Punch"
+        ],
+        "ability": "Chlorophyll",
+        "item": "Quick Claw",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
         }
       }
     },
@@ -37698,6 +42168,46 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Intimidate (Bulky Support) - bt-5": {
+        "species": "Shinx",
+        "moves": [
+          "Spark",
+          "Bite",
+          "Light Screen",
+          "Thunder Wave"
+        ],
+        "ability": "Intimidate",
+        "item": "Sitrus Berry",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
+      },
+      "Intimidate (Bulky Support) - bt-4-3": {
+        "species": "Shinx",
+        "moves": [
+          "Spark",
+          "Bite",
+          "Roar",
+          "Leer"
+        ],
+        "ability": "Intimidate",
+        "item": "King's Rock",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Shroomish": {
@@ -37779,6 +42289,46 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Sturdy (Bulky Support) - bt-253-2": {
+        "species": "Shuckle",
+        "moves": [
+          "Power Trick",
+          "Double Team",
+          "Wrap",
+          "Toxic"
+        ],
+        "ability": "Sturdy",
+        "item": "Bright Powder",
+        "nature": "Impish",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 0,
+          "spd": 6,
+          "spe": 0
+        }
+      },
+      "Sturdy (Bulky Support) - bt-150-3": {
+        "species": "Shuckle",
+        "moves": [
+          "Wrap",
+          "Power Split",
+          "Toxic",
+          "Rest"
+        ],
+        "ability": "Sturdy",
+        "item": "Chesto Berry",
+        "nature": "Careful",
+        "evs": {
+          "hp": 212,
+          "atk": 68,
+          "def": 4,
+          "spa": 6,
+          "spd": 212,
+          "spe": 8
+        }
       }
     },
     "Shuppet": {
@@ -37799,6 +42349,26 @@
           "spa": 20,
           "spd": 18,
           "spe": 20
+        }
+      },
+      "Insomnia (Bulky Support) - bt-28": {
+        "species": "Shuppet",
+        "moves": [
+          "Will-O-Wisp",
+          "Shadow Sneak",
+          "Grudge",
+          "Knock Off"
+        ],
+        "ability": "Insomnia",
+        "item": "Rawst Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -38394,6 +42964,26 @@
           "spd": 252,
           "spe": 252
         }
+      },
+      "Chlorophyll (Bulky Support) - bt-16": {
+        "species": "Skiploom",
+        "moves": [
+          "Mega Drain",
+          "Leech Seed",
+          "Cotton Spore",
+          "Synthesis"
+        ],
+        "ability": "Chlorophyll",
+        "item": "Big Root",
+        "nature": "Timid",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Skitty": {
@@ -38474,6 +43064,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Battle Armor (Bulky Support) - bt-20": {
+        "species": "Skorupi",
+        "moves": [
+          "Poison Sting",
+          "Bite",
+          "Scary Face",
+          "Toxic Spikes"
+        ],
+        "ability": "Battle Armor",
+        "item": "Payapa Berry",
+        "nature": "Impish",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -38694,6 +43304,66 @@
           "spa": 0,
           "spd": 202,
           "spe": 56
+        }
+      },
+      "Truant (Bulky Support) - bt-239": {
+        "species": "Slaking",
+        "moves": [
+          "Counter",
+          "Encore",
+          "Body Slam",
+          "Slack Off"
+        ],
+        "ability": "Truant",
+        "item": "Sitrus Berry",
+        "nature": "Careful",
+        "evs": {
+          "hp": 48,
+          "atk": 226,
+          "def": 4,
+          "spa": 4,
+          "spd": 224,
+          "spe": 4
+        }
+      },
+      "Truant (Fast Attacker) - bt-240-3": {
+        "species": "Slaking",
+        "moves": [
+          "Hyper Beam",
+          "Blizzard",
+          "Fire Blast",
+          "Thunderbolt"
+        ],
+        "ability": "Truant",
+        "item": "Wide Lens",
+        "nature": "Timid",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Truant (Fast Attacker) - bt-277-3": {
+        "species": "Slaking",
+        "moves": [
+          "Giga Impact",
+          "Earthquake",
+          "Night Slash",
+          "Hammer Arm"
+        ],
+        "ability": "Truant",
+        "item": "Sitrus Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 6
         }
       }
     },
@@ -39056,6 +43726,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Oblivious (Bulky Support) - bt-9": {
+        "species": "Slowpoke",
+        "moves": [
+          "Confusion",
+          "Disable",
+          "Water Pulse",
+          "Yawn"
+        ],
+        "ability": "Oblivious",
+        "item": "Sitrus Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Slowpoke-Galar": {
@@ -39241,6 +43931,46 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Oblivious (Bulky Support) - bt-0-2": {
+        "species": "Smoochum",
+        "moves": [
+          "Sweet Kiss",
+          "Sing",
+          "Confusion",
+          "Ice Beam"
+        ],
+        "ability": "Oblivious",
+        "item": "Bright Powder",
+        "nature": "Docile",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Oblivious (Bulky Support) - bt-19-2": {
+        "species": "Smoochum",
+        "moves": [
+          "Sweet Kiss",
+          "Sing",
+          "Confusion",
+          "Ice Beam"
+        ],
+        "ability": "Oblivious",
+        "item": "Bright Powder",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Sneasel": {
@@ -39261,6 +43991,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Pickpocket (Fast Attacker) - bt-61-3": {
+        "species": "Sneasel",
+        "moves": [
+          "Ice Shard",
+          "Fake Out",
+          "Ice Punch",
+          "Throat Chop"
+        ],
+        "ability": "Pickpocket",
+        "item": "Focus Sash",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 32,
+          "spd": 28,
+          "spe": 140
         }
       }
     },
@@ -39506,6 +44256,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Moody (Bulky Attacker) - bt-3": {
+        "species": "Snorunt",
+        "moves": [
+          "Icy Wind",
+          "Headbutt",
+          "Protect",
+          "Bite"
+        ],
+        "ability": "Moody",
+        "item": "King's Rock",
+        "nature": "Brave",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Snover": {
@@ -39527,6 +44297,26 @@
           "spd": 74,
           "spe": 36
         }
+      },
+      "Snow Warning (Bulky Attacker) - bt-1": {
+        "species": "Snover",
+        "moves": [
+          "Razor Leaf",
+          "Icy Wind",
+          "Blizzard",
+          "Ice Shard"
+        ],
+        "ability": "Snow Warning",
+        "item": "Icy Rock",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Snubbull": {
@@ -39547,6 +44337,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Intimidate (Bulky Support) - bt-20": {
+        "species": "Snubbull",
+        "moves": [
+          "Bite",
+          "Charm",
+          "Swagger",
+          "Scary Face"
+        ],
+        "ability": "Intimidate",
+        "item": "Scope Lens",
+        "nature": "Brave",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -39646,6 +44456,26 @@
           "spa": 0,
           "spd": 0,
           "spe": 0
+        }
+      },
+      "Levitate (Bulky Support) - bt-39-3": {
+        "species": "Solrock",
+        "moves": [
+          "Confusion",
+          "Cosmic Power",
+          "Light Screen",
+          "Sandstorm"
+        ],
+        "ability": "Levitate",
+        "item": "Sitrus Berry",
+        "nature": "Quiet",
+        "evs": {
+          "hp": 140,
+          "atk": 32,
+          "def": 140,
+          "spa": 28,
+          "spd": 140,
+          "spe": 30
         }
       }
     },
@@ -39812,6 +44642,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Own Tempo (Bulky Attacker) - bt-63": {
+        "species": "Spinda",
+        "moves": [
+          "Flail",
+          "Teeter Dance",
+          "Psybeam",
+          "Icy Wind"
+        ],
+        "ability": "Own Tempo",
+        "item": "Silk Scarf",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Spiritomb": {
@@ -39935,6 +44785,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Thick Fat (Bulky Support) - bt-20-2": {
+        "species": "Spoink",
+        "moves": [
+          "Psychic",
+          "Bounce",
+          "Magic Coat",
+          "Confuse Ray"
+        ],
+        "ability": "Thick Fat",
+        "item": "Sitrus Berry",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Squirtle": {
@@ -39954,6 +44824,46 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Torrent (Bulky Support) - bt-21-2": {
+        "species": "Squirtle",
+        "moves": [
+          "Aqua Tail",
+          "Bite",
+          "Withdraw",
+          "Protect"
+        ],
+        "ability": "Torrent",
+        "item": "Focus Band",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Torrent (Bulky Attacker) - bt-14-2": {
+        "species": "Squirtle",
+        "moves": [
+          "Water Pulse",
+          "Brine",
+          "Ice Beam",
+          "Protect"
+        ],
+        "ability": "Torrent",
+        "item": "Sitrus Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -40017,6 +44927,26 @@
           "spa": 36,
           "spd": 36,
           "spe": 252
+        }
+      },
+      "Intimidate (Bulky Support) - bt-100-3": {
+        "species": "Stantler",
+        "moves": [
+          "Extrasensory",
+          "Confuse Ray",
+          "Stomp",
+          "Sand Attack"
+        ],
+        "ability": "Intimidate",
+        "item": "Twisted Spoon",
+        "nature": "Gentle",
+        "evs": {
+          "hp": 160,
+          "atk": 12,
+          "def": 10,
+          "spa": 160,
+          "spd": 8,
+          "spe": 160
         }
       }
     },
@@ -40298,6 +45228,26 @@
           "spd": 36,
           "spe": 36
         }
+      },
+      "Reckless (Bulky Attacker) - bt-2-2": {
+        "species": "Starly",
+        "moves": [
+          "Wing Attack",
+          "Quick Attack",
+          "Thief",
+          "Take Down"
+        ],
+        "ability": "Reckless",
+        "item": "Muscle Band",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Starmie": {
@@ -40419,6 +45369,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Illuminate (Bulky Support) - bt-35": {
+        "species": "Staryu",
+        "moves": [
+          "Surf",
+          "Minimize",
+          "Swift",
+          "Light Screen"
+        ],
+        "ability": "Illuminate",
+        "item": "Shell Bell",
+        "nature": "Modest",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -41006,6 +45976,66 @@
           "spd": 128,
           "spe": 252
         }
+      },
+      "Pressure (Bulky Attacker) - bt-140-8": {
+        "species": "Suicune",
+        "moves": [
+          "Tailwind",
+          "Icy Wind",
+          "Scald",
+          "Snarl"
+        ],
+        "ability": "Pressure",
+        "item": "Sitrus Berry",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 0,
+          "spd": 6,
+          "spe": 0
+        }
+      },
+      "Pressure (Bulky Attacker) - bt-279": {
+        "species": "Suicune",
+        "moves": [
+          "Hail",
+          "Scald",
+          "Ice Beam",
+          "Blizzard"
+        ],
+        "ability": "Pressure",
+        "item": "Icy Rock",
+        "nature": "Modest",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 6,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Pressure (Bulky Support) - bt-267-2": {
+        "species": "Suicune",
+        "moves": [
+          "Rest",
+          "Icy Wind",
+          "Calm Mind",
+          "Scald"
+        ],
+        "ability": "Pressure",
+        "item": "Wacan Berry",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 4,
+          "spd": 0,
+          "spe": 2
+        }
       }
     },
     "Sunflora": {
@@ -41064,6 +46094,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Solar Power (Bulky Support) - bt-55-3": {
+        "species": "Sunflora",
+        "moves": [
+          "Petal Dance",
+          "Ingrain",
+          "Leech Seed",
+          "Light Screen"
+        ],
+        "ability": "Solar Power",
+        "item": "Persim Berry",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 32,
+          "spd": 28,
+          "spe": 140
         }
       }
     },
@@ -41147,6 +46197,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Cloud Nine (Bulky Support) - bt-26": {
+        "species": "Swablu",
+        "moves": [
+          "Take Down",
+          "Dream Eater",
+          "Sing",
+          "Attract"
+        ],
+        "ability": "Cloud Nine",
+        "item": "Mental Herb",
+        "nature": "Lonely",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Swadloon": {
@@ -41226,6 +46296,26 @@
           "spa": 0,
           "spd": 128,
           "spe": 252
+        }
+      },
+      "Sticky Hold (Bulky Attacker) - bt-74-3": {
+        "species": "Swalot",
+        "moves": [
+          "Stockpile",
+          "Ice Beam",
+          "Shadow Ball",
+          "Sludge Bomb"
+        ],
+        "ability": "Sticky Hold",
+        "item": "Black Sludge",
+        "nature": "Modest",
+        "evs": {
+          "hp": 160,
+          "atk": 12,
+          "def": 10,
+          "spa": 160,
+          "spd": 8,
+          "spe": 160
         }
       }
     },
@@ -41812,6 +46902,26 @@
           "spd": 6,
           "spe": 0
         }
+      },
+      "Regenerator (Bulky Attacker) - bt-73": {
+        "species": "Tangela",
+        "moves": [
+          "Mega Drain",
+          "Slam",
+          "Leech Seed",
+          "Bind"
+        ],
+        "ability": "Regenerator",
+        "item": "Lax Incense",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 140,
+          "atk": 28,
+          "def": 140,
+          "spa": 32,
+          "spd": 140,
+          "spe": 30
+        }
       }
     },
     "Tangrowth": {
@@ -42040,6 +47150,66 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Intimidate (Fast Attacker) - bt-277-2": {
+        "species": "Tauros",
+        "moves": [
+          "Double-Edge",
+          "Payback",
+          "Stone Edge",
+          "Substitute"
+        ],
+        "ability": "Intimidate",
+        "item": "Leftovers",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Intimidate (Bulky Support) - bt-278-2": {
+        "species": "Tauros",
+        "moves": [
+          "Earthquake",
+          "Facade",
+          "Iron Tail",
+          "Rest"
+        ],
+        "ability": "Intimidate",
+        "item": "Chesto Berry",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Intimidate (Fast Attacker) - bt-151": {
+        "species": "Tauros",
+        "moves": [
+          "Thrash",
+          "Zen Headbutt",
+          "Earthquake",
+          "Giga Impact"
+        ],
+        "ability": "Intimidate",
+        "item": "Lum Berry",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 12,
+          "spa": 12,
+          "spd": 12,
+          "spe": 156
+        }
       }
     },
     "Tauros-Paldea-Aqua": {
@@ -42108,6 +47278,28 @@
         }
       }
     },
+    "Teddiursa": {
+      "Pickup (Bulky Support) - bt-2-2": {
+        "species": "Teddiursa",
+        "moves": [
+          "Lick",
+          "Fake Tears",
+          "Brick Break",
+          "Rest"
+        ],
+        "ability": "Pickup",
+        "item": "Chesto Berry",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
+      }
+    },
     "Tentacool": {
       "Liquid Ooze (Bulky Attacker) - ID 146": {
         "species": "Tentacool",
@@ -42126,6 +47318,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Liquid Ooze (Bulky Attacker) - bt-12-3": {
+        "species": "Tentacool",
+        "moves": [
+          "Bubble Beam",
+          "Acid",
+          "Sludge Bomb",
+          "Wrap"
+        ],
+        "ability": "Liquid Ooze",
+        "item": "Pecha Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -42701,6 +47913,68 @@
           "spd": 0,
           "spe": 6
         }
+      },
+      "Serene Grace (Bulky Support) - bt-15-4": {
+        "species": "Togetic",
+        "moves": [
+          "Aerial Ace",
+          "Dazzling Gleam",
+          "Wish",
+          "Follow Me"
+        ],
+        "ability": "Serene Grace",
+        "item": "Lax Incense",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
+      }
+    },
+    "Torchic": {
+      "Blaze (Bulky Support) - bt-15": {
+        "species": "Torchic",
+        "moves": [
+          "Flame Charge",
+          "Quick Attack",
+          "Sand Attack",
+          "Double Team"
+        ],
+        "ability": "Blaze",
+        "item": "Shuca Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Blaze (Bulky Support) - bt-16": {
+        "species": "Torchic",
+        "moves": [
+          "Will-O-Wisp",
+          "Feather Dance",
+          "Double Team",
+          "Flamethrower"
+        ],
+        "ability": "Blaze",
+        "item": "Sitrus Berry",
+        "nature": "Timid",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Torkoal": {
@@ -42945,6 +48219,46 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Torrent (Bulky Attacker) - bt-4-3": {
+        "species": "Totodile",
+        "moves": [
+          "Waterfall",
+          "Aerial Ace",
+          "Slash",
+          "Screech"
+        ],
+        "ability": "Torrent",
+        "item": "Wacan Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Torrent (Bulky Support) - bt-12": {
+        "species": "Totodile",
+        "moves": [
+          "Slash",
+          "Water Pulse",
+          "Screech",
+          "Scary Face"
+        ],
+        "ability": "Torrent",
+        "item": "Scope Lens",
+        "nature": "Bashful",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -43351,6 +48665,46 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Overgrow (Bulky Support) - bt-4": {
+        "species": "Treecko",
+        "moves": [
+          "Mega Drain",
+          "Aerial Ace",
+          "Flash",
+          "Double Team"
+        ],
+        "ability": "Overgrow",
+        "item": "Big Root",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
+      },
+      "Overgrow (Bulky Attacker) - bt-31": {
+        "species": "Treecko",
+        "moves": [
+          "Mega Drain",
+          "Endeavor",
+          "Brick Break",
+          "Rock Slide"
+        ],
+        "ability": "Overgrow",
+        "item": "Focus Sash",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Trevenant": {
@@ -43451,6 +48805,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Chlorophyll (Bulky Attacker) - bt-141": {
+        "species": "Tropius",
+        "moves": [
+          "Magical Leaf",
+          "Whirlwind",
+          "Aerial Ace",
+          "Steel Wing"
+        ],
+        "ability": "Chlorophyll",
+        "item": "Sitrus Berry",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 12,
+          "spd": 8,
+          "spe": 160
         }
       }
     },
@@ -43734,6 +49108,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Overgrow (Bulky Support) - bt-15-2": {
+        "species": "Turtwig",
+        "moves": [
+          "Grass Knot",
+          "Bite",
+          "Curse",
+          "Withdraw"
+        ],
+        "ability": "Overgrow",
+        "item": "Occa Berry",
+        "nature": "Brave",
+        "evs": {
+          "hp": 160,
+          "atk": 158,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -44283,6 +49677,46 @@
           "spd": 36,
           "spe": 252
         }
+      },
+      "Inner Focus (Bulky Support) - bt-301": {
+        "species": "Umbreon",
+        "moves": [
+          "Foul Play",
+          "Helping Hand",
+          "Snarl",
+          "Detect"
+        ],
+        "ability": "Inner Focus",
+        "item": "Leftovers",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 6,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Inner Focus (Bulky Support) - bt-259-3": {
+        "species": "Umbreon",
+        "moves": [
+          "Foul Play",
+          "Swagger",
+          "Yawn",
+          "Protect"
+        ],
+        "ability": "Inner Focus",
+        "item": "Leftovers",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 0,
+          "spd": 6,
+          "spe": 0
+        }
       }
     },
     "Unfezant": {
@@ -44486,6 +49920,46 @@
           "spa": 0,
           "spd": 0,
           "spe": 106
+        }
+      },
+      "Guts (Bulky Support) - bt-284": {
+        "species": "Ursaring",
+        "moves": [
+          "Facade",
+          "Aerial Ace",
+          "Sleep Talk",
+          "Rest"
+        ],
+        "ability": "Guts",
+        "item": "Flame Orb",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Guts (Bulky Attacker) - bt-204": {
+        "species": "Ursaring",
+        "moves": [
+          "Facade",
+          "Earthquake",
+          "Rock Tomb",
+          "Protect"
+        ],
+        "ability": "Guts",
+        "item": "Flame Orb",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 68,
+          "atk": 212,
+          "def": 6,
+          "spa": 8,
+          "spd": 4,
+          "spe": 212
         }
       }
     },
@@ -45034,6 +50508,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Compound Eyes (Bulky Support) - bt-6": {
+        "species": "Venonat",
+        "moves": [
+          "Psybeam",
+          "Supersonic",
+          "Stun Spore",
+          "Skill Swap"
+        ],
+        "ability": "Compound Eyes",
+        "item": "Sitrus Berry",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Venusaur": {
@@ -45215,6 +50709,26 @@
           "spd": 128,
           "spe": 252
         }
+      },
+      "Pressure (Bulky Support) - bt-293-2": {
+        "species": "Vespiquen",
+        "moves": [
+          "Bug Buzz",
+          "Sludge Bomb",
+          "Power Gem",
+          "Roost"
+        ],
+        "ability": "Pressure",
+        "item": "Wise Glasses",
+        "nature": "Modest",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 6,
+          "spa": 252,
+          "spd": 0,
+          "spe": 0
+        }
       }
     },
     "Vibrava": {
@@ -45273,6 +50787,26 @@
           "spa": 0,
           "spd": 252,
           "spe": 128
+        }
+      },
+      "Levitate (Bulky Attacker) - bt-6-3": {
+        "species": "Vibrava",
+        "moves": [
+          "Dragon Breath",
+          "Dig",
+          "Screech",
+          "Rock Tomb"
+        ],
+        "ability": "Levitate",
+        "item": "Cheri Berry",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
         }
       }
     },
@@ -45377,6 +50911,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Vital Spirit (Bulky Support) - bt-85": {
+        "species": "Vigoroth",
+        "moves": [
+          "Slash",
+          "Counter",
+          "Encore",
+          "Uproar"
+        ],
+        "ability": "Vital Spirit",
+        "item": "Focus Band",
+        "nature": "Lonely",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 30,
+          "spa": 32,
+          "spd": 28,
+          "spe": 140
         }
       }
     },
@@ -45697,6 +51251,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Swarm (Bulky Support) - bt-56": {
+        "species": "Volbeat",
+        "moves": [
+          "Bug Buzz",
+          "Confuse Ray",
+          "Quick Attack",
+          "Helping Hand"
+        ],
+        "ability": "Swarm",
+        "item": "Liechi Berry",
+        "nature": "Quirky",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 158,
+          "spd": 48,
+          "spe": 48
+        }
       }
     },
     "Volcanion": {
@@ -45839,6 +51413,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Aftermath (Bulky Support) - bt-28-2": {
+        "species": "Voltorb",
+        "moves": [
+          "Spark",
+          "Screech",
+          "Rollout",
+          "Light Screen"
+        ],
+        "ability": "Aftermath",
+        "item": "Lax Incense",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 48,
+          "atk": 160,
+          "def": 48,
+          "spa": 48,
+          "spd": 48,
+          "spe": 158
+        }
       }
     },
     "Voltorb-Hisui": {
@@ -45884,6 +51478,28 @@
         }
       }
     },
+    "Vulpix": {
+      "Drought (Bulky Support) - bt-20": {
+        "species": "Vulpix",
+        "moves": [
+          "Will-O-Wisp",
+          "Confuse Ray",
+          "Fire Spin",
+          "Quick Attack"
+        ],
+        "ability": "Drought",
+        "item": "Focus Sash",
+        "nature": "Modest",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
+        }
+      }
+    },
     "Vulpix-Alola": {
       "Snow Cloak (Bulky Attacker) - ID 72": {
         "species": "Vulpix-Alola",
@@ -45924,6 +51540,26 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Oblivious (Bulky Support) - bt-70": {
+        "species": "Wailmer",
+        "moves": [
+          "Whirlpool",
+          "Roar",
+          "Defense Curl",
+          "Rollout"
+        ],
+        "ability": "Oblivious",
+        "item": "Mystic Water",
+        "nature": "Docile",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 158,
+          "spa": 48,
+          "spd": 48,
+          "spe": 48
         }
       }
     },
@@ -45983,6 +51619,46 @@
           "spa": 220,
           "spd": 16,
           "spe": 16
+        }
+      },
+      "Pressure (Bulky Support) - bt-265-2": {
+        "species": "Wailord",
+        "moves": [
+          "Curse",
+          "Earthquake",
+          "Waterfall",
+          "Double Team"
+        ],
+        "ability": "Pressure",
+        "item": "Leftovers",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 252,
+          "atk": 252,
+          "def": 6,
+          "spa": 0,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Pressure (Bulky Attacker) - bt-182-2": {
+        "species": "Wailord",
+        "moves": [
+          "Defense Curl",
+          "Rollout",
+          "Waterfall",
+          "Avalanche"
+        ],
+        "ability": "Pressure",
+        "item": "Wacan Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 68,
+          "atk": 212,
+          "def": 6,
+          "spa": 8,
+          "spd": 4,
+          "spe": 212
         }
       }
     },
@@ -46105,6 +51781,26 @@
           "spa": 252,
           "spd": 0,
           "spe": 6
+        }
+      },
+      "Torrent (Bulky Support) - bt-87": {
+        "species": "Wartortle",
+        "moves": [
+          "Aqua Tail",
+          "Bite",
+          "Rapid Spin",
+          "Yawn"
+        ],
+        "ability": "Torrent",
+        "item": "Focus Band",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 140,
+          "atk": 140,
+          "def": 28,
+          "spa": 32,
+          "spd": 140,
+          "spe": 30
         }
       }
     },
@@ -46383,6 +52079,46 @@
           "spa": 84,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Levitate (Bulky Support) - bt-259-3": {
+        "species": "Weezing",
+        "moves": [
+          "Fire Blast",
+          "Sludge Bomb",
+          "Will-O-Wisp",
+          "Pain Split"
+        ],
+        "ability": "Levitate",
+        "item": "Black Sludge",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 6,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Levitate (Bulky Support) - bt-155": {
+        "species": "Weezing",
+        "moves": [
+          "Will-O-Wisp",
+          "Double Team",
+          "Sludge Bomb",
+          "Substitute"
+        ],
+        "ability": "Levitate",
+        "item": "Leftovers",
+        "nature": "Calm",
+        "evs": {
+          "hp": 160,
+          "atk": 12,
+          "def": 12,
+          "spa": 158,
+          "spd": 156,
+          "spe": 12
         }
       }
     },
@@ -46667,6 +52403,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Competitive (Bulky Support) - bt-53-3": {
+        "species": "Wigglytuff",
+        "moves": [
+          "Sing",
+          "Disable",
+          "Wish",
+          "Dazzling Gleam"
+        ],
+        "ability": "Competitive",
+        "item": "Silk Scarf",
+        "nature": "Relaxed",
+        "evs": {
+          "hp": 140,
+          "atk": 28,
+          "def": 140,
+          "spa": 32,
+          "spd": 140,
+          "spe": 30
+        }
       }
     },
     "Wimpod": {
@@ -46827,6 +52583,26 @@
           "spd": 50,
           "spe": 52
         }
+      },
+      "Shadow Tag (Bulky Support) - bt-53-2": {
+        "species": "Wobbuffet",
+        "moves": [
+          "Counter",
+          "Mirror Coat",
+          "Encore",
+          "Safeguard"
+        ],
+        "ability": "Shadow Tag",
+        "item": "Leftovers",
+        "nature": "Careful",
+        "evs": {
+          "hp": 160,
+          "atk": 48,
+          "def": 48,
+          "spa": 48,
+          "spd": 158,
+          "spe": 48
+        }
       }
     },
     "Woobat": {
@@ -46950,6 +52726,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Overcoat (Bulky Attacker) - bt-55-3": {
+        "species": "Wormadam",
+        "moves": [
+          "Razor Leaf",
+          "Psybeam",
+          "Protect",
+          "Bug Buzz"
+        ],
+        "ability": "Overcoat",
+        "item": "Coba Berry",
+        "nature": "Modest",
+        "evs": {
+          "hp": 30,
+          "atk": 28,
+          "def": 140,
+          "spa": 32,
+          "spd": 140,
+          "spe": 140
         }
       }
     },
@@ -47213,6 +53009,26 @@
           "spd": 12,
           "spe": 248
         }
+      },
+      "Magic Bounce (Bulky Support) - bt-97-3": {
+        "species": "Xatu",
+        "moves": [
+          "Air Slash",
+          "Night Shade",
+          "Wish",
+          "Future Sight"
+        ],
+        "ability": "Magic Bounce",
+        "item": "Sharp Beak",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 160,
+          "atk": 12,
+          "def": 10,
+          "spa": 160,
+          "spd": 8,
+          "spe": 160
+        }
       }
     },
     "Xerneas": {
@@ -47340,6 +53156,28 @@
         }
       }
     },
+    "Yanma": {
+      "Speed Boost (Bulky Support) - bt-32-4": {
+        "species": "Yanma",
+        "moves": [
+          "Bug Buzz",
+          "Air Slash",
+          "Double Team",
+          "Detect"
+        ],
+        "ability": "Speed Boost",
+        "item": "Lax Incense",
+        "nature": "Modest",
+        "evs": {
+          "hp": 48,
+          "atk": 48,
+          "def": 48,
+          "spa": 160,
+          "spd": 48,
+          "spe": 158
+        }
+      }
+    },
     "Yanmega": {
       "Speed Boost (Fast Attacker) - ID 696": {
         "species": "Yanmega",
@@ -47418,6 +53256,26 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Speed Boost (Bulky Support) - bt-182": {
+        "species": "Yanmega",
+        "moves": [
+          "Aerial Ace",
+          "Steel Wing",
+          "Thief",
+          "U-turn"
+        ],
+        "ability": "Speed Boost",
+        "item": "Charti Berry",
+        "nature": "Adamant",
+        "evs": {
+          "hp": 68,
+          "atk": 212,
+          "def": 6,
+          "spa": 8,
+          "spd": 4,
+          "spe": 212
         }
       }
     },
@@ -47564,6 +53422,26 @@
           "spd": 84,
           "spe": 86
         }
+      },
+      "Toxic Boost (Fast Attacker) - bt-109-2": {
+        "species": "Zangoose",
+        "moves": [
+          "Slash",
+          "Double Kick",
+          "Roar",
+          "Quick Attack"
+        ],
+        "ability": "Toxic Boost",
+        "item": "Persim Berry",
+        "nature": "Hardy",
+        "evs": {
+          "hp": 160,
+          "atk": 160,
+          "def": 10,
+          "spa": 12,
+          "spd": 8,
+          "spe": 160
+        }
       }
     },
     "Zapdos": {
@@ -47605,6 +53483,66 @@
           "spa": 88,
           "spd": 84,
           "spe": 86
+        }
+      },
+      "Static (Bulky Support) - bt-263-3": {
+        "species": "Zapdos",
+        "moves": [
+          "Discharge",
+          "Volt Switch",
+          "Roost",
+          "Hurricane"
+        ],
+        "ability": "Static",
+        "item": "Magnet",
+        "nature": "Bold",
+        "evs": {
+          "hp": 252,
+          "atk": 0,
+          "def": 252,
+          "spa": 6,
+          "spd": 0,
+          "spe": 0
+        }
+      },
+      "Static (Fast Attacker) - bt-226-3": {
+        "species": "Zapdos",
+        "moves": [
+          "Rain Dance",
+          "Thunder",
+          "Charge Beam",
+          "Drill Peck"
+        ],
+        "ability": "Static",
+        "item": "Sharp Beak",
+        "nature": "Timid",
+        "evs": {
+          "hp": 6,
+          "atk": 0,
+          "def": 0,
+          "spa": 252,
+          "spd": 0,
+          "spe": 252
+        }
+      },
+      "Pressure (Bulky Support) - bt-211-3": {
+        "species": "Zapdos",
+        "moves": [
+          "Drill Peck",
+          "U-turn",
+          "Steel Wing",
+          "Ancient Power"
+        ],
+        "ability": "Pressure",
+        "item": "King's Rock",
+        "nature": "Jolly",
+        "evs": {
+          "hp": 6,
+          "atk": 252,
+          "def": 0,
+          "spa": 0,
+          "spd": 0,
+          "spe": 252
         }
       }
     },
